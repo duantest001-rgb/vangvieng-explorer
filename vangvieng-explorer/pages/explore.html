@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="lo">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ສຳຫຼວດ — VangVieng Explorer</title>
+  <link rel="stylesheet" href="../css/style.css" />
+  <link rel="stylesheet" href="../css/explore.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700;800&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+  <!-- NAVBAR -->
+  <nav class="navbar scrolled" id="navbar">
+    <div class="nav-container">
+      <a href="../index.html" class="nav-logo" style="color:var(--dark)">
+        <span class="logo-leaf">🌿</span>
+        <span class="logo-text">VangVieng<strong>Explorer</strong></span>
+      </a>
+      <div class="nav-links" id="navLinks">
+        <a href="../index.html" class="nav-link">ໜ້າຫຼັກ</a>
+        <a href="explore.html" class="nav-link active">ສຳຫຼວດ</a>
+        <a href="map.html" class="nav-link">ແຜນທີ່</a>
+        <a href="ai-chat.html" class="nav-link nav-ai">🤖 ຖາມ AI</a>
+      </div>
+      <button class="hamburger" id="hamburger"><span></span><span></span><span></span></button>
+    </div>
+  </nav>
+
+  <!-- PAGE HEADER -->
+  <section class="page-header">
+    <div class="container">
+      <p class="section-label">ວັງວຽງ, ລາວ</p>
+      <h1 class="page-title">ສຳຫຼວດທຸກສະຖານທີ່</h1>
+      <p class="page-sub">ຄົ້ນຫາ ແລະ ກອງຂໍ້ມູນ ສະຖານທີ່ທ່ອງທ່ຽວ, ທີ່ພັກ, ຮ້ານອາຫານ ແລະ ກິດຈະກຳ</p>
+    </div>
+  </section>
+
+  <!-- FILTERS -->
+  <section class="filters-section">
+    <div class="container">
+
+      <!-- Search -->
+      <div class="explore-search-box">
+        <span class="search-icon">🔍</span>
+        <input type="text" id="exploreSearch" placeholder="ຄົ້ນຫາ... ເຊັ່ນ: ຖ້ຳ, resort, kayak" />
+        <button class="clear-btn" id="clearSearch" style="display:none" onclick="clearSearch()">✕</button>
+      </div>
+
+      <!-- Category Filters -->
+      <div class="filter-tabs">
+        <button class="filter-tab active" data-cat="">🗺️ ທັງໝົດ</button>
+        <button class="filter-tab" data-cat="attraction">🏔️ ສະຖານທີ່</button>
+        <button class="filter-tab" data-cat="hotel">🏨 ທີ່ພັກ</button>
+        <button class="filter-tab" data-cat="restaurant">🍜 ຮ້ານອາຫານ</button>
+        <button class="filter-tab" data-cat="activity">🛶 ກິດຈະກຳ</button>
+        <button class="filter-tab eco-tab" data-eco="true">🌱 Eco</button>
+      </div>
+
+      <!-- Results count -->
+      <div class="results-bar">
+        <span id="resultsCount">ກຳລັງໂຫລດ...</span>
+        <div class="sort-box">
+          <label>ຮຽງຕາມ:</label>
+          <select id="sortSelect" onchange="handleSort()">
+            <option value="rating">⭐ Rating</option>
+            <option value="name">🔤 ຊື່</option>
+            <option value="price_asc">💰 ລາຄາ (ຖືກ→ແພງ)</option>
+          </select>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- PLACES GRID -->
+  <section class="section explore-section">
+    <div class="container">
+      <div class="places-grid" id="exploreGrid">
+        <!-- Populated by JS -->
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div class="footer-bottom">
+      <p>© 2025 VangVieng Explorer · Made with 🌿 in Laos</p>
+    </div>
+  </footer>
+
+  <script src="../js/supabase.js"></script>
+  <script src="../js/explore.js"></script>
+</body>
+</html>

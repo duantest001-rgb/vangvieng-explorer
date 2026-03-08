@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="lo">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>VangVieng Explorer 🌿</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700;800&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+  <!-- ═══════════════════════════════════════
+       NAVBAR
+  ═══════════════════════════════════════ -->
+  <nav class="navbar" id="navbar">
+    <div class="nav-container">
+      <a href="index.html" class="nav-logo">
+        <span class="logo-leaf">🌿</span>
+        <span class="logo-text">VangVieng<strong>Explorer</strong></span>
+      </a>
+      <div class="nav-links" id="navLinks">
+        <a href="index.html" class="nav-link active">ໜ້າຫຼັກ</a>
+        <a href="pages/explore.html" class="nav-link">ສຳຫຼວດ</a>
+        <a href="pages/map.html" class="nav-link">ແຜນທີ່</a>
+        <a href="pages/ai-chat.html" class="nav-link nav-ai">🤖 ຖາມ AI</a>
+      </div>
+      <button class="hamburger" id="hamburger" aria-label="menu">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- ═══════════════════════════════════════
+       HERO
+  ═══════════════════════════════════════ -->
+  <section class="hero">
+    <div class="hero-bg">
+      <div class="hero-shape s1"></div>
+      <div class="hero-shape s2"></div>
+      <div class="hero-shape s3"></div>
+    </div>
+    <div class="hero-content">
+      <div class="hero-badge">✦ Eco Tourism Vang Vieng</div>
+      <h1 class="hero-title">
+        ຄົ້ນພົບ<br/>
+        <span class="hero-highlight">ວັງວຽງ</span><br/>
+        ທີ່ແທ້ຈິງ
+      </h1>
+      <p class="hero-sub">ສະຖານທີ່ທ່ອງທ່ຽວ · ທີ່ພັກ · ຮ້ານອາຫານ · ກິດຈະກຳ<br>ທຸກຢ່າງໃນທີ່ດຽວ ໂດຍ AI</p>
+
+      <!-- Search Bar -->
+      <div class="search-box">
+        <div class="search-icon">🔍</div>
+        <input
+          type="text"
+          id="heroSearch"
+          class="search-input"
+          placeholder="ຊອກຫາ... ເຊັ່ນ: ລ້ອງແຄນ, coffee, resort"
+          autocomplete="off"
+        />
+        <button class="search-btn" onclick="handleSearch()">ຄົ້ນຫາ</button>
+      </div>
+
+      <!-- Quick Tags -->
+      <div class="quick-tags">
+        <button class="tag" onclick="searchTag('ທ່ອງທ່ຽວ')">🏔️ ທ່ອງທ່ຽວ</button>
+        <button class="tag" onclick="searchTag('resort')">🏨 Resort</button>
+        <button class="tag" onclick="searchTag('ຮ້ານອາຫານ')">🍜 ອາຫານ</button>
+        <button class="tag" onclick="searchTag('adventure')">🛶 Adventure</button>
+        <button class="tag" onclick="searchTag('cafe')">☕ Cafe</button>
+      </div>
+    </div>
+
+    <div class="hero-scroll">
+      <span>ເລື່ອນລົງ</span>
+      <div class="scroll-arrow">↓</div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════
+       STATS
+  ═══════════════════════════════════════ -->
+  <section class="stats-bar">
+    <div class="stats-container">
+      <div class="stat-item">
+        <span class="stat-num" data-target="50">0</span>+
+        <span class="stat-label">ສະຖານທີ່</span>
+      </div>
+      <div class="stat-divider"></div>
+      <div class="stat-item">
+        <span class="stat-num" data-target="30">0</span>+
+        <span class="stat-label">ທີ່ພັກ</span>
+      </div>
+      <div class="stat-divider"></div>
+      <div class="stat-item">
+        <span class="stat-num" data-target="40">0</span>+
+        <span class="stat-label">ຮ້ານອາຫານ</span>
+      </div>
+      <div class="stat-divider"></div>
+      <div class="stat-item">
+        <span class="stat-num" data-target="20">0</span>+
+        <span class="stat-label">ກິດຈະກຳ</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════
+       CATEGORIES
+  ═══════════════════════════════════════ -->
+  <section class="section categories-section">
+    <div class="container">
+      <div class="section-header">
+        <p class="section-label">ຄົ້ນຫາຕາມປະເພດ</p>
+        <h2 class="section-title">ຢາກໄປໃສ?</h2>
+      </div>
+
+      <div class="categories-grid">
+        <a href="pages/explore.html?cat=attraction" class="cat-card cat-attraction">
+          <div class="cat-icon">🏔️</div>
+          <div class="cat-info">
+            <h3>ສະຖານທີ່ທ່ອງທ່ຽວ</h3>
+            <p>ຖ້ຳ · ນ້ຳຕົກ · ທົ່ງນາ</p>
+          </div>
+          <div class="cat-arrow">→</div>
+        </a>
+
+        <a href="pages/explore.html?cat=hotel" class="cat-card cat-hotel">
+          <div class="cat-icon">🏨</div>
+          <div class="cat-info">
+            <h3>ທີ່ພັກ</h3>
+            <p>Resort · Guesthouse · Homestay</p>
+          </div>
+          <div class="cat-arrow">→</div>
+        </a>
+
+        <a href="pages/explore.html?cat=restaurant" class="cat-card cat-restaurant">
+          <div class="cat-icon">🍜</div>
+          <div class="cat-info">
+            <h3>ຮ້ານອາຫານ</h3>
+            <p>ລາວ · ສາກົນ · Street food</p>
+          </div>
+          <div class="cat-arrow">→</div>
+        </a>
+
+        <a href="pages/explore.html?cat=activity" class="cat-card cat-activity">
+          <div class="cat-icon">🛶</div>
+          <div class="cat-info">
+            <h3>ກິດຈະກຳ</h3>
+            <p>Kayak · Zipline · Cycling</p>
+          </div>
+          <div class="cat-arrow">→</div>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════
+       FEATURED PLACES
+  ═══════════════════════════════════════ -->
+  <section class="section featured-section">
+    <div class="container">
+      <div class="section-header">
+        <p class="section-label">ແນະນຳໂດຍ AI</p>
+        <h2 class="section-title">ສະຖານທີ່ຍອດນິຍົມ</h2>
+        <a href="pages/explore.html" class="see-all">ເບິ່ງທັງໝົດ →</a>
+      </div>
+
+      <div class="places-grid" id="featuredGrid">
+        <!-- Populated by JS (later from Supabase) -->
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════
+       ECO BANNER
+  ═══════════════════════════════════════ -->
+  <section class="eco-banner">
+    <div class="eco-bg-shapes">
+      <div class="eco-shape e1"></div>
+      <div class="eco-shape e2"></div>
+    </div>
+    <div class="container eco-content">
+      <div class="eco-text">
+        <span class="eco-tag">🌱 Eco Tourism</span>
+        <h2>ທ່ອງທ່ຽວຢ່າງຮັບຜິດຊອບ</h2>
+        <p>ເຮົາຄັດເລືອກສະຖານທີ່ທີ່ຮັກສາທໍາມະຊາດ ແລະ ສະໜັບສະໜູນຊຸມຊົນທ້ອງຖິ່ນ</p>
+        <a href="pages/explore.html?eco=true" class="btn-eco">ສຳຫຼວດ Eco Spots</a>
+      </div>
+      <div class="eco-icons">
+        <div class="eco-icon-item">🌳<span>ທໍາມະຊາດ</span></div>
+        <div class="eco-icon-item">🤝<span>ຊຸມຊົນ</span></div>
+        <div class="eco-icon-item">♻️<span>ຍືນຍົງ</span></div>
+        <div class="eco-icon-item">📸<span>ປະສົບການ</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════
+       AI PROMO
+  ═══════════════════════════════════════ -->
+  <section class="section ai-promo-section">
+    <div class="container">
+      <div class="ai-promo-card">
+        <div class="ai-promo-left">
+          <div class="ai-bubble">
+            <div class="ai-avatar">🤖</div>
+            <div class="ai-msg">
+              <p>"ຂ້ອຍຢາກໄປຖ້ຳ ແລະ ຈະຕ້ອງເອົາຫຍັງໄປດ້ວຍ?"</p>
+            </div>
+          </div>
+          <div class="ai-bubble reply">
+            <div class="ai-avatar bot">✨</div>
+            <div class="ai-msg bot-msg">
+              <p>ແນະນຳ ຖ້ຳ Tham Phu Kham — ໃກ້ Blue Lagoon! ຕ້ອງເອົາ: ໄຟສ່ອງ, ເກີບທີ່ລື່ນ, ນ້ຳດື່ມ. ໄປຕອນເຊົ້າ 8-10 ໂມງດີທີ່ສຸດ 🌄</p>
+            </div>
+          </div>
+        </div>
+        <div class="ai-promo-right">
+          <span class="ai-label">AI Travel Assistant</span>
+          <h2>ຖາມ AI ຊ່ວຍວາງແຜນ</h2>
+          <p>AI ຂອງເຮົາຮູ້ຈັກວັງວຽງທຸກມຸມ — ຖາມໄດ້ທຸກຄຳຖາມ ທັງລາວ ແລະ ອັງກິດ</p>
+          <a href="pages/ai-chat.html" class="btn-primary">ລອງຖາມ AI →</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════
+       FOOTER
+  ═══════════════════════════════════════ -->
+  <footer class="footer">
+    <div class="container footer-grid">
+      <div class="footer-brand">
+        <div class="footer-logo">🌿 VangVieng<strong>Explorer</strong></div>
+        <p>Platform ທ່ອງທ່ຽວ Eco-Tourism ສຳລັບວັງວຽງ ທີ່ດີທີ່ສຸດ</p>
+      </div>
+      <div class="footer-links">
+        <h4>ເມນູ</h4>
+        <a href="index.html">ໜ້າຫຼັກ</a>
+        <a href="pages/explore.html">ສຳຫຼວດ</a>
+        <a href="pages/map.html">ແຜນທີ່</a>
+        <a href="pages/ai-chat.html">ຖາມ AI</a>
+      </div>
+      <div class="footer-links">
+        <h4>ປະເພດ</h4>
+        <a href="pages/explore.html?cat=attraction">ສະຖານທີ່</a>
+        <a href="pages/explore.html?cat=hotel">ທີ່ພັກ</a>
+        <a href="pages/explore.html?cat=restaurant">ອາຫານ</a>
+        <a href="pages/explore.html?cat=activity">ກິດຈະກຳ</a>
+      </div>
+      <div class="footer-contact">
+        <h4>ຕິດຕໍ່</h4>
+        <p>📍 ວັງວຽງ, ແຂວງວຽງຈັນ</p>
+        <p>📧 hello@vangviengexplorer.com</p>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>© 2025 VangVieng Explorer · Made with 🌿 in Laos</p>
+    </div>
+  </footer>
+
+  <script src="js/supabase.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
