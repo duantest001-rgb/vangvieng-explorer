@@ -57,8 +57,8 @@ async function loadPlaces() {
     grid.innerHTML = `
       <div class="error-state">
         <div class="error-icon">⚠️</div>
-        <p>ເຊື່ອມຕໍ່ຖານຂໍ້ມູນຜິດພາດ</p>
-        <button class="retry-btn" onclick="loadPlaces()">ລອງໃໝ່</button>
+        <p data-i18n="error.db">ເຊື່ອມຕໍ່ຖານຂໍ້ມູນຜິດພາດ</p>
+        <button class="retry-btn" onclick="loadPlaces()" data-i18n="error.retry">ລອງໃໝ່</button>
       </div>`;
   }
 }
@@ -108,28 +108,30 @@ function renderGrid(places) {
     grid.innerHTML = `
       <div class="no-results">
         <div class="no-icon">🔍</div>
-        <h3>ບໍ່ພົບສະຖານທີ່</h3>
-        <p>ລອງປ່ຽນ filter ຫຼື ຄຳຄົ້ນຫາ</p>
+        <h3 data-i18n="results.empty.title">ບໍ່ພົບສະຖານທີ່</h3>
+        <p data-i18n="results.empty.sub">ລອງປ່ຽນ filter ຫຼື ຄຳຄົ້ນຫາ</p>
       </div>`;
     return;
   }
 
   grid.innerHTML = places.map(p => `
     <div class="place-card" onclick="window.location.href='detail.html?id=${p.id}'">
-      <div style="background:${p.image_bg || '#e0f2ff'}; width:100%; aspect-ratio:4/3;
-        display:flex; align-items:center; justify-content:center; font-size:3.5rem;">
-        ${p.image_emoji || "📍"}
+      <div style="position:relative">
+        <div style="background:${p.image_bg || '#e0f2ff'}; width:100%; aspect-ratio:3/2;
+          display:flex; align-items:center; justify-content:center; font-size:4rem;
+          position:relative; overflow:hidden;">
+          ${p.image_emoji || '📍'}
+          <div style="position:absolute;inset:0;background:linear-gradient(to bottom,transparent 50%,rgba(0,0,0,0.3) 100%)"></div>
+        </div>
+        ${p.is_eco ? '<span class="card-eco-badge">🌱 Eco</span>' : ''}
+        <span class="card-rating-badge">⭐ ${p.rating || '-'}</span>
       </div>
       <div class="card-body">
-        <div class="card-meta">
-          <span class="card-cat">${getCatLabel(p.category)}</span>
-          ${p.is_eco ? '<span class="card-eco">🌱 Eco</span>' : ''}
-        </div>
+        <span class="card-cat">${getCatLabel(p.category)}</span>
         <h3 class="card-title">${p.name}</h3>
-        <p class="card-desc">${p.description || ""}</p>
         <div class="card-footer">
-          <span class="card-rating">⭐ ${p.rating || "-"}</span>
-          <span class="card-price">${p.price_range || ""} · ${p.address || ""}</span>
+          <span class="card-price">${p.price_range || ''}</span>
+          <span style="font-size:0.75rem;color:var(--muted)">${p.address || ''}</span>
         </div>
       </div>
     </div>
@@ -143,8 +145,10 @@ function showLoading(grid) {
 
 // ── UPDATE COUNT ──
 function updateCount(n) {
-  document.getElementById("resultsCount").textContent =
-    `ພົບ ${n} ສະຖານທີ່`;
+  const lang = localStorage.getItem("lang") || "lo";
+  const tr = (typeof TRANSLATIONS !== "undefined" && TRANSLATIONS[lang]) || {};
+  const label = tr["results.count"] ? tr["results.count"].replace("{n}", n) : `ພົບ ${n} ສະຖານທີ່`;
+  document.getElementById("resultsCount").textContent = label;
 }
 
 // ── CATEGORY FILTER ──
@@ -206,6 +210,11 @@ function setupNavbar() {
 }
 
 // ── HELPER ──
+function t(key) {
+  const lang = localStorage.getItem("lang") || "lo";
+  return (typeof TRANSLATIONS !== "undefined" && TRANSLATIONS[lang] && TRANSLATIONS[lang][key]) || key;
+}
 function getCatLabel(cat) {
-  return { attraction: "ສະຖານທີ່", hotel: "ທີ່ພັກ", restaurant: "ຮ້ານອາຫານ", activity: "ກິດຈະກຳ" }[cat] || cat;
+  const map = { attraction: "cat.attraction", hotel: "cat.hotel", restaurant: "cat.restaurant", activity: "cat.activity" };
+  return map[cat] ? t(map[cat]) : cat;
 }

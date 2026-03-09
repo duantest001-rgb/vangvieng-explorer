@@ -160,32 +160,32 @@ const statsBar = document.querySelector('.stats-bar');
 if (statsBar) statsObserver.observe(statsBar);
 
 // ── RENDER FEATURED PLACES ──
+function t(key) {
+  const lang = localStorage.getItem("lang") || "lo";
+  return (typeof TRANSLATIONS !== "undefined" && TRANSLATIONS[lang] && TRANSLATIONS[lang][key]) || key;
+}
 function getCategoryLabel(cat) {
-  const labels = {
-    attraction: 'ສະຖານທີ່',
-    hotel: 'ທີ່ພັກ',
-    restaurant: 'ຮ້ານອາຫານ',
-    activity: 'ກິດຈະກຳ'
-  };
-  return labels[cat] || cat;
+  const map = { attraction: "cat.attraction", hotel: "cat.hotel", restaurant: "cat.restaurant", activity: "cat.activity" };
+  return map[cat] ? t(map[cat]) : cat;
 }
 
 function renderPlaceCard(place) {
   return `
     <div class="place-card" onclick="goToDetail(${place.id})">
-      <div class="card-img-placeholder" style="background:${place.image_bg}; width:100%; aspect-ratio:4/3; display:flex; align-items:center; justify-content:center; font-size:3.5rem;">
-        ${place.image_emoji}
+      <div style="position:relative">
+        <div class="card-img-placeholder" style="background:${place.image_bg || '#e0f2ff'}; width:100%; aspect-ratio:3/2; display:flex; align-items:center; justify-content:center; font-size:4rem; position:relative; overflow:hidden;">
+          ${place.image_emoji || '📍'}
+          <div style="position:absolute;inset:0;background:linear-gradient(to bottom,transparent 50%,rgba(0,0,0,0.3) 100%)"></div>
+        </div>
+        ${place.is_eco ? '<span class="card-eco-badge">🌱 Eco</span>' : ''}
+        <span class="card-rating-badge">⭐ ${place.rating || '-'}</span>
       </div>
       <div class="card-body">
-        <div class="card-meta">
-          <span class="card-cat">${getCategoryLabel(place.category)}</span>
-          ${place.is_eco ? '<span class="card-eco">🌱 Eco</span>' : ''}
-        </div>
+        <span class="card-cat">${getCategoryLabel(place.category)}</span>
         <h3 class="card-title">${place.name}</h3>
-        <p class="card-desc">${place.description}</p>
         <div class="card-footer">
-          <span class="card-rating">⭐ ${place.rating}</span>
-          <span class="card-price">${place.price_range} · ${place.address}</span>
+          <span class="card-price">${place.price_range || ''}</span>
+          <span class="card-price" style="color:var(--muted);font-size:0.75rem">${place.address || ''}</span>
         </div>
       </div>
     </div>
@@ -201,12 +201,12 @@ function renderFeatured() {
   db.getPlaces().then(data => {
     const featured = data.slice(0, 6);
     if (featured.length === 0) {
-      grid.innerHTML = `<div class="empty-state"><div class="empty-icon">🌿</div><h3>ຍັງບໍ່ມີຂໍ້ມູນ</h3></div>`;
+      grid.innerHTML = `<div class="empty-state"><div class="empty-icon">🌿</div><h3 data-i18n="results.empty.title">ຍັງບໍ່ມີຂໍ້ມູນ</h3></div>`;
       return;
     }
     grid.innerHTML = featured.map(renderPlaceCard).join("");
   }).catch(() => {
-    grid.innerHTML = `<div class="empty-state"><div class="empty-icon">⚠️</div><h3>ໂຫລດຂໍ້ມູນຜິດພາດ</h3></div>`;
+    grid.innerHTML = `<div class="empty-state"><div class="empty-icon">⚠️</div><h3 data-i18n="error.db">ໂຫລດຂໍ້ມູນຜິດພາດ</h3></div>`;
   });
 }
 
