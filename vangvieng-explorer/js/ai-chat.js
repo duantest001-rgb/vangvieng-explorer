@@ -5,8 +5,8 @@
 
 // ── CONFIG ──
 // ໄປຮັບ free API key ທີ່: https://aistudio.google.com/app/apikey
-const GEMINI_KEY = "AIzaSyCcXrjErae0Po-4TxAMvWzpID25ytPz_eA";
-const GEMINI_URL = `https://gemini-proxy.duan-test001.workers.dev`;
+const GEMINI_KEY = "AIzaSyBLpUQGYU36qBMRoTTULyZYyqHxt52qbBc";
+const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_KEY}`;
 
 // System prompt — ໃຫ້ AI ຮູ້ context ວັງວຽງ
 const SYSTEM_PROMPT = `ເຈົ້າຄື AI Travel Assistant ຂອງ VangVieng Explorer — platform ທ່ອງທ່ຽວ eco-tourism ສຳລັບວັງວຽງ, ລາວ.
@@ -48,12 +48,6 @@ async function sendMessage() {
   const input = document.getElementById("chatInput");
   const text  = input.value.trim();
   if (!text || isLoading) return;
-
-  // Check API key
-  if (GEMINI_KEY === "YOUR_GEMINI_API_KEY") {
-    appendMessage("bot", `⚠️ ຍັງບໍ່ໄດ້ຕັ້ງ Gemini API Key\n\nໄປຮັບ key ຟຣີທີ່: <a href="https://aistudio.google.com/app/apikey" target="_blank" style="color:var(--green-600)">aistudio.google.com</a>\nແລ້ວໃສ່ໃນໄຟລ໌ js/ai-chat.js ທີ່ GEMINI_KEY`, true);
-    return;
-  }
 
   // Add user message
   appendMessage("user", text);
