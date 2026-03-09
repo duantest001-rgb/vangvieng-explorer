@@ -5,7 +5,7 @@
 
 // ── CONFIG ──
 // ໄປຮັບ free API key ທີ່: https://aistudio.google.com/app/apikey
-const GEMINI_KEY = "AIzaSyBLpUQGYU36qBMRoTTULyZYyqHxt52qbBc";
+const GEMINI_KEY = "AIzaSyCcXrjErae0Po-4TxAMvWzpID25ytPz_eA";
 const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_KEY}`;
 
 // System prompt — ໃຫ້ AI ຮູ້ context ວັງວຽງ
