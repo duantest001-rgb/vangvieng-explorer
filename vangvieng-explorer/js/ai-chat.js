@@ -6,7 +6,7 @@
 // ── CONFIG ──
 // ໄປຮັບ free API key ທີ່: https://aistudio.google.com/app/apikey
 const GEMINI_KEY = "AIzaSyBLpUQGYU36qBMRoTTULyZYyqHxt52qbBc";
-const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_KEY}`;
+const GEMINI_URL = "https://gemini-proxy.duan-test001.workers.dev";
 
 // System prompt — ໃຫ້ AI ຮູ້ context ວັງວຽງ
 const SYSTEM_PROMPT = `ເຈົ້າຄື AI Travel Assistant ຂອງ VangVieng Explorer — platform ທ່ອງທ່ຽວ eco-tourism ສຳລັບວັງວຽງ, ລາວ.
