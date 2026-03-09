@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="lo">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>VangVieng Explorer 🌿</title>
+  <link rel="stylesheet" href="../css/style.css" />
+  <link rel="stylesheet" href="../css/ai-chat.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700;800&family=Outfit:wght@300;400;500;600;700&family=Noto+Sans+Lao:wght@400;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+
+  <nav class="navbar scrolled" id="navbar">
+    <div class="nav-container">
+      <a href="../index.html" class="nav-logo" style="color:var(--dark)">
+        <img src="../assets/logo.png" alt="logo" class="nav-logo-img" />
+        <span class="logo-text">VangVieng<strong>Explorer</strong></span>
+      </a>
+      <div class="nav-links" id="navLinks">
+        <a href="../index.html" class="nav-link" data-i18n="nav.home">ໜ້າຫຼັກ</a>
+        <a href="explore.html" class="nav-link" data-i18n="nav.explore">ສຳຫຼວດ</a>
+        <a href="map.html" class="nav-link" data-i18n="nav.map">ແຜນທີ່</a>
+        <a href="ai-chat.html" class="nav-link nav-ai active" data-i18n="nav.ai">🤖 ຖາມ AI</a>
+      </div>
+      <div class="lang-dropdown" id="langDropdown">
+        <button class="lang-toggle" id="langToggle" onclick="toggleLangMenu()">
+          <span id="langFlag">🇱🇦</span>
+          
+          <span class="lang-arrow">▾</span>
+        </button>
+        <div class="lang-menu" id="langMenu">
+          <button class="lang-option active" data-lang="lo" onclick="selectLang('lo','🇱🇦','ລາວ')">🇱🇦 ລາວ</button>
+          <button class="lang-option" data-lang="en" onclick="selectLang('en','🇬🇧','English')">🇬🇧 English</button>
+          <button class="lang-option" data-lang="zh" onclick="selectLang('zh','🇨🇳','中文')">🇨🇳 中文</button>
+          <button class="lang-option" data-lang="th" onclick="selectLang('th','🇹🇭','ไทย')">🇹🇭 ไทย</button>
+          <button class="lang-option" data-lang="ko" onclick="selectLang('ko','🇰🇷','한국어')">🇰🇷 한국어</button>
+        </div>
+      </div>
+      <button class="hamburger" id="hamburger"><span></span><span></span><span></span></button>
+    </div>
+  </nav>
+
+  <div class="chat-layout">
+    <div class="chat-header">
+      <div class="chat-avatar">✨</div>
+      <div class="chat-header-info">
+        <h2>VangVieng AI Assistant</h2>
+        <span class="chat-status">🟢 <span data-i18n="chat.status">ອອນລາຍ · ຮູ້ຈັກວັງວຽງທຸກມຸມ</span></span>
+      </div>
+    </div>
+
+    <div class="chat-messages" id="chatMessages">
+      <div class="msg-row bot">
+        <div class="msg-avatar">✨</div>
+        <div class="msg-bubble bot-bubble">
+          <p data-i18n="chat.welcome1">ສະບາຍດີ! 👋 ຂ້ອຍຄື AI assistant ຂອງ VangVieng Explorer</p>
+          <p data-i18n="chat.welcome2">ຖາມຂ້ອຍໄດ້ທຸກຢ່າງກ່ຽວກັບ <strong>ວັງວຽງ</strong> ທັງພາສາລາວ ແລະ ອັງກິດ:</p>
+          <ul>
+            <li data-i18n="chat.li1">🏔️ ສະຖານທີ່ທ່ອງທ່ຽວ ແລະ ກິດຈະກຳ</li>
+            <li data-i18n="chat.li2">🏨 ທີ່ພັກ ແລະ ຮ້ານອາຫານ</li>
+            <li data-i18n="chat.li3">🗓️ ວາງແຜນການທ່ຽວ</li>
+            <li data-i18n="chat.li4">💡 ຄຳແນະນຳຕ່າງໆ</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="quick-suggestions" id="quickSugg">
+      <button class="sugg-btn" onclick="sendSuggestion(this)" data-i18n="chat.sugg1">ຈະໄປໃສດີທີ່ສຸດ?</button>
+      <button class="sugg-btn" onclick="sendSuggestion(this)" data-i18n="chat.sugg2">Blue Lagoon ໄປຍັງໄງ?</button>
+      <button class="sugg-btn" onclick="sendSuggestion(this)" data-i18n="chat.sugg3">ທ່ຽວ 2 ວັນ ວາງແຜນໃຫ້ຫນ້ອຍ</button>
+      <button class="sugg-btn" onclick="sendSuggestion(this)" data-i18n="chat.sugg4">ອາຫານລາວທີ່ຕ້ອງລອງ</button>
+    </div>
+
+    <div class="chat-input-bar">
+      <textarea id="chatInput" rows="1"
+        placeholder="ພິມຄຳຖາມ..."></textarea>
+      <button class="send-btn" id="sendBtn" onclick="sendMessage()"><span>➤</span></button>
+    </div>
+  </div>
+
+  <script src="../js/ai-chat.js"></script>
+  <script src="../js/i18n.js"></script>
+</body>
+</html>

@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>VangVieng Explorer 🌿</title>
   <link rel="stylesheet" href="../css/style.css" />
-  <link rel="stylesheet" href="../css/detail.css" />
+  <link rel="stylesheet" href="../css/map.css" />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700;800&family=Outfit:wght@300;400;500;600;700&family=Noto+Sans+Lao:wght@400;600;700;800&display=swap" rel="stylesheet">
@@ -20,8 +20,8 @@
       </a>
       <div class="nav-links" id="navLinks">
         <a href="../index.html" class="nav-link" data-i18n="nav.home">ໜ້າຫຼັກ</a>
-        <a href="explore.html" class="nav-link active" data-i18n="nav.explore">ສຳຫຼວດ</a>
-        <a href="map.html" class="nav-link" data-i18n="nav.map">ແຜນທີ່</a>
+        <a href="explore.html" class="nav-link" data-i18n="nav.explore">ສຳຫຼວດ</a>
+        <a href="map.html" class="nav-link active" data-i18n="nav.map">ແຜນທີ່</a>
         <a href="ai-chat.html" class="nav-link nav-ai" data-i18n="nav.ai">🤖 ຖາມ AI</a>
       </div>
       <div class="lang-dropdown" id="langDropdown">
@@ -42,33 +42,36 @@
     </div>
   </nav>
 
-  <div class="back-bar">
-    <div class="container">
-      <button onclick="history.back()" class="back-btn" data-i18n="detail.back">← ກັບຄືນ</button>
+  <div class="map-layout">
+    <div class="map-sidebar" id="mapSidebar">
+      <div class="map-sidebar-header">
+        <h2 data-i18n="map.all">ສະຖານທີ່ທັງໝົດ</h2>
+        <div class="map-filter-tabs">
+          <button class="map-tab active" data-cat="" data-i18n="map.tab.all">ທັງໝົດ</button>
+          <button class="map-tab" data-cat="attraction">🏔️</button>
+          <button class="map-tab" data-cat="hotel">🏨</button>
+          <button class="map-tab" data-cat="restaurant">🍜</button>
+          <button class="map-tab" data-cat="activity">🛶</button>
+        </div>
+      </div>
+      <div class="map-place-list" id="mapPlaceList"></div>
+    </div>
+
+    <div class="map-container">
+      <iframe id="mainMap" class="main-map"
+        src="https://maps.google.com/maps?q=18.9228,102.4441&z=14&output=embed"
+        allowfullscreen loading="lazy">
+      </iframe>
+      <div class="map-open-btn">
+        <a href="https://maps.google.com/maps?q=Vang+Vieng,Laos" target="_blank" class="open-google-btn">
+          🗺️ <span data-i18n="map.open">ເປີດໃນ Google Maps</span>
+        </a>
+      </div>
     </div>
   </div>
 
-  <main class="detail-main" id="detailContent">
-    <div class="container">
-      <div class="loading-detail">
-        <div class="loading-card" style="height:320px; border-radius:24px;"></div>
-        <div style="margin-top:24px">
-          <div class="loading-card" style="height:32px; width:60%; margin-bottom:12px;"></div>
-          <div class="loading-card" style="height:20px; width:80%; margin-bottom:8px;"></div>
-          <div class="loading-card" style="height:20px; width:70%;"></div>
-        </div>
-      </div>
-    </div>
-  </main>
-
-  <footer class="footer">
-    <div class="footer-bottom">
-      <p data-i18n="footer.copy">© 2025 VangVieng Explorer · Made with 🌿 in Laos</p>
-    </div>
-  </footer>
-
   <script src="../js/supabase.js"></script>
-  <script src="../js/detail.js"></script>
+  <script src="../js/map.js"></script>
   <script src="../js/i18n.js"></script>
 </body>
 </html>
