@@ -1,14 +1,11 @@
 /* ═══════════════════════════════════════════════
-   AI Chat Logic — Gemini API (Free Tier)
-   ⚠️ ໃສ່ Gemini API Key ຂອງຕົນເອງທີ່ GEMINI_KEY
+   AI Chat Logic — Cloudflare Worker Proxy
 ═══════════════════════════════════════════════ */
 
 // ── CONFIG ──
-// ໄປຮັບ free API key ທີ່: https://aistudio.google.com/app/apikey
-const GEMINI_KEY = "AIzaSyBLpUQGYU36qBMRoTTULyZYyqHxt52qbBc";
 const GEMINI_URL = "https://gemini-proxy.duan-test001.workers.dev";
 
-// System prompt — ໃຫ້ AI ຮູ້ context ວັງວຽງ
+// System prompt
 const SYSTEM_PROMPT = `ເຈົ້າຄື AI Travel Assistant ຂອງ VangVieng Explorer — platform ທ່ອງທ່ຽວ eco-tourism ສຳລັບວັງວຽງ, ລາວ.
 
 ກົດລະບຽບ:
@@ -27,16 +24,15 @@ const SYSTEM_PROMPT = `ເຈົ້າຄື AI Travel Assistant ຂອງ VangV
 
 // ── STATE ──
 let chatHistory = [];
-let isLoading   = false;
+let isLoading = false;
 
 // ── INIT ──
 document.addEventListener("DOMContentLoaded", () => {
   setupNavbar();
   setupInput();
 
-  // ຖ້າມາຈາກ detail page ກັບ ?place=xxx
   const params = new URLSearchParams(window.location.search);
-  const place  = params.get("place");
+  const place = params.get("place");
   if (place) {
     document.getElementById("chatInput").value = `ບອກຂໍ້ມູນກ່ຽວກັບ ${place} ໃຫ້ຂ້ອຍຫນ້ອຍ`;
     sendMessage();
@@ -46,22 +42,18 @@ document.addEventListener("DOMContentLoaded", () => {
 // ── SEND MESSAGE ──
 async function sendMessage() {
   const input = document.getElementById("chatInput");
-  const text  = input.value.trim();
+  const text = input.value.trim();
   if (!text || isLoading) return;
 
-  // Add user message
   appendMessage("user", text);
   input.value = "";
   autoResize(input);
   input.focus();
 
-  // Hide suggestions after first message
   document.getElementById("quickSugg").style.display = "none";
 
-  // Add to history
   chatHistory.push({ role: "user", parts: [{ text }] });
 
-  // Show typing
   const typingId = showTyping();
   isLoading = true;
   document.getElementById("sendBtn").disabled = true;
@@ -74,13 +66,14 @@ async function sendMessage() {
   } catch (err) {
     removeTyping(typingId);
     appendMessage("bot", "⚠️ ຂໍໂທດ ເກີດຂໍ້ຜິດພາດ ລອງໃໝ່ອີກຄັ້ງ", false, true);
+    console.error("Gemini error:", err);
   } finally {
     isLoading = false;
     document.getElementById("sendBtn").disabled = false;
   }
 }
 
-// ── CALL GEMINI API ──
+// ── CALL GEMINI VIA WORKER ──
 async function callGemini() {
   const body = {
     system_instruction: { parts: [{ text: SYSTEM_PROMPT }] },
@@ -95,21 +88,26 @@ async function callGemini() {
   });
 
   if (!res.ok) {
-    const err = await res.json();
-    throw new Error(err?.error?.message || "API error");
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err?.error || "API error " + res.status);
   }
 
   const data = await res.json();
+
+  if (data.error) {
+    throw new Error(data.error);
+  }
+
   return data.candidates?.[0]?.content?.parts?.[0]?.text || "ບໍ່ໄດ້ຮັບຄຳຕອບ";
 }
 
 // ── APPEND MESSAGE ──
 function appendMessage(role, text, isHTML = false, isError = false) {
   const msgs = document.getElementById("chatMessages");
-  const row  = document.createElement("div");
+  const row = document.createElement("div");
   row.className = `msg-row ${role}`;
 
-  const avatar  = role === "bot" ? "✨" : "👤";
+  const avatar = role === "bot" ? "✨" : "👤";
   const bubbleClass = role === "bot"
     ? `msg-bubble bot-bubble${isError ? " error-bubble" : ""}`
     : "msg-bubble user-bubble";
@@ -137,8 +135,8 @@ function formatText(text) {
 // ── TYPING INDICATOR ──
 function showTyping() {
   const msgs = document.getElementById("chatMessages");
-  const id   = "typing-" + Date.now();
-  const row  = document.createElement("div");
+  const id = "typing-" + Date.now();
+  const row = document.createElement("div");
   row.className = "msg-row bot";
   row.id = id;
   row.innerHTML = `
@@ -180,7 +178,7 @@ function autoResize(el) {
 // ── NAVBAR ──
 function setupNavbar() {
   const hamburger = document.getElementById("hamburger");
-  const navLinks  = document.getElementById("navLinks");
+  const navLinks = document.getElementById("navLinks");
   if (hamburger && navLinks) {
     hamburger.addEventListener("click", () => navLinks.classList.toggle("open"));
   }
