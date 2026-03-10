@@ -252,6 +252,7 @@ button { cursor: pointer; border: none; font-family: var(--font-body); }
 ══════════════════════════════════════════ */
 .stats-bar {
   background: var(--green-800);
+  padding: 28px 0;
 }
 .stats-container {
   max-width: 800px; margin: 0 auto; padding: 0 24px;
