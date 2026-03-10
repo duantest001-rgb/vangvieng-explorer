@@ -120,7 +120,12 @@ function renderGrid(places) {
         <div style="background:${p.image_bg || '#e0f2ff'}; width:100%; aspect-ratio:3/2;
           display:flex; align-items:center; justify-content:center; font-size:4rem;
           position:relative; overflow:hidden;">
-          ${p.image_emoji || '📍'}
+          ${p.image_url
+            ? `<img src="${p.image_url}" alt="${p.name}"
+                style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;"
+                onerror="this.style.display='none'">`
+            : p.image_emoji || '📍'
+          }
           <div style="position:absolute;inset:0;background:linear-gradient(to bottom,transparent 50%,rgba(0,0,0,0.3) 100%)"></div>
         </div>
         ${p.is_eco ? '<span class="card-eco-badge">🌱 Eco</span>' : ''}
