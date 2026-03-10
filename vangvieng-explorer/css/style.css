@@ -255,8 +255,9 @@ button { cursor: pointer; border: none; font-family: var(--font-body); }
   padding: 28px 0;
 }
 .stats-container {
-  max-width: 800px; margin: 0 auto; padding: 20px 24px;
-  display: flex; align-items: center; justify-content: space-around; flex-wrap: nowrap; gap: 0;
+  max-width: 800px; margin: 0 auto; padding: 20px 12px;
+  display: grid; grid-template-columns: repeat(4, 1fr);
+  align-items: center; text-align: center;
 }
 .stat-item {
   display: flex; align-items: baseline; gap: 6px;
