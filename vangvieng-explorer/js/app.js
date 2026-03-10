@@ -144,21 +144,6 @@ function animateCounter(el, target, duration = 1500) {
   }, 16);
 }
 
-const statsObserver = new IntersectionObserver((entries) => {
-  entries.forEach(entry => {
-    if (entry.isIntersecting) {
-      document.querySelectorAll('.stat-num').forEach(el => {
-        const target = parseInt(el.dataset.target);
-        animateCounter(el, target);
-      });
-      statsObserver.disconnect();
-    }
-  });
-}, { threshold: 0.3 });
-
-const statsBar = document.querySelector('.stats-bar');
-if (statsBar) statsObserver.observe(statsBar);
-
 // ── RENDER FEATURED PLACES ──
 function t(key) {
   const lang = localStorage.getItem("lang") || "lo";
