@@ -260,8 +260,8 @@ button { cursor: pointer; border: none; font-family: var(--font-body); }
 }
 .stat-item {
   display: flex; align-items: baseline; gap: 6px;
-  color: var(--white); font-size: 2rem; font-weight: 600;
-  font-family: var(--font-display); letter-spacing: 0.02em;
+  color: var(--white); font-size: 1.6rem; font-weight: 700;
+  font-family: var(--font-body); letter-spacing: 0;
 }
 .stat-label { font-size: 0.85rem; font-weight: 400; color: rgba(255,255,255,0.6); font-family: var(--font-body); }
 .stat-divider { width: 1px; height: 40px; background: rgba(255,255,255,0.15); }
