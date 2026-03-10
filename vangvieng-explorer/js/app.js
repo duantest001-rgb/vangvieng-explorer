@@ -158,7 +158,7 @@ function renderPlaceCard(place) {
   return `
     <div class="place-card" onclick="goToDetail(${place.id})">
       <div style="position:relative">
-        <div class="card-img-placeholder" style="background:${place.image_bg || '#e0f2ff'}; width:100%; aspect-ratio:3/2; display:flex; align-items:center; justify-content:center; font-size:4rem; position:relative; overflow:hidden;">
+       <div class="card-img-placeholder" style="background:${place.image_bg || '#e0f2ff'}; width:100%; aspect-ratio:3/2; display:flex; align-items:center; justify-content:center; font-size:4rem; position:relative; overflow:hidden;">
           ${place.image_url
             ? `<img src="${place.image_url}" alt="${place.name}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;" onerror="this.style.display='none'">`
             : place.image_emoji || '📍'
