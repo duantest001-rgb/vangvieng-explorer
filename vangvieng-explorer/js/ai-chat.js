@@ -87,21 +87,17 @@ async function callClaude() {
     body: JSON.stringify(body)
   });
 
-  if (!res.ok) {
-    const err = await res.json().catch(() => ({}));
-    throw new Error(err?.error || "API error " + res.status);
-  }
-
   const data = await res.json();
 
-  if (data.error) {
-    throw new Error(data.error);
+  // ແກ້ຕ້ອງ — log ດູກ່ອນ + ອ່ານ error ຖືກຕ້ອງ
+  console.log("Claude response:", JSON.stringify(data));
+
+  if (!res.ok || data.error) {
+    throw new Error(data.error?.message || data.error?.type || JSON.stringify(data.error) || "API error " + res.status);
   }
 
-  // Claude response format
   return data.content?.[0]?.text || "ບໍ່ໄດ້ຮັບຄຳຕອບ";
 }
-
 // ── APPEND MESSAGE ──
 function appendMessage(role, text, isHTML = false, isError = false) {
   const msgs = document.getElementById("chatMessages");
