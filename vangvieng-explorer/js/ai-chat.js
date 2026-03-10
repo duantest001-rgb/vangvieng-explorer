@@ -1,9 +1,9 @@
 /* ═══════════════════════════════════════════════
-   AI Chat Logic — Cloudflare Worker Proxy
+   AI Chat Logic — Cloudflare Worker Proxy (Claude)
 ═══════════════════════════════════════════════ */
 
 // ── CONFIG ──
-const GEMINI_URL = "https://gemini-proxy.duan-test001.workers.dev";
+const CLAUDE_URL = "https://gemini-proxy.duan-test001.workers.dev"; // ຊື່ Worker ຍັງເດີມ, ແຕ່ code Worker ປ່ຽນໄປ Claude ແລ້ວ
 
 // System prompt
 const SYSTEM_PROMPT = `ເຈົ້າຄື AI Travel Assistant ຂອງ VangVieng Explorer — platform ທ່ອງທ່ຽວ eco-tourism ສຳລັບວັງວຽງ, ລາວ.
@@ -23,7 +23,7 @@ const SYSTEM_PROMPT = `ເຈົ້າຄື AI Travel Assistant ຂອງ VangV
 - ເດືອນດີທີ່ສຸດ: ຕ.ລ - ມ.ສ (dry season)`;
 
 // ── STATE ──
-let chatHistory = [];
+let chatHistory = []; // format: [{ role: "user", content: "..." }, { role: "assistant", content: "..." }]
 let isLoading = false;
 
 // ── INIT ──
@@ -52,36 +52,36 @@ async function sendMessage() {
 
   document.getElementById("quickSugg").style.display = "none";
 
-  chatHistory.push({ role: "user", parts: [{ text }] });
+  // Claude format: role "user" / "assistant"
+  chatHistory.push({ role: "user", content: text });
 
   const typingId = showTyping();
   isLoading = true;
   document.getElementById("sendBtn").disabled = true;
 
   try {
-    const reply = await callGemini();
+    const reply = await callClaude();
     removeTyping(typingId);
     appendMessage("bot", reply);
-    chatHistory.push({ role: "model", parts: [{ text: reply }] });
+    chatHistory.push({ role: "assistant", content: reply });
   } catch (err) {
     removeTyping(typingId);
     appendMessage("bot", "⚠️ ຂໍໂທດ ເກີດຂໍ້ຜິດພາດ ລອງໃໝ່ອີກຄັ້ງ", false, true);
-    console.error("Gemini error:", err);
+    console.error("Claude error:", err);
   } finally {
     isLoading = false;
     document.getElementById("sendBtn").disabled = false;
   }
 }
 
-// ── CALL GEMINI VIA WORKER ──
-async function callGemini() {
+// ── CALL CLAUDE VIA WORKER ──
+async function callClaude() {
   const body = {
-    system_instruction: { parts: [{ text: SYSTEM_PROMPT }] },
-    contents: chatHistory,
-    generationConfig: { maxOutputTokens: 600, temperature: 0.7 }
+    system: SYSTEM_PROMPT,
+    messages: chatHistory
   };
 
-  const res = await fetch(GEMINI_URL, {
+  const res = await fetch(CLAUDE_URL, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(body)
@@ -98,7 +98,8 @@ async function callGemini() {
     throw new Error(data.error);
   }
 
-  return data.candidates?.[0]?.content?.parts?.[0]?.text || "ບໍ່ໄດ້ຮັບຄຳຕອບ";
+  // Claude response format
+  return data.content?.[0]?.text || "ບໍ່ໄດ້ຮັບຄຳຕອບ";
 }
 
 // ── APPEND MESSAGE ──
