@@ -179,6 +179,23 @@ function renderPlaceCard(place) {
     </div>
   `;
 }
+async function loadStats() {
+  try {
+    const data = await db.getPlaces();
+    const total       = data.length;
+    const hotels      = data.filter(p => p.category === 'hotel').length;
+    const restaurants = data.filter(p => p.category === 'restaurant').length;
+    const activities  = data.filter(p => p.category === 'activity').length;
+
+    const targets = [total, hotels, restaurants, activities];
+    document.querySelectorAll('.stat-num').forEach((el, i) => {
+      el.dataset.target = targets[i];
+      animateCounter(el, targets[i]);
+    });
+  } catch (err) {
+    console.error("Stats error:", err);
+  }
+}
 function renderFeatured() {
   const grid = document.getElementById("featuredGrid");
   if (!grid) return;
