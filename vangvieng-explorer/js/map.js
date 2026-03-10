@@ -40,8 +40,11 @@ function renderList(places) {
   list.innerHTML = places.map(p => `
     <div class="map-place-item ${activeId === p.id ? 'active' : ''}"
          onclick="selectPlace(${p.id}, ${p.lat}, ${p.lng})">
-      <div class="map-item-icon" style="background:${p.image_bg || '#e0f2ff'}">
-        ${p.image_emoji || "📍"}
+      <div class="map-item-icon" style="background:${p.image_bg || '#e0f2ff'}; overflow:hidden; position:relative;">
+        ${p.image_url
+          ? `<img src="${p.image_url}" alt="${p.name}" style="width:100%;height:100%;object-fit:cover;position:absolute;inset:0;" onerror="this.style.display='none'">`
+          : p.image_emoji || "📍"
+        }
       </div>
       <div class="map-item-info">
         <div class="map-item-name">${p.name}</div>
