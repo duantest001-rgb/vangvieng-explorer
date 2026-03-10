@@ -39,8 +39,12 @@ function renderDetail(p) {
 
   document.getElementById("detailContent").innerHTML = `
     <div class="container">
-      <div class="detail-hero" style="background:${p.image_bg || '#e0f2ff'}">
-        ${p.image_emoji || "📍"}
+     <div class="detail-hero" style="background:${p.image_bg || '#e0f2ff'}; position:relative; overflow:hidden;">
+        ${p.image_url
+          ? `<img src="${p.image_url}" alt="${p.name}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;" onerror="this.style.display='none'">`
+          : ''
+        }
+        <span style="position:relative;z-index:1;font-size:4rem">${p.image_url ? '' : (p.image_emoji || '📍')}</span>
       </div>
       <div class="detail-layout">
         <!-- LEFT -->
