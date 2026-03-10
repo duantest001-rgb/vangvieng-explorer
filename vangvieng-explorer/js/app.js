@@ -221,4 +221,5 @@ function goToDetail(id) {
 // ── INIT ──
 document.addEventListener('DOMContentLoaded', () => {
   renderFeatured();
+  loadStats();
 });
