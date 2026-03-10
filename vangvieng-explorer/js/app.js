@@ -174,7 +174,10 @@ function renderPlaceCard(place) {
     <div class="place-card" onclick="goToDetail(${place.id})">
       <div style="position:relative">
         <div class="card-img-placeholder" style="background:${place.image_bg || '#e0f2ff'}; width:100%; aspect-ratio:3/2; display:flex; align-items:center; justify-content:center; font-size:4rem; position:relative; overflow:hidden;">
-          ${place.image_emoji || '📍'}
+          ${place.image_url
+            ? `<img src="${place.image_url}" alt="${place.name}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;" onerror="this.style.display='none'">`
+            : place.image_emoji || '📍'
+          }
           <div style="position:absolute;inset:0;background:linear-gradient(to bottom,transparent 50%,rgba(0,0,0,0.3) 100%)"></div>
         </div>
         ${place.is_eco ? '<span class="card-eco-badge">🌱 Eco</span>' : ''}
@@ -191,7 +194,6 @@ function renderPlaceCard(place) {
     </div>
   `;
 }
-
 function renderFeatured() {
   const grid = document.getElementById("featuredGrid");
   if (!grid) return;
