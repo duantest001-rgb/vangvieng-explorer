@@ -140,3 +140,16 @@
   min-width: 16px; height: 16px; border-radius: 99px;
   padding: 0 4px; margin-left: 2px; vertical-align: middle;
 }
+
+/* ── TAGS IN CARD ── */
+.card-tags {
+  display: flex; flex-wrap: wrap; gap: 4px;
+  margin: 6px 0 4px;
+}
+.card-tag {
+  font-size: 0.68rem; font-weight: 600;
+  color: var(--green-700);
+  background: var(--green-100);
+  border: 1px solid var(--green-300);
+  padding: 2px 8px; border-radius: 99px;
+}
