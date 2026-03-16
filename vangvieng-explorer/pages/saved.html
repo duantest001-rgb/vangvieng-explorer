@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="lo">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ສະຖານທີ່ທີ່ບັນທຶກ · VangVieng Explorer</title>
+  <link rel="stylesheet" href="../css/style.css" />
+  <link rel="stylesheet" href="../css/saved.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700;800&family=Outfit:wght@300;400;500;600;700&family=Noto+Sans+Lao:wght@400;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+
+  <!-- NAVBAR -->
+  <nav class="navbar scrolled" id="navbar">
+    <div class="nav-container">
+      <a href="../index.html" class="nav-logo" style="color:var(--dark)">
+        <img src="../assets/logo.png" alt="logo" class="nav-logo-img" />
+        <span class="logo-text">VangVieng<strong>Explorer</strong></span>
+      </a>
+      <div class="nav-links" id="navLinks">
+        <a href="../index.html" class="nav-link" data-i18n="nav.home">ໜ້າຫຼັກ</a>
+        <a href="explore.html" class="nav-link" data-i18n="nav.explore">ສຳຫຼວດ</a>
+        <a href="map.html" class="nav-link" data-i18n="nav.map">ແຜນທີ່</a>
+        <a href="ai-chat.html" class="nav-link nav-ai" data-i18n="nav.ai">🤖 ຖາມ AI</a>
+        <a href="saved.html" class="nav-link active">🔖 ບັນທຶກ</a>
+      </div>
+      <div class="lang-dropdown" id="langDropdown">
+        <button class="lang-toggle" id="langToggle" onclick="toggleLangMenu()">
+          <span id="langFlag">🇱🇦</span>
+          <span class="lang-arrow">▾</span>
+        </button>
+        <div class="lang-menu" id="langMenu">
+          <button class="lang-option active" data-lang="lo" onclick="selectLang('lo','🇱🇦','ລາວ')">🇱🇦 ລາວ</button>
+          <button class="lang-option" data-lang="en" onclick="selectLang('en','🇬🇧','English')">🇬🇧 English</button>
+          <button class="lang-option" data-lang="zh" onclick="selectLang('zh','🇨🇳','中文')">🇨🇳 中文</button>
+          <button class="lang-option" data-lang="th" onclick="selectLang('th','🇹🇭','ไทย')">🇹🇭 ไทย</button>
+          <button class="lang-option" data-lang="ko" onclick="selectLang('ko','🇰🇷','한국어')">🇰🇷 한국어</button>
+        </div>
+      </div>
+      <button class="hamburger" id="hamburger"><span></span><span></span><span></span></button>
+    </div>
+  </nav>
+
+  <!-- PAGE HEADER -->
+  <div class="page-header">
+    <div class="container">
+      <div class="header-eyebrow">🔖 ລາຍການຂອງຂ້ອຍ</div>
+      <h1 class="page-title">ສະຖານທີ່ທີ່ບັນທຶກ</h1>
+      <p class="page-sub">ສະຖານທີ່ທີ່ເຈົ້າຢາກໄປ — ເກັບໄວ້ໃນທີ່ດຽວ</p>
+    </div>
+  </div>
+
+  <!-- TOOLBAR -->
+  <div class="saved-toolbar">
+    <div class="container">
+      <span class="saved-count" id="savedCount">0 ສະຖານທີ່</span>
+      <div class="toolbar-actions">
+        <button class="btn-share" id="btnShare" onclick="shareList()">
+          📤 ແບ່ງປັນລາຍການ
+        </button>
+        <button class="btn-clear" id="btnClear" onclick="confirmClear()">
+          🗑️ ລ້າງທັງໝົດ
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MAIN CONTENT -->
+  <main class="saved-main">
+    <div class="container">
+      <div class="places-grid" id="savedGrid"></div>
+    </div>
+  </main>
+
+  <!-- TOAST -->
+  <div class="toast" id="toast"></div>
+
+  <!-- CONFIRM MODAL -->
+  <div class="modal-overlay" id="modalOverlay" onclick="closeModal()">
+    <div class="modal-box" onclick="event.stopPropagation()">
+      <div class="modal-icon">🗑️</div>
+      <h3 class="modal-title">ລ້າງລາຍການທັງໝົດ?</h3>
+      <p class="modal-desc">ສະຖານທີ່ທີ່ບັນທຶກທັງໝົດຈະຖືກລົບ ແລະ ບໍ່ສາມາດກູ້ຄືນໄດ້</p>
+      <div class="modal-btns">
+        <button class="modal-cancel" onclick="closeModal()">ຍົກເລີກ</button>
+        <button class="modal-confirm" onclick="clearAll()">ລ້າງທັງໝົດ</button>
+      </div>
+    </div>
+  </div>
+
+  <footer class="footer">
+    <div class="footer-bottom">
+      <p>© 2025 VangVieng Explorer · Made with 🌿 in Laos</p>
+    </div>
+  </footer>
+
+  <script src="../js/supabase.js"></script>
+  <script src="../js/saved.js"></script>
+  <script src="../js/i18n.js"></script>
+</body>
+</html>
