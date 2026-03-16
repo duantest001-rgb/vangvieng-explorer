@@ -119,7 +119,6 @@ function renderDetail(p) {
               <button class="share-btn share-line" onclick="sharePlace('line')">Line</button>
               <button class="share-btn share-wa" onclick="sharePlace('whatsapp')">WhatsApp</button>
             </div>
-            <div class="share-copied" id="shareCopied" style="display:none;">✅ ຄັດລອກ URL ແລ້ວ!</div>
           </div>
           </div>
         </div>
