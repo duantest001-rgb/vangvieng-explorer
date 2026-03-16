@@ -110,10 +110,53 @@ function renderDetail(p) {
                 text-align:center;cursor:pointer;transition:var(--transition);"
             >${isSaved(p.id) ? '🔖 ບັນທຶກແລ້ວ' : '🔖 ບັນທຶກສະຖານທີ່ນີ້'}</button>
           </div>
+          <div class="sidebar-card">
+            <h4>📤 ແຊຣ໌ສະຖານທີ່ນີ້</h4>
+            <div class="share-grid">
+              <button class="share-btn share-copy" onclick="sharePlace('copy')">📋 Copy Link</button>
+              <button class="share-btn share-native" onclick="sharePlace('native')">📱 Share</button>
+              <button class="share-btn share-fb" onclick="sharePlace('facebook')">Facebook</button>
+              <button class="share-btn share-line" onclick="sharePlace('line')">Line</button>
+              <button class="share-btn share-wa" onclick="sharePlace('whatsapp')">WhatsApp</button>
+            </div>
+            <div class="share-copied" id="shareCopied" style="display:none;">✅ ຄັດລອກ URL ແລ້ວ!</div>
+          </div>
+          </div>
         </div>
       </div>
     </div>
   `;
+}
+
+// ── SHARE ──
+function sharePlace(method) {
+  const p    = window._currentPlace;
+  if (!p) return;
+  const url  = window.location.href;
+  const text = `🌿 ${p.name} — ສະຖານທີ່ທ່ຽວວັງວຽງ\n${p.description ? p.description.slice(0,80) + '...' : ''}\n${url}`;
+  const enc  = encodeURIComponent(url);
+  const etxt = encodeURIComponent(`🌿 ${p.name} — VangVieng Explorer\n${url}`);
+
+  if (method === 'copy') {
+    navigator.clipboard.writeText(url).then(() => {
+      const el = document.getElementById('shareCopied');
+      if (el) { el.style.display = 'block'; setTimeout(() => el.style.display = 'none', 2500); }
+    });
+  } else if (method === 'native' && navigator.share) {
+    navigator.share({ title: p.name, text: `ສະຖານທີ່ທ່ຽວວັງວຽງ — ${p.name}`, url }).catch(() => {});
+  } else if (method === 'native') {
+    // fallback to copy if native share not supported
+    navigator.clipboard.writeText(url).then(() => {
+      const el = document.getElementById('shareCopied');
+      if (el) { el.style.display = 'block'; setTimeout(() => el.style.display = 'none', 2500); }
+    });
+  } else if (method === 'facebook') {
+    window.open(`https://www.facebook.com/sharer/sharer.php?u=${enc}`, '_blank', 'width=600,height=400');
+  } else if (method === 'line') {
+    window.open(`https://social-plugins.line.me/lineit/share?url=${enc}`, '_blank', 'width=600,height=400');
+  } else if (method === 'whatsapp') {
+    window.open(`https://wa.me/?text=${etxt}`, '_blank');
+  }
 }
 
 function showError(msg) {
