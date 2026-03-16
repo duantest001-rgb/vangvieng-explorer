@@ -7,10 +7,11 @@ const WORKER_URL = "https://gemini-proxy.duan-test001.workers.dev";
 
 // ── TAB SWITCHING ──
 function switchChatTab(tab) {
-  document.getElementById('sectionChat').classList.toggle('active', tab === 'chat');
-  document.getElementById('sectionPlanner').classList.toggle('active', tab === 'planner');
-  document.getElementById('tabChat').classList.toggle('active', tab === 'chat');
-  document.getElementById('tabPlanner').classList.toggle('active', tab === 'planner');
+  ['chat','planner','saved'].forEach(t => {
+    document.getElementById('section' + t.charAt(0).toUpperCase() + t.slice(1))?.classList.toggle('active', t === tab);
+    document.getElementById('tab' + t.charAt(0).toUpperCase() + t.slice(1))?.classList.toggle('active', t === tab);
+  });
+  if (tab === 'saved') loadSavedPlans();
 }
 
 // ── TAG/CHIP HELPERS ──
@@ -150,8 +151,16 @@ function renderPlanResult(itinerary, places, meta) {
     html += `</div>`;
   });
 
-  html += `<div class="plan-pace-note">${paceMsg[meta.pace] ?? ''}</div>`;
+  html += `
+    <div class="plan-pace-note">${paceMsg[meta.pace] ?? ''}</div>
+    <button class="planner-btn" style="margin-top:1rem;" onclick="savePlan()">
+      💾 ບັນທຶກແຜນນີ້
+    </button>
+    <div id="saveStatus"></div>`;
+
   document.getElementById('plannerResult').innerHTML = html;
+  // store current plan for saving
+  window._currentPlan = { itinerary, places, meta };
 }
 
 // ── RESET ──
@@ -159,4 +168,115 @@ function resetPlanner() {
   document.getElementById('plannerForm').style.display = 'block';
   document.getElementById('plannerResult').style.display = 'none';
   document.getElementById('plannerResult').innerHTML = '';
+  window._currentPlan = null;
+}
+
+// ── SAVE PLAN TO SUPABASE ──
+async function savePlan() {
+  const plan = window._currentPlan;
+  if (!plan) return;
+  const btn = document.querySelector('#plannerResult .planner-btn');
+  if (btn) { btn.textContent = '⏳ ກຳລັງບັນທຶກ...'; btn.disabled = true; }
+
+  try {
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/saved_plans`, {
+      method: 'POST',
+      headers: {
+        'apikey': SUPABASE_KEY,
+        'Authorization': `Bearer ${SUPABASE_KEY}`,
+        'Content-Type': 'application/json',
+        'Prefer': 'return=minimal'
+      },
+      body: JSON.stringify({
+        plan_data: plan.itinerary,
+        meta: plan.meta
+      })
+    });
+    if (res.ok) {
+      document.getElementById('saveStatus').innerHTML =
+        `<p style="color:var(--green-700);font-size:0.85rem;text-align:center;margin-top:8px;">✅ ບັນທຶກແຜນສຳເລັດ!</p>`;
+      if (btn) { btn.textContent = '✅ ບັນທຶກແລ້ວ'; btn.disabled = true; }
+    } else {
+      throw new Error('Save failed');
+    }
+  } catch (e) {
+    document.getElementById('saveStatus').innerHTML =
+      `<p style="color:#c0392b;font-size:0.85rem;text-align:center;margin-top:8px;">❌ ບັນທຶກຜິດພາດ</p>`;
+    if (btn) { btn.textContent = '💾 ບັນທຶກແຜນນີ້'; btn.disabled = false; }
+  }
+}
+
+// ── LOAD SAVED PLANS ──
+async function loadSavedPlans() {
+  const container = document.getElementById('savedPlansContainer');
+  if (!container) return;
+  container.innerHTML = `<div style="text-align:center;padding:2rem;"><div class="planner-spinner"></div></div>`;
+
+  try {
+    const res = await fetch(
+      `${SUPABASE_URL}/rest/v1/saved_plans?select=*&order=created_at.desc`,
+      { headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` } }
+    );
+    const plans = await res.json();
+    renderSavedPlans(plans);
+  } catch (e) {
+    container.innerHTML = `<p style="color:#c0392b;font-size:0.85rem;text-align:center;">❌ ໂຫລດຜິດພາດ</p>`;
+  }
+}
+
+// ── RENDER SAVED PLANS LIST ──
+function renderSavedPlans(plans) {
+  const container = document.getElementById('savedPlansContainer');
+  if (!plans.length) {
+    container.innerHTML = `
+      <div style="text-align:center;padding:3rem 1rem;">
+        <div style="font-size:2.5rem;margin-bottom:12px;">🗺️</div>
+        <p style="color:var(--muted);font-size:0.9rem;">ຍັງບໍ່ມີແຜນທ່ຽວທີ່ບັນທຶກ<br>ໄປ Trip Planner ແລ້ວກົດ 💾 ບັນທຶກ</p>
+      </div>`;
+    return;
+  }
+
+  container.innerHTML = plans.map(p => {
+    const meta = p.meta || {};
+    const days = meta.days || '?';
+    const date = new Date(p.created_at).toLocaleDateString('lo-LA', { day:'numeric', month:'short' });
+    const stops = (p.plan_data || []).reduce((s, d) => s + (d.stops?.length || 0), 0);
+    return `
+      <div class="saved-plan-card" onclick="openSavedPlan(${p.id})">
+        <div class="saved-plan-info">
+          <div class="saved-plan-title">ແຜນ ${days} ວັນ ວັງວຽງ</div>
+          <div class="saved-plan-meta">${meta.style || ''} · ${meta.pace || ''} · ${stops} stops</div>
+          <div class="saved-plan-date">📅 ${date}</div>
+        </div>
+        <div style="display:flex;gap:6px;align-items:center;">
+          <button class="saved-plan-view">ເບິ່ງ →</button>
+          <button class="saved-plan-del" onclick="event.stopPropagation();deleteSavedPlan(${p.id})">🗑️</button>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+// ── OPEN SAVED PLAN ──
+async function openSavedPlan(id) {
+  const res = await fetch(
+    `${SUPABASE_URL}/rest/v1/saved_plans?id=eq.${id}&select=*`,
+    { headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` } }
+  );
+  const data = await res.json();
+  const plan = data[0];
+  if (!plan) return;
+  const places = await db.getPlaces();
+  switchChatTab('planner');
+  document.getElementById('plannerForm').style.display = 'none';
+  document.getElementById('plannerResult').style.display = 'block';
+  renderPlanResult(plan.plan_data, places, plan.meta || {});
+}
+
+// ── DELETE SAVED PLAN ──
+async function deleteSavedPlan(id) {
+  await fetch(`${SUPABASE_URL}/rest/v1/saved_plans?id=eq.${id}`, {
+    method: 'DELETE',
+    headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
+  });
+  loadSavedPlans();
 }
