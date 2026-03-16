@@ -43,6 +43,14 @@
   </nav>
 
   <div class="chat-layout">
+    <!-- TAB SWITCHER -->
+    <div class="chat-tabs">
+      <button class="chat-tab active" id="tabChat" onclick="switchChatTab('chat')">🤖 ຖາມ AI</button>
+      <button class="chat-tab" id="tabPlanner" onclick="switchChatTab('planner')">🗺️ Trip Planner</button>
+    </div>
+
+    <!-- TAB: CHAT -->
+    <div id="sectionChat" class="chat-tab-section active">
     <div class="chat-header">
       <div class="chat-avatar">✨</div>
       <div class="chat-header-info">
@@ -79,9 +87,70 @@
         placeholder="ພິມຄຳຖາມ..."></textarea>
       <button class="send-btn" id="sendBtn" onclick="sendMessage()"><span>➤</span></button>
     </div>
-  </div>
+    </div><!-- end sectionChat -->
 
+    <!-- TAB: TRIP PLANNER -->
+    <div id="sectionPlanner" class="chat-tab-section" style="overflow-y:auto; padding: 1rem 1.5rem 2rem;">
+
+      <div class="planner-form" id="plannerForm">
+        <p class="planner-intro">ບອກ AI ວ່າເຈົ້າຢາກຫຍັງ — ຮັບແຜນທ່ຽວທີ່ສ້າງຈາກສະຖານທີ່ຈິງໃນ app</p>
+
+        <div class="planner-group">
+          <label class="planner-label">📅 ຢູ່ກີ່ວັນ?</label>
+          <select id="pDays" class="planner-select">
+            <option value="1">1 ວັນ</option>
+            <option value="2">2 ວັນ</option>
+            <option value="3" selected>3 ວັນ</option>
+            <option value="4">4 ວັນ</option>
+            <option value="5">5 ວັນ</option>
+          </select>
+        </div>
+
+        <div class="planner-group">
+          <label class="planner-label">🎯 ສົນໃຈຫຍັງ?</label>
+          <div class="planner-tags" id="pInterests">
+            <div class="p-tag on" onclick="togglePTag(this)">🌊 ທຳມະຊາດ</div>
+            <div class="p-tag on" onclick="togglePTag(this)">🕌 ວັດ/ຖ້ຳ</div>
+            <div class="p-tag"   onclick="togglePTag(this)">🪂 ຜະຈົນໄພ</div>
+            <div class="p-tag"   onclick="togglePTag(this)">🍜 ອາຫານ</div>
+            <div class="p-tag on" onclick="togglePTag(this)">📸 ທ່ອງທ່ຽວ</div>
+            <div class="p-tag"   onclick="togglePTag(this)">🎵 ສະໜຸກ</div>
+          </div>
+        </div>
+
+        <div class="planner-group">
+          <label class="planner-label">🏷️ ລະດັບ trip</label>
+          <div class="planner-chips" id="pStyle">
+            <div class="p-chip on" onclick="pickPChip('pStyle',this)">💰 Budget</div>
+            <div class="p-chip"   onclick="pickPChip('pStyle',this)">💰💰 Mid-range</div>
+            <div class="p-chip"   onclick="pickPChip('pStyle',this)">💰💰💰 Premium</div>
+          </div>
+        </div>
+
+        <div class="planner-group">
+          <label class="planner-label">⚡ Pace</label>
+          <div class="planner-chips" id="pPace">
+            <div class="p-chip"   onclick="pickPChip('pPace',this)">🌿 ສະບາຍໆ</div>
+            <div class="p-chip on" onclick="pickPChip('pPace',this)">⚖️ ປານກາງ</div>
+            <div class="p-chip"   onclick="pickPChip('pPace',this)">🔥 ເຕັມທີ່</div>
+          </div>
+        </div>
+
+        <button class="planner-btn" onclick="generatePlan()">✨ ສ້າງແຜນທ່ຽວ</button>
+        <div id="plannerError"></div>
+      </div>
+
+      <!-- RESULT -->
+      <div id="plannerResult" style="display:none;"></div>
+
+    </div><!-- end sectionPlanner -->
+
+  </div><!-- end chat-layout -->
+
+  <script src="../js/supabase.js"></script>
+  <script src="../js/saved.js"></script>
   <script src="../js/ai-chat.js"></script>
+  <script src="../js/trip-planner.js"></script>
   <script src="../js/i18n.js"></script>
 </body>
 </html>
