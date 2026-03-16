@@ -313,6 +313,14 @@
         <input type="text" class="form-input" id="f_address" placeholder="ເຊັ່ນ: 3km ຈາກຕົວເມືອງ"/>
       </div>
       <div class="form-group">
+        <label>⏰ ເວລາເປີດ-ປິດ</label>
+        <input type="text" class="form-input" id="f_hours" placeholder="ເຊັ່ນ: 08:00 – 17:00"/>
+      </div>
+      <div class="form-group">
+        <label>🏷️ Tags (ຄັ່ນດ້ວຍ ,)</label>
+        <input type="text" class="form-input" id="f_tags" placeholder="ເຊັ່ນ: ນ້ຳ, ຖ້ຳ, ທຳມະຊາດ"/>
+      </div>
+      <div class="form-group">
         <label>Latitude</label>
         <input type="number" class="form-input" id="f_lat" placeholder="18.92" step="0.0001"/>
       </div>
@@ -369,7 +377,9 @@
 // ── CONFIG ──
 const SUPABASE_URL = 'https://axqgotrbnglssxhwkfjc.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_Jx8kMe3QiaBZ3rE9T7OHtA_hxrbgW5b';
-const ADMIN_PASSWORD = 'vangvieng2025';
+// SHA-256 hash — ບໍ່ເກັບ password plain text ໃນ code
+// ປ່ຽນ hash ໃໝ່: https://emn178.github.io/online-tools/sha256.html
+const ADMIN_HASH = '5684c312d4d964fb9ec8a485f4e99b1b82f084abe2ea27857b94a4d60da7b601';
 
 // ── STATE ──
 let allPlaces = [];
@@ -377,9 +387,13 @@ let editingId = null;
 let deletingId = null;
 
 // ── LOGIN ──
-function doLogin() {
+async function doLogin() {
   const pw = document.getElementById('pwInput').value;
-  if (pw === ADMIN_PASSWORD) {
+  if (!pw) return;
+  // hash ທີ່ user ພິມ ແລ້ວ compare
+  const buf  = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(pw));
+  const hash = Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,'0')).join('');
+  if (hash === ADMIN_HASH) {
     document.getElementById('loginScreen').style.display = 'none';
     document.getElementById('adminApp').style.display = 'block';
     sessionStorage.setItem('adminAuth', '1');
@@ -524,13 +538,15 @@ function openEditModal(id) {
   document.getElementById('f_img_url').value = p.image_url || '';
   document.getElementById('f_bg').value = p.image_bg || '#d4eddf';
   document.getElementById('f_eco').checked = !!p.is_eco;
+  document.getElementById('f_hours').value = p.opening_hours || '';
+  document.getElementById('f_tags').value  = p.tags || '';
   previewImg();
   document.getElementById('placeModal').classList.add('open');
 }
 function closeModal() { document.getElementById('placeModal').classList.remove('open'); }
 
 function clearForm() {
-  ['f_name','f_name_en','f_desc','f_address','f_lat','f_lng','f_emoji','f_rating','f_img_url'].forEach(id => document.getElementById(id).value = '');
+  ['f_name','f_name_en','f_desc','f_address','f_lat','f_lng','f_emoji','f_rating','f_img_url','f_hours','f_tags'].forEach(id => document.getElementById(id).value = '');
   document.getElementById('f_category').value = 'attraction';
   document.getElementById('f_price').value = '$';
   document.getElementById('f_bg').value = '#d4eddf';
@@ -561,7 +577,9 @@ async function savePlace() {
     rating: parseFloat(document.getElementById('f_rating').value) || null,
     image_url: document.getElementById('f_img_url').value.trim() || null,
     image_bg: document.getElementById('f_bg').value,
-    is_eco: document.getElementById('f_eco').checked
+    is_eco: document.getElementById('f_eco').checked,
+    opening_hours: document.getElementById('f_hours').value.trim() || null,
+    tags: document.getElementById('f_tags').value.trim() || null,
   };
   if (!data.name) { showToast('ໃສ່ຊື່ສະຖານທີ່ກ່ອນ!', 'error'); btn.textContent = '💾 ບັນທຶກ'; btn.disabled = false; return; }
   const ok = editingId ? await apiUpdate(editingId, data) : await apiInsert(data);
