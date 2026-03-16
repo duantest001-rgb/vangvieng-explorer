@@ -82,7 +82,8 @@ function applyFilters() {
       p.name?.toLowerCase().includes(q) ||
       p.name_en?.toLowerCase().includes(q) ||
       p.description?.toLowerCase().includes(q) ||
-      p.address?.toLowerCase().includes(q)
+      p.address?.toLowerCase().includes(q) ||
+      p.tags?.toLowerCase().includes(q)
     );
   }
   // Sort
@@ -139,6 +140,7 @@ function renderGrid(places) {
       <div class="card-body">
         <span class="card-cat">${getCatLabel(p.category)}</span>
         <h3 class="card-title">${p.name}</h3>
+        ${p.tags ? `<div class="card-tags">${p.tags.split(',').slice(0,3).map(t => `<span class="card-tag">${t.trim()}</span>`).join('')}</div>` : ''}
         <div class="card-footer">
           <span class="card-price">${p.price_range || ''}</span>
           <span style="font-size:0.75rem;color:var(--muted)">${p.address || ''}</span>
