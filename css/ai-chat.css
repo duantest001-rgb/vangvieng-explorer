@@ -254,3 +254,28 @@ body { overflow: hidden; background: var(--bg); }
   font-size: 0.82rem; color: var(--muted); text-align: center;
   margin-top: 0.5rem;
 }
+
+/* ── SAVED PLAN CARDS ── */
+.saved-plan-card {
+  display: flex; align-items: center; justify-content: space-between;
+  background: var(--white); border: 1px solid var(--border);
+  border-radius: var(--radius-md); padding: 12px 14px;
+  margin-bottom: 8px; cursor: pointer; transition: var(--transition);
+}
+.saved-plan-card:hover { border-color: var(--green-400); box-shadow: var(--shadow-sm); }
+.saved-plan-info { flex: 1; }
+.saved-plan-title { font-size: 0.9rem; font-weight: 700; color: var(--dark); }
+.saved-plan-meta { font-size: 0.75rem; color: var(--muted); margin-top: 2px; }
+.saved-plan-date { font-size: 0.72rem; color: var(--muted); margin-top: 4px; }
+.saved-plan-view {
+  padding: 6px 12px; border-radius: var(--radius-xl);
+  background: var(--green-100); color: var(--green-700);
+  border: 1px solid var(--green-300);
+  font-size: 0.78rem; font-weight: 600; font-family: inherit; cursor: pointer;
+}
+.saved-plan-del {
+  padding: 6px 10px; border-radius: var(--radius-xl);
+  background: #fff0f0; color: #c0392b;
+  border: 1px solid #ffc8c8;
+  font-size: 0.78rem; cursor: pointer;
+}
