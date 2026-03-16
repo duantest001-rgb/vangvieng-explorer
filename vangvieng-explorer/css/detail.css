@@ -82,3 +82,61 @@
 
 .loading-detail { animation: fadeIn 0.3s ease; }
 @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+/* ── REVIEW SECTION ── */
+.review-section {
+  margin-top: 32px;
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 24px;
+}
+.review-header {
+  display: flex; align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap; gap: 12px;
+  margin-bottom: 20px;
+}
+.review-title {
+  font-size: 0.85rem; font-weight: 700;
+  color: var(--dark); text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+.review-avg {
+  display: flex; align-items: center; gap: 8px;
+}
+.avg-num {
+  font-size: 1.6rem; font-weight: 700; color: var(--dark);
+}
+.avg-stars { font-size: 1rem; color: #f59e0b; letter-spacing: 2px; }
+.avg-count { font-size: 0.82rem; color: var(--muted); }
+.review-avg-empty { font-size: 0.82rem; color: var(--muted); }
+
+.review-prompt {
+  font-size: 0.9rem; color: var(--text);
+  margin-bottom: 12px; font-weight: 500;
+}
+.star-picker {
+  display: flex; gap: 8px; margin-bottom: 10px;
+}
+.star-btn {
+  font-size: 2rem; background: none; border: none;
+  cursor: pointer; color: var(--muted);
+  transition: transform 0.1s, color 0.15s;
+  line-height: 1; padding: 0;
+  font-family: inherit;
+}
+.star-btn:hover,
+.star-btn.active { color: #f59e0b; transform: scale(1.2); }
+.review-note {
+  font-size: 0.75rem; color: var(--muted);
+  line-height: 1.5;
+}
+.review-done {
+  background: var(--green-50);
+  border: 1px solid var(--green-300);
+  border-radius: var(--radius-sm);
+  padding: 14px 18px;
+  font-size: 0.9rem; font-weight: 600;
+  color: var(--green-700); line-height: 1.6;
+}
