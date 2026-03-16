@@ -140,3 +140,117 @@ body { overflow: hidden; background: var(--bg); }
   .quick-suggestions { padding: 8px 16px; }
   .chat-input-bar { padding: 10px 16px 16px; }
 }
+
+/* ── TABS ── */
+.chat-tabs {
+  display: flex; border-bottom: 1px solid var(--border);
+  background: var(--white);
+}
+.chat-tab {
+  flex: 1; padding: 12px 8px;
+  border: none; background: none;
+  font-family: var(--font-body); font-size: 0.88rem; font-weight: 600;
+  color: var(--muted); cursor: pointer; transition: var(--transition);
+  border-bottom: 2px solid transparent;
+}
+.chat-tab.active { color: var(--green-700); border-bottom-color: var(--green-700); }
+.chat-tab:hover:not(.active) { color: var(--text); }
+
+.chat-tab-section { display: none; flex: 1; flex-direction: column; }
+.chat-tab-section.active { display: flex; }
+
+/* ── TRIP PLANNER FORM ── */
+.planner-intro {
+  font-size: 0.85rem; color: var(--muted);
+  line-height: 1.6; margin-bottom: 1.25rem;
+}
+.planner-group { margin-bottom: 1.1rem; }
+.planner-label {
+  font-size: 0.78rem; font-weight: 700; letter-spacing: 0.06em;
+  color: var(--muted); text-transform: uppercase;
+  display: block; margin-bottom: 8px;
+}
+.planner-select {
+  width: 100%; padding: 10px 12px;
+  border: 1.5px solid var(--border); border-radius: var(--radius-sm);
+  font-family: var(--font-body); font-size: 0.9rem;
+  background: var(--bg); color: var(--text);
+}
+.planner-tags { display: flex; flex-wrap: wrap; gap: 7px; }
+.p-tag {
+  padding: 6px 13px; border-radius: 99px;
+  border: 1.5px solid var(--border);
+  font-size: 0.82rem; font-family: inherit;
+  cursor: pointer; background: var(--bg); color: var(--muted);
+  transition: var(--transition); user-select: none;
+}
+.p-tag.on { background: var(--green-100); border-color: var(--green-500); color: var(--green-700); font-weight: 600; }
+.planner-chips { display: flex; gap: 7px; flex-wrap: wrap; }
+.p-chip {
+  padding: 7px 16px; border-radius: 99px;
+  border: 1.5px solid var(--border);
+  font-size: 0.82rem; font-family: inherit;
+  cursor: pointer; background: var(--bg); color: var(--muted);
+  transition: var(--transition); user-select: none;
+}
+.p-chip.on { background: var(--green-100); border-color: var(--green-500); color: var(--green-700); font-weight: 600; }
+.planner-btn {
+  width: 100%; padding: 13px;
+  border-radius: var(--radius-xl); border: none;
+  background: linear-gradient(135deg, var(--green-700), var(--green-500));
+  color: var(--white); font-size: 0.95rem; font-weight: 700;
+  font-family: inherit; cursor: pointer;
+  transition: var(--transition); margin-top: 0.25rem;
+}
+.planner-btn:hover { opacity: 0.9; transform: translateY(-1px); }
+
+/* ── SPINNER ── */
+.planner-spinner {
+  width: 44px; height: 44px; border-radius: 50%;
+  border: 3px solid var(--border); border-top-color: var(--green-500);
+  animation: spin 0.8s linear infinite; display: inline-block;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ── RESULT ── */
+.planner-back-btn {
+  background: none; border: none; font-family: inherit;
+  font-size: 0.85rem; color: var(--muted); cursor: pointer;
+  margin-bottom: 1rem; padding: 0; display: block;
+  transition: var(--transition);
+}
+.planner-back-btn:hover { color: var(--green-700); }
+.plan-header { margin-bottom: 1.25rem; }
+.plan-title { font-family: var(--font-display); font-size: 1.3rem; font-weight: 700; color: var(--dark); }
+.plan-meta { display: flex; gap: 6px; margin-top: 6px; flex-wrap: wrap; }
+.plan-badge {
+  font-size: 0.75rem; padding: 3px 10px; border-radius: 99px;
+  background: var(--green-100); color: var(--green-700); font-weight: 600;
+}
+.plan-day { margin-bottom: 1.25rem; }
+.plan-day-label {
+  font-size: 0.72rem; font-weight: 700; letter-spacing: 0.07em;
+  color: var(--muted); text-transform: uppercase; margin-bottom: 8px;
+}
+.plan-stop {
+  display: flex; align-items: flex-start; gap: 10px;
+  background: var(--white); border: 1px solid var(--border);
+  border-radius: var(--radius-md); padding: 10px 12px;
+  margin-bottom: 7px; cursor: pointer; transition: var(--transition);
+}
+.plan-stop:hover { border-color: var(--green-400); box-shadow: var(--shadow-sm); }
+.plan-time { font-size: 0.75rem; color: var(--muted); min-width: 40px; padding-top: 2px; }
+.plan-info { flex: 1; min-width: 0; }
+.plan-name { font-size: 0.9rem; font-weight: 700; color: var(--dark); }
+.plan-cat {
+  display: inline-block; font-size: 0.68rem; font-weight: 700;
+  color: var(--green-700); background: var(--green-100);
+  padding: 1px 7px; border-radius: 99px; margin-top: 2px;
+}
+.plan-note { font-size: 0.78rem; color: var(--muted); margin-top: 4px; line-height: 1.5; }
+.plan-pace-note {
+  background: var(--bg); border: 1px solid var(--border);
+  border-radius: var(--radius-md); padding: 10px 14px;
+  font-size: 0.82rem; color: var(--muted); text-align: center;
+  margin-top: 0.5rem;
+}
