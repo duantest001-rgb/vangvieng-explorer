@@ -606,30 +606,58 @@ button { cursor: pointer; border: none; font-family: var(--font-body); }
    RESPONSIVE
 ══════════════════════════════════════════ */
 @media (max-width: 768px) {
+  /* ── 1. HAMBURGER MENU — slide down panel, ບໍ່ fullscreen ── */
   .nav-links {
-    display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-    background: var(--green-900); flex-direction: column;
-    align-items: center; justify-content: center; gap: 16px;
-    z-index: 999;
+    display: none;
+    position: fixed; top: 64px; left: 0; right: 0;
+    background: rgba(255,255,255,0.98);
+    backdrop-filter: blur(16px);
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: flex-start;
+    gap: 0; z-index: 999;
+    padding: 8px 0 16px;
+    box-shadow: 0 8px 32px rgba(16,80,160,0.12);
+    border-bottom: 1px solid var(--border);
+    max-height: calc(100vh - 64px);
+    overflow-y: auto;
   }
   .nav-links.open { display: flex; }
-  .nav-link { font-size: 1.2rem !important; color: var(--white) !important; }
+  .nav-link {
+    font-size: 0.95rem !important;
+    color: var(--text) !important;
+    padding: 12px 24px !important;
+    width: 100%;
+    border-bottom: 1px solid var(--border);
+  }
+  .nav-link:last-child { border-bottom: none; }
+  .nav-link.nav-ai {
+    color: var(--white) !important;
+    background: linear-gradient(135deg, var(--green-700), var(--green-500));
+    margin: 8px 16px 0;
+    border-radius: var(--radius-xl);
+    width: calc(100% - 32px);
+    text-align: center;
+    border-bottom: none;
+  }
   .hamburger { display: flex; z-index: 1000; }
+
+  /* ── 2. STATS BAR — fix ຕັດຂອບ ── */
+  .stats-container {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px; padding: 16px;
+  }
+  .stat-item { font-size: 1.3rem; justify-content: center; }
+  .stat-divider { display: none; }
 
   .hero { padding: 100px 24px 60px; }
   .search-box { flex-wrap: wrap; border-radius: var(--radius-lg); }
   .search-btn { width: 100%; padding: 12px; border-radius: var(--radius-md); }
 
-  .stats-container { justify-content: center; gap: 24px; }
-  .stat-divider { display: none; }
-
   .categories-grid { grid-template-columns: 1fr 1fr; }
-
   .eco-content { flex-direction: column; }
   .eco-icons { justify-content: center; }
-
   .ai-promo-card { padding: 32px 24px; gap: 32px; }
-
   .section { padding: 56px 0; }
 }
 
