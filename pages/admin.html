@@ -242,11 +242,43 @@
 
   <!-- TAB: PLACES -->
   <div class="tab-section active" id="sectionPlaces">
+  <!-- STATS ROW 1: Places -->
   <div class="stats-row" id="statsRow">
-    <div class="stat-card blue"><div class="num" id="statTotal">-</div><div class="lbl">ທັງໝົດ</div></div>
+    <div class="stat-card blue"><div class="num" id="statTotal">-</div><div class="lbl">ສະຖານທີ່ທັງໝົດ</div></div>
     <div class="stat-card green"><div class="num" id="statEco">-</div><div class="lbl">🌱 Eco</div></div>
     <div class="stat-card yellow"><div class="num" id="statImg">-</div><div class="lbl">ມີຮູບ</div></div>
     <div class="stat-card red"><div class="num" id="statNoImg">-</div><div class="lbl">ບໍ່ມີຮູບ</div></div>
+  </div>
+
+  <!-- STATS ROW 2: Engagement -->
+  <div class="stats-row" id="statsRow2" style="margin-top:0;">
+    <div class="stat-card blue"><div class="num" id="statReviews">-</div><div class="lbl">⭐ Reviews ທັງໝົດ</div></div>
+    <div class="stat-card yellow"><div class="num" id="statPending">-</div><div class="lbl">⏳ ລໍຖ້າ Approve</div></div>
+    <div class="stat-card green"><div class="num" id="statPlans">-</div><div class="lbl">🗺️ ແຜນທ່ຽວ Saved</div></div>
+    <div class="stat-card blue"><div class="num" id="statAvgRating">-</div><div class="lbl">⭐ Rating ສະເລ່ຍ</div></div>
+  </div>
+
+  <!-- TOP PLACES TABLE -->
+  <div style="padding:0 24px 24px; max-width:1400px; margin:0 auto;">
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px;">
+
+      <!-- Top Rated -->
+      <div style="background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:20px;">
+        <h3 style="font-size:0.85rem; color:var(--muted); text-transform:uppercase; letter-spacing:0.05em; margin-bottom:16px;">
+          ⭐ Top Rated Places
+        </h3>
+        <div id="topRatedList"></div>
+      </div>
+
+      <!-- Reviews by Category -->
+      <div style="background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:20px;">
+        <h3 style="font-size:0.85rem; color:var(--muted); text-transform:uppercase; letter-spacing:0.05em; margin-bottom:16px;">
+          📊 ສະຖານທີ່ຕາມປະເພດ
+        </h3>
+        <div id="catBreakdown"></div>
+      </div>
+
+    </div>
   </div>
 
   <!-- TOOLBAR -->
@@ -497,11 +529,69 @@ async function loadPlaces() {
 }
 
 function renderStats() {
+  // Row 1
   document.getElementById('statTotal').textContent = allPlaces.length;
-  document.getElementById('statEco').textContent = allPlaces.filter(p => p.is_eco).length;
+  document.getElementById('statEco').textContent   = allPlaces.filter(p => p.is_eco).length;
   const withImg = allPlaces.filter(p => p.image_url).length;
-  document.getElementById('statImg').textContent = withImg;
+  document.getElementById('statImg').textContent   = withImg;
   document.getElementById('statNoImg').textContent = allPlaces.length - withImg;
+
+  // Top Rated
+  const topRated = [...allPlaces]
+    .filter(p => p.rating)
+    .sort((a,b) => b.rating - a.rating)
+    .slice(0, 5);
+  document.getElementById('topRatedList').innerHTML = topRated.map(p => `
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.05);">
+      <span style="font-size:0.88rem;color:var(--text);">${p.name}</span>
+      <span style="color:var(--warn);font-weight:700;font-size:0.88rem;">⭐ ${p.rating}</span>
+    </div>`).join('');
+
+  // Category breakdown
+  const cats = { attraction:'🏔️ ສະຖານທີ່', hotel:'🏨 ທີ່ພັກ', restaurant:'🍜 ອາຫານ', activity:'🛶 ກິດຈະກຳ' };
+  document.getElementById('catBreakdown').innerHTML = Object.entries(cats).map(([key, label]) => {
+    const count = allPlaces.filter(p => p.category === key).length;
+    const pct   = allPlaces.length ? Math.round((count / allPlaces.length) * 100) : 0;
+    return `
+      <div style="margin-bottom:12px;">
+        <div style="display:flex;justify-content:space-between;font-size:0.82rem;margin-bottom:4px;">
+          <span style="color:var(--text);">${label}</span>
+          <span style="color:var(--muted);">${count} (${pct}%)</span>
+        </div>
+        <div style="background:rgba(255,255,255,0.08);border-radius:4px;height:6px;">
+          <div style="background:var(--accent);border-radius:4px;height:6px;width:${pct}%;transition:width 0.5s ease;"></div>
+        </div>
+      </div>`;
+  }).join('');
+
+  // Load async stats
+  loadEngagementStats();
+}
+
+async function loadEngagementStats() {
+  try {
+    // Reviews count
+    const [rAll, rPending, rPlans] = await Promise.all([
+      fetch(`${SUPABASE_URL}/rest/v1/reviews?select=id,rating`, { headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` } }).then(r => r.json()),
+      fetch(`${SUPABASE_URL}/rest/v1/reviews?approved=eq.false&select=id`, { headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` } }).then(r => r.json()),
+      fetch(`${SUPABASE_URL}/rest/v1/saved_plans?select=id`, { headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` } }).then(r => r.json()),
+    ]);
+
+    document.getElementById('statReviews').textContent = rAll.length;
+    document.getElementById('statPending').textContent = rPending.length;
+    document.getElementById('statPlans').textContent   = rPlans.length;
+
+    const avg = rAll.length
+      ? (rAll.reduce((s, r) => s + r.rating, 0) / rAll.length).toFixed(1)
+      : '-';
+    document.getElementById('statAvgRating').textContent = avg;
+
+    // Update pending badge
+    const badge = document.getElementById('reviewBadge');
+    if (rPending.length > 0) { badge.textContent = rPending.length; badge.style.display = 'inline'; }
+    else { badge.style.display = 'none'; }
+
+  } catch(e) { console.error('engagement stats:', e); }
 }
 
 const CAT_LABELS = { attraction:'ສະຖານທີ່', hotel:'ທີ່ພັກ', restaurant:'ຮ້ານອາຫານ', activity:'ກິດຈະກຳ' };
@@ -737,25 +827,13 @@ async function deleteReview(id) {
 }
 
 // load pending badge on init
-async function loadPendingBadge() {
-  try {
-    const res = await fetch(
-      `${SUPABASE_URL}/rest/v1/reviews?approved=eq.false&select=id`,
-      { headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` } }
-    );
-    const data = await res.json();
-    const badge = document.getElementById('reviewBadge');
-    if (data.length > 0) { badge.textContent = data.length; badge.style.display = 'inline'; }
-  } catch {}
-}
-
 // ── CLOSE ON OVERLAY CLICK ──
 document.getElementById('placeModal').addEventListener('click', e => { if(e.target === e.currentTarget) closeModal(); });
 document.getElementById('deleteModal').addEventListener('click', e => { if(e.target === e.currentTarget) closeDeleteModal(); });
 
 // ── AUTO LOAD ──
 document.addEventListener('DOMContentLoaded', () => {
-  if (sessionStorage.getItem('adminAuth') === '1') { loadPlaces(); loadPendingBadge(); }
+  if (sessionStorage.getItem('adminAuth') === '1') { loadPlaces(); }
 });
 </script>
 </body>
