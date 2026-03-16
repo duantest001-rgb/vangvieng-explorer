@@ -47,6 +47,7 @@
     <div class="chat-tabs">
       <button class="chat-tab active" id="tabChat" onclick="switchChatTab('chat')">🤖 ຖາມ AI</button>
       <button class="chat-tab" id="tabPlanner" onclick="switchChatTab('planner')">🗺️ Trip Planner</button>
+      <button class="chat-tab" id="tabSaved" onclick="switchChatTab('saved')">💾 ແຜນຂອງຂ້ອຍ</button>
     </div>
 
     <!-- TAB: CHAT -->
@@ -144,6 +145,11 @@
       <div id="plannerResult" style="display:none;"></div>
 
     </div><!-- end sectionPlanner -->
+
+    <!-- TAB: SAVED PLANS -->
+    <div id="sectionSaved" class="chat-tab-section" style="overflow-y:auto;padding:1rem 1.5rem 2rem;">
+      <div id="savedPlansContainer"></div>
+    </div><!-- end sectionSaved -->
 
   </div><!-- end chat-layout -->
 
