@@ -116,3 +116,35 @@
   .filter-tabs { gap: 6px; }
   .filter-tab { padding: 7px 14px; font-size: 0.8rem; }
 }
+
+/* ── CARD BOOKMARK ICON ── */
+.card-bookmark-icon {
+  position: absolute; bottom: 10px; right: 10px; z-index: 3;
+  background: rgba(255,255,255,0.92);
+  border: none; border-radius: 50%;
+  width: 34px; height: 34px;
+  font-size: 0.85rem;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  transition: var(--transition);
+  backdrop-filter: blur(8px);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  font-family: var(--font-body);
+  color: var(--green-700);
+}
+.card-bookmark-icon:hover { transform: scale(1.15); }
+.card-bookmark-icon.active {
+  background: var(--green-700);
+  color: white;
+}
+
+/* ── NAV BADGE ── */
+#navSaved { position: relative; }
+#savedBadge {
+  display: inline-flex; align-items: center; justify-content: center;
+  background: var(--green-700); color: white;
+  font-size: 0.65rem; font-weight: 700;
+  min-width: 16px; height: 16px;
+  border-radius: 99px; padding: 0 4px;
+  margin-left: 2px; vertical-align: middle;
+}
