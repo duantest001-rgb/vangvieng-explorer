@@ -82,39 +82,3 @@
 
 .loading-detail { animation: fadeIn 0.3s ease; }
 @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-
-/* ── BOOKMARK BUTTON ── */
-.bookmark-btn {
-  display: block; width: 100%; padding: 13px;
-  background: var(--green-100);
-  color: var(--green-700);
-  border: 1.5px solid var(--green-300);
-  border-radius: var(--radius-md);
-  font-size: 0.9rem; font-weight: 600;
-  font-family: var(--font-body);
-  text-align: center;
-  transition: var(--transition);
-  margin-top: 12px; cursor: pointer;
-}
-.bookmark-btn:hover {
-  background: var(--green-700);
-  color: var(--white);
-  border-color: var(--green-700);
-  transform: translateY(-2px);
-}
-.bookmark-btn.saved {
-  background: var(--green-700);
-  color: var(--white);
-  border-color: var(--green-700);
-}
-
-/* ── NAV BADGE ── */
-#navSaved { position: relative; }
-#savedBadge {
-  display: inline-flex; align-items: center; justify-content: center;
-  background: var(--green-700); color: white;
-  font-size: 0.65rem; font-weight: 700;
-  min-width: 16px; height: 16px;
-  border-radius: 99px; padding: 0 4px;
-  margin-left: 2px; vertical-align: middle;
-}
