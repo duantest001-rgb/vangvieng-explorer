@@ -92,12 +92,15 @@ function renderDetail(p) {
               🤖 ${t("detail.ai_btn")}
             </a>
             <button
-              class="bookmark-btn ${isSaved(p.id) ? 'saved' : ''}"
-              data-bookmark="${p.id}"
-              onclick="toggleSave(${JSON.stringify(p).replace(/"/g, '&quot;')}); updateBookmarkUI('${p.id}')"
-            >
-              ${isSaved(p.id) ? '🔖 ບັນທຶກແລ້ວ' : '🔖 ບັນທຶກສະຖານທີ່ນີ້'}
-            </button>
+              id="bmBtn"
+              onclick="toggleSave(window._currentPlace); const s=isSaved(window._currentPlace.id); this.textContent=s?'🔖 ບັນທຶກແລ້ວ':'🔖 ບັນທຶກສະຖານທີ່ນີ້'; this.style.background=s?'var(--green-700)':'var(--green-100)'; this.style.color=s?'#fff':'var(--green-700)'"
+              style="display:block;width:100%;padding:13px;margin-top:12px;
+                background:${isSaved(p.id)?'var(--green-700)':'var(--green-100)'};
+                color:${isSaved(p.id)?'#fff':'var(--green-700)'};
+                border:1.5px solid var(--green-300);border-radius:var(--radius-md);
+                font-size:0.9rem;font-weight:600;font-family:var(--font-body);
+                text-align:center;cursor:pointer;transition:var(--transition);"
+            >${isSaved(p.id) ? '🔖 ບັນທຶກແລ້ວ' : '🔖 ບັນທຶກສະຖານທີ່ນີ້'}</button>
           </div>
         </div>
       </div>
@@ -112,15 +115,6 @@ function showError(msg) {
       <h3>${msg}</h3>
       <a href="explore.html" style="display:inline-block; margin-top:20px; color:var(--green-600); font-weight:600">← ${t("detail.back")}</a>
     </div>`;
-}
-
-function updateBookmarkUI(id) {
-  const btn = document.querySelector(`[data-bookmark="${id}"]`);
-  if (!btn) return;
-  const saved = isSaved(id);
-  btn.textContent = saved ? '🔖 ບັນທຶກແລ້ວ' : '🔖 ບັນທຶກສະຖານທີ່ນີ້';
-  btn.classList.toggle('saved', saved);
-  updateNavBadge();
 }
 
 function setupNavbar() {

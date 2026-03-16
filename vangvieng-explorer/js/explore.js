@@ -131,11 +131,10 @@ function renderGrid(places) {
         ${p.is_eco ? '<span class="card-eco-badge">🌱 Eco</span>' : ''}
         <span class="card-rating-badge">⭐ ${p.rating || '-'}</span>
         <button
-          class="card-bookmark-icon ${isSaved(p.id) ? 'active' : ''}"
-          data-bookmark="${p.id}"
-          title="${isSaved(p.id) ? 'ລຶບອອກ' : 'ບັນທຶກ'}"
-          onclick="event.stopPropagation(); toggleSave(${JSON.stringify(p).replace(/"/g,'&quot;')}); updateCardBookmark('${p.id}')"
-        >${isSaved(p.id) ? '🔖' : '＋'}</button>
+          class="card-bm-btn${isSaved(p.id) ? ' bm-on' : ''}"
+          onclick="event.stopPropagation(); toggleSave(${JSON.stringify(p).replace(/"/g,'&quot;')}); this.classList.toggle('bm-on'); this.textContent=isSaved('${p.id}')?'🔖':'➕'"
+          title="ບັນທຶກ"
+        >${isSaved(p.id) ? '🔖' : '➕'}</button>
       </div>
       <div class="card-body">
         <span class="card-cat">${getCatLabel(p.category)}</span>
@@ -218,16 +217,6 @@ function setupNavbar() {
       l.addEventListener("click", () => navLinks.classList.remove("open"))
     );
   }
-  updateNavBadge();
-}
-
-function updateCardBookmark(id) {
-  const btn = document.querySelector(`.card-bookmark-icon[data-bookmark="${id}"]`);
-  if (!btn) return;
-  const saved = isSaved(id);
-  btn.textContent = saved ? '🔖' : '＋';
-  btn.classList.toggle('active', saved);
-  btn.title = saved ? 'ລຶບອອກ' : 'ບັນທຶກ';
   updateNavBadge();
 }
 
