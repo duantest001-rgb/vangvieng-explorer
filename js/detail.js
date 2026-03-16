@@ -132,7 +132,8 @@ function renderDetail(p) {
 function sharePlace(method) {
   const p    = window._currentPlace;
   if (!p) return;
-  const url  = window.location.href;
+  const base = 'https://duantest001-rgb.github.io/vangvieng-explorer';
+  const url  = `${base}/pages/detail.html?id=${p.id}`;
   const text = `🌿 ${p.name} — ສະຖານທີ່ທ່ຽວວັງວຽງ\n${p.description ? p.description.slice(0,80) + '...' : ''}\n${url}`;
   const enc  = encodeURIComponent(url);
   const etxt = encodeURIComponent(`🌿 ${p.name} — VangVieng Explorer\n${url}`);
