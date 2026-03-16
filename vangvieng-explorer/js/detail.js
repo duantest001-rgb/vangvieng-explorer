@@ -91,6 +91,13 @@ function renderDetail(p) {
             <a href="ai-chat.html?place=${encodeURIComponent(p.name)}" class="ai-suggest-btn">
               🤖 ${t("detail.ai_btn")}
             </a>
+            <button
+              class="bookmark-btn ${isSaved(p.id) ? 'saved' : ''}"
+              data-bookmark="${p.id}"
+              onclick="toggleSave(${JSON.stringify(p).replace(/"/g, '&quot;')}); updateBookmarkUI('${p.id}')"
+            >
+              ${isSaved(p.id) ? '🔖 ບັນທຶກແລ້ວ' : '🔖 ບັນທຶກສະຖານທີ່ນີ້'}
+            </button>
           </div>
         </div>
       </div>
@@ -107,10 +114,20 @@ function showError(msg) {
     </div>`;
 }
 
+function updateBookmarkUI(id) {
+  const btn = document.querySelector(`[data-bookmark="${id}"]`);
+  if (!btn) return;
+  const saved = isSaved(id);
+  btn.textContent = saved ? '🔖 ບັນທຶກແລ້ວ' : '🔖 ບັນທຶກສະຖານທີ່ນີ້';
+  btn.classList.toggle('saved', saved);
+  updateNavBadge();
+}
+
 function setupNavbar() {
   const hamburger = document.getElementById("hamburger");
   const navLinks  = document.getElementById("navLinks");
   if (hamburger && navLinks) {
     hamburger.addEventListener("click", () => navLinks.classList.toggle("open"));
   }
+  updateNavBadge();
 }
