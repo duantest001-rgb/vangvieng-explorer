@@ -36,7 +36,17 @@ const TRANSLATIONS = {
     "detail.rating":"RATING","detail.price":"ລາຄາ","detail.address":"ທີ່ຢູ່","detail.type":"ປະເພດ",
     "detail.map":"ແຜນທີ່","detail.ask_ai":"ຖາມ AI",
     "detail.ai_desc":"ຢາກຮູ້ຂໍ້ມູນເພີ່ມເຕີມກ່ຽວກັບ {name}? ຖາມ AI ໄດ້ເລີຍ",
-    "detail.ai_btn":"ຖາມ AI ກ່ຽວກັບທີ່ນີ້","detail.no_desc":"ຍັງບໍ່ມີລາຍລະອຽດ"
+    "detail.ai_btn":"ຖາມ AI ກ່ຽວກັບທີ່ນີ້","detail.no_desc":"ຍັງບໍ່ມີລາຍລະອຽດ",
+    "detail.hours":"ເວລາເປີດ-ປິດ","detail.tags":"Tags",
+    "detail.share":"ແຊຣ໌ສະຖານທີ່ນີ້","detail.share.copy":"📋 Copy Link","detail.share.native":"📱 Share",
+    "detail.bookmark":"🔖 ບັນທຶກສະຖານທີ່ນີ້","detail.bookmarked":"🔖 ບັນທຶກແລ້ວ",
+    "review.title":"ຄະແນນຈາກຜູ້ໃຊ້","review.prompt":"ເຈົ້າຄິດວ່າສະຖານທີ່ນີ້ເປັນແນວໃດ?",
+    "review.note":"* ຄະແນນຈະສະແດງຫຼັງ admin ກວດສອບ","review.done":"ຂອບໃຈສຳລັບຄະແນນ!",
+    "review.empty":"ຍັງບໍ່ມີຄະແນນ",
+    "saved.title":"ສະຖານທີ່ທີ່ບັນທຶກ","saved.empty.title":"ຍັງບໍ່ມີສະຖານທີ່ທີ່ບັນທຶກ",
+    "saved.empty.desc":"ໄປສຳຫຼວດ ແລ້ວກົດ 🔖 ໃສ່ສະຖານທີ່ທີ່ຢາກໄປ",
+    "saved.share":"📤 ແບ່ງປັນ","saved.clear":"🗑️ ລ້າງທັງໝົດ",
+    "nav.saved":"🔖 ບັນທຶກ","filter.eco":"🌱 Eco"
   },
   en: {
     "nav.home":"Home","nav.explore":"Explore","nav.map":"Map","nav.ai":"🤖 Ask AI",
@@ -75,7 +85,17 @@ const TRANSLATIONS = {
     "detail.rating":"RATING","detail.price":"Price","detail.address":"Address","detail.type":"Category",
     "detail.map":"Map","detail.ask_ai":"Ask AI",
     "detail.ai_desc":"Want to know more about {name}? Ask our AI!",
-    "detail.ai_btn":"Ask AI about this place","detail.no_desc":"No description available"
+    "detail.ai_btn":"Ask AI about this place","detail.no_desc":"No description available",
+    "detail.hours":"Opening Hours","detail.tags":"Tags",
+    "detail.share":"Share this place","detail.share.copy":"📋 Copy Link","detail.share.native":"📱 Share",
+    "detail.bookmark":"🔖 Save this place","detail.bookmarked":"🔖 Saved",
+    "review.title":"User Ratings","review.prompt":"What do you think of this place?",
+    "review.note":"* Rating will appear after admin review","review.done":"Thanks for your rating!",
+    "review.empty":"No ratings yet",
+    "saved.title":"Saved Places","saved.empty.title":"No saved places yet",
+    "saved.empty.desc":"Browse and tap 🔖 to save places you want to visit",
+    "saved.share":"📤 Share","saved.clear":"🗑️ Clear all",
+    "nav.saved":"🔖 Saved","filter.eco":"🌱 Eco"
   },
   zh: {
     "nav.home":"首页","nav.explore":"探索","nav.map":"地图","nav.ai":"🤖 问AI",
@@ -114,7 +134,17 @@ const TRANSLATIONS = {
     "detail.rating":"评分","detail.price":"价格","detail.address":"地址","detail.type":"类别",
     "detail.map":"地图","detail.ask_ai":"问AI",
     "detail.ai_desc":"想了解更多关于 {name} 的信息？问我们的 AI 吧！",
-    "detail.ai_btn":"向 AI 询问此地点","detail.no_desc":"暂无描述"
+    "detail.ai_btn":"向 AI 询问此地点","detail.no_desc":"暂无描述",
+    "detail.hours":"开放时间","detail.tags":"标签",
+    "detail.share":"分享此地点","detail.share.copy":"📋 复制链接","detail.share.native":"📱 分享",
+    "detail.bookmark":"🔖 收藏此地点","detail.bookmarked":"🔖 已收藏",
+    "review.title":"用户评分","review.prompt":"您对这个地方有什么看法？",
+    "review.note":"* 评分将在管理员审核后显示","review.done":"感谢您的评分！",
+    "review.empty":"暂无评分",
+    "saved.title":"收藏的地点","saved.empty.title":"暂无收藏",
+    "saved.empty.desc":"浏览并点击 🔖 收藏您想去的地方",
+    "saved.share":"📤 分享","saved.clear":"🗑️ 清除全部",
+    "nav.saved":"🔖 收藏","filter.eco":"🌱 生态"
   },
   th: {
     "nav.home":"หน้าหลัก","nav.explore":"สำรวจ","nav.map":"แผนที่","nav.ai":"🤖 ถาม AI",
@@ -153,7 +183,17 @@ const TRANSLATIONS = {
     "detail.rating":"คะแนน","detail.price":"ราคา","detail.address":"ที่อยู่","detail.type":"ประเภท",
     "detail.map":"แผนที่","detail.ask_ai":"ถาม AI",
     "detail.ai_desc":"อยากรู้ข้อมูลเพิ่มเติมเกี่ยวกับ {name}? ถาม AI ได้เลย",
-    "detail.ai_btn":"ถาม AI เกี่ยวกับที่นี่","detail.no_desc":"ยังไม่มีรายละเอียด"
+    "detail.ai_btn":"ถาม AI เกี่ยวกับที่นี่","detail.no_desc":"ยังไม่มีรายละเอียด",
+    "detail.hours":"เวลาเปิด-ปิด","detail.tags":"แท็ก",
+    "detail.share":"แชร์สถานที่นี้","detail.share.copy":"📋 คัดลอกลิงก์","detail.share.native":"📱 แชร์",
+    "detail.bookmark":"🔖 บันทึกสถานที่นี้","detail.bookmarked":"🔖 บันทึกแล้ว",
+    "review.title":"คะแนนจากผู้ใช้","review.prompt":"คุณคิดอย่างไรกับสถานที่นี้?",
+    "review.note":"* คะแนนจะแสดงหลังจาก admin ตรวจสอบ","review.done":"ขอบคุณสำหรับคะแนน!",
+    "review.empty":"ยังไม่มีคะแนน",
+    "saved.title":"สถานที่ที่บันทึก","saved.empty.title":"ยังไม่มีสถานที่ที่บันทึก",
+    "saved.empty.desc":"สำรวจและแตะ 🔖 เพื่อบันทึกสถานที่ที่อยากไป",
+    "saved.share":"📤 แชร์","saved.clear":"🗑️ ล้างทั้งหมด",
+    "nav.saved":"🔖 บันทึก","filter.eco":"🌱 อีโค"
   },
   ko: {
     "nav.home":"홈","nav.explore":"탐색","nav.map":"지도","nav.ai":"🤖 AI 질문",
@@ -192,7 +232,17 @@ const TRANSLATIONS = {
     "detail.rating":"평점","detail.price":"가격","detail.address":"주소","detail.type":"카테고리",
     "detail.map":"지도","detail.ask_ai":"AI 질문",
     "detail.ai_desc":"{name}에 대해 더 알고 싶으신가요? AI에게 물어보세요!",
-    "detail.ai_btn":"이 장소에 대해 AI에게 질문","detail.no_desc":"설명 없음"
+    "detail.ai_btn":"이 장소에 대해 AI에게 질문","detail.no_desc":"설명 없음",
+    "detail.hours":"운영 시간","detail.tags":"태그",
+    "detail.share":"이 장소 공유","detail.share.copy":"📋 링크 복사","detail.share.native":"📱 공유",
+    "detail.bookmark":"🔖 저장하기","detail.bookmarked":"🔖 저장됨",
+    "review.title":"사용자 평점","review.prompt":"이 장소에 대해 어떻게 생각하세요?",
+    "review.note":"* 평점은 관리자 검토 후 표시됩니다","review.done":"평점 감사합니다!",
+    "review.empty":"아직 평점이 없습니다",
+    "saved.title":"저장된 장소","saved.empty.title":"저장된 장소가 없습니다",
+    "saved.empty.desc":"탐색하고 🔖 를 눌러 가고 싶은 곳을 저장하세요",
+    "saved.share":"📤 공유","saved.clear":"🗑️ 전체 삭제",
+    "nav.saved":"🔖 저장","filter.eco":"🌱 에코"
   }
 };
 
