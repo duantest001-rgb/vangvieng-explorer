@@ -22,6 +22,7 @@ async function loadDetail(id) {
     if (!place) { showError(t("error.not_found")); return; }
     window._currentPlace = place;
     renderDetail(place);
+    renderReviews(place.id, 'reviewContainer');
     document.title = `${place.name} — VangVieng Explorer`;
   } catch (err) {
     showError(t("error.db"));
@@ -73,7 +74,14 @@ function renderDetail(p) {
               <div class="info-label">🗂️ ${t("detail.type")}</div>
               <div class="info-value">${catLabel}</div>
             </div>
+            ${p.opening_hours ? `
+            <div class="info-item">
+              <div class="info-label">⏰ ເວລາເປີດ-ປິດ</div>
+              <div class="info-value">${p.opening_hours}</div>
+            </div>` : ''}
           </div>
+          <!-- REVIEWS -->
+          <div id="reviewContainer"></div>
         </div>
         <!-- RIGHT SIDEBAR -->
         <div class="detail-sidebar">
