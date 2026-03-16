@@ -3,16 +3,78 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>ສະຖານທີ່ທີ່ບັນທຶກ · VangVieng Explorer</title>
+  <title>ລາຍການທີ່ບັນທຶກ · VangVieng Explorer</title>
   <link rel="stylesheet" href="../css/style.css" />
-  <link rel="stylesheet" href="../css/saved.css" />
+  <link rel="stylesheet" href="../css/explore.css" />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700;800&family=Outfit:wght@300;400;500;600;700&family=Noto+Sans+Lao:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    .saved-toolbar {
+      background: var(--white); border-bottom: 1px solid var(--border);
+      padding: 14px 0; position: sticky; top: 64px; z-index: 90;
+      box-shadow: var(--shadow-sm);
+    }
+    .saved-toolbar .container {
+      display: flex; align-items: center; justify-content: space-between;
+      flex-wrap: wrap; gap: 12px;
+    }
+    .saved-count { font-size: 0.88rem; font-weight: 600; color: var(--muted); }
+    .toolbar-btns { display: flex; gap: 8px; }
+    .btn-share {
+      padding: 8px 18px; border-radius: var(--radius-xl);
+      background: var(--green-100); color: var(--green-700);
+      font-size: 0.83rem; font-weight: 600; font-family: var(--font-body);
+      border: 1.5px solid var(--green-300); cursor: pointer;
+      transition: var(--transition);
+    }
+    .btn-share:hover { background: var(--green-700); color: var(--white); border-color: var(--green-700); }
+    .btn-clear {
+      padding: 8px 18px; border-radius: var(--radius-xl);
+      background: #fff0f0; color: #c0392b;
+      font-size: 0.83rem; font-weight: 600; font-family: var(--font-body);
+      border: 1.5px solid #ffc8c8; cursor: pointer; transition: var(--transition);
+    }
+    .btn-clear:hover { background: #c0392b; color: var(--white); border-color: #c0392b; }
+    .btn-share:disabled, .btn-clear:disabled { opacity: 0.35; pointer-events: none; }
+    /* Modal */
+    .modal-overlay {
+      position: fixed; inset: 0; background: rgba(0,0,0,0.45);
+      display: none; align-items: center; justify-content: center;
+      z-index: 1000; padding: 24px;
+    }
+    .modal-overlay.open { display: flex; }
+    .modal-box {
+      background: var(--white); border-radius: var(--radius-lg);
+      padding: 36px 32px; max-width: 360px; width: 100%; text-align: center;
+    }
+    .modal-box .icon { font-size: 2.5rem; margin-bottom: 16px; }
+    .modal-box h3 { font-size: 1.1rem; font-weight: 700; color: var(--dark); margin-bottom: 10px; }
+    .modal-box p { font-size: 0.88rem; color: var(--muted); line-height: 1.6; margin-bottom: 28px; }
+    .modal-btns { display: flex; gap: 12px; }
+    .modal-cancel {
+      flex: 1; padding: 11px; border-radius: var(--radius-xl);
+      background: var(--bg); border: 1.5px solid var(--border);
+      color: var(--text); font-size: 0.9rem; font-weight: 600;
+      font-family: var(--font-body); cursor: pointer;
+    }
+    .modal-confirm {
+      flex: 1; padding: 11px; border-radius: var(--radius-xl);
+      background: #c0392b; border: none; color: var(--white);
+      font-size: 0.9rem; font-weight: 600; font-family: var(--font-body); cursor: pointer;
+    }
+    /* Nav badge */
+    .saved-badge {
+      display: inline-flex; align-items: center; justify-content: center;
+      background: var(--green-700); color: white;
+      font-size: 0.65rem; font-weight: 700;
+      min-width: 16px; height: 16px; border-radius: 99px;
+      padding: 0 4px; margin-left: 2px; vertical-align: middle;
+    }
+  </style>
 </head>
 <body>
 
-  <!-- NAVBAR -->
   <nav class="navbar scrolled" id="navbar">
     <div class="nav-container">
       <a href="../index.html" class="nav-logo" style="color:var(--dark)">
@@ -24,7 +86,7 @@
         <a href="explore.html" class="nav-link" data-i18n="nav.explore">ສຳຫຼວດ</a>
         <a href="map.html" class="nav-link" data-i18n="nav.map">ແຜນທີ່</a>
         <a href="ai-chat.html" class="nav-link nav-ai" data-i18n="nav.ai">🤖 ຖາມ AI</a>
-        <a href="saved.html" class="nav-link active">🔖 ບັນທຶກ</a>
+        <a href="saved.html" class="nav-link active">🔖 ບັນທຶກ <span class="saved-badge" style="display:none"></span></a>
       </div>
       <div class="lang-dropdown" id="langDropdown">
         <button class="lang-toggle" id="langToggle" onclick="toggleLangMenu()">
@@ -43,10 +105,10 @@
     </div>
   </nav>
 
-  <!-- PAGE HEADER -->
+  <!-- HEADER -->
   <div class="page-header">
     <div class="container">
-      <div class="header-eyebrow">🔖 ລາຍການຂອງຂ້ອຍ</div>
+      <p class="page-sub" style="font-size:0.8rem;letter-spacing:0.1em;text-transform:uppercase;margin-bottom:10px;opacity:0.6;">🔖 ລາຍການຂອງຂ້ອຍ</p>
       <h1 class="page-title">ສະຖານທີ່ທີ່ບັນທຶກ</h1>
       <p class="page-sub">ສະຖານທີ່ທີ່ເຈົ້າຢາກໄປ — ເກັບໄວ້ໃນທີ່ດຽວ</p>
     </div>
@@ -56,33 +118,26 @@
   <div class="saved-toolbar">
     <div class="container">
       <span class="saved-count" id="savedCount">0 ສະຖານທີ່</span>
-      <div class="toolbar-actions">
-        <button class="btn-share" id="btnShare" onclick="shareList()">
-          📤 ແບ່ງປັນລາຍການ
-        </button>
-        <button class="btn-clear" id="btnClear" onclick="confirmClear()">
-          🗑️ ລ້າງທັງໝົດ
-        </button>
+      <div class="toolbar-btns">
+        <button class="btn-share" id="btnShare" onclick="shareList()" disabled>📤 ແບ່ງປັນ</button>
+        <button class="btn-clear" id="btnClear" onclick="confirmClear()" disabled>🗑️ ລ້າງທັງໝົດ</button>
       </div>
     </div>
   </div>
 
-  <!-- MAIN CONTENT -->
-  <main class="saved-main">
+  <!-- GRID -->
+  <section class="section explore-section">
     <div class="container">
       <div class="places-grid" id="savedGrid"></div>
     </div>
-  </main>
-
-  <!-- TOAST -->
-  <div class="toast" id="toast"></div>
+  </section>
 
   <!-- CONFIRM MODAL -->
   <div class="modal-overlay" id="modalOverlay" onclick="closeModal()">
     <div class="modal-box" onclick="event.stopPropagation()">
-      <div class="modal-icon">🗑️</div>
-      <h3 class="modal-title">ລ້າງລາຍການທັງໝົດ?</h3>
-      <p class="modal-desc">ສະຖານທີ່ທີ່ບັນທຶກທັງໝົດຈະຖືກລົບ ແລະ ບໍ່ສາມາດກູ້ຄືນໄດ້</p>
+      <div class="icon">🗑️</div>
+      <h3>ລ້າງລາຍການທັງໝົດ?</h3>
+      <p>ສະຖານທີ່ທີ່ບັນທຶກທັງໝົດຈະຖືກລົບ ບໍ່ສາມາດກູ້ຄືນໄດ້</p>
       <div class="modal-btns">
         <button class="modal-cancel" onclick="closeModal()">ຍົກເລີກ</button>
         <button class="modal-confirm" onclick="clearAll()">ລ້າງທັງໝົດ</button>
@@ -92,12 +147,23 @@
 
   <footer class="footer">
     <div class="footer-bottom">
-      <p>© 2025 VangVieng Explorer · Made with 🌿 in Laos</p>
+      <p data-i18n="footer.copy">© 2025 VangVieng Explorer · Made with 🌿 in Laos</p>
     </div>
   </footer>
 
-  <script src="../js/supabase.js"></script>
   <script src="../js/saved.js"></script>
   <script src="../js/i18n.js"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      renderSavedPage();
+      updateNavBadge();
+      // navbar hamburger
+      const hamburger = document.getElementById("hamburger");
+      const navLinks  = document.getElementById("navLinks");
+      if (hamburger && navLinks) {
+        hamburger.addEventListener("click", () => navLinks.classList.toggle("open"));
+      }
+    });
+  </script>
 </body>
 </html>
