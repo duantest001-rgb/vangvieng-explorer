@@ -139,16 +139,13 @@ function sharePlace(method) {
 
   if (method === 'copy') {
     navigator.clipboard.writeText(url).then(() => {
-      const el = document.getElementById('shareCopied');
-      if (el) { el.style.display = 'block'; setTimeout(() => el.style.display = 'none', 2500); }
+      showToast('📋 ຄັດລອກ URL ແລ້ວ!');
     });
   } else if (method === 'native' && navigator.share) {
     navigator.share({ title: p.name, text: `ສະຖານທີ່ທ່ຽວວັງວຽງ — ${p.name}`, url }).catch(() => {});
   } else if (method === 'native') {
-    // fallback to copy if native share not supported
     navigator.clipboard.writeText(url).then(() => {
-      const el = document.getElementById('shareCopied');
-      if (el) { el.style.display = 'block'; setTimeout(() => el.style.display = 'none', 2500); }
+      showToast('📋 ຄັດລອກ URL ແລ້ວ!');
     });
   } else if (method === 'facebook') {
     window.open(`https://www.facebook.com/sharer/sharer.php?u=${enc}`, '_blank', 'width=600,height=400');
