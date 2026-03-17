@@ -89,8 +89,29 @@ body { overflow: hidden; }
 /* Mobile */
 @media (max-width: 768px) {
   body { overflow: auto; }
-  .map-layout { flex-direction: column; height: auto; }
-  .map-sidebar { width: 100%; min-width: unset; height: auto; overflow: visible; }
+  .map-layout { flex-direction: column; height: auto; gap: 0; }
+  .map-sidebar {
+    width: 100%; min-width: unset;
+    height: auto; overflow: visible;
+    border-right: none;
+    border-bottom: 1px solid var(--border);
+  }
   .map-place-list { max-height: 240px; }
-  .map-container { height: 35vh; min-height: 220px; }
+  .map-container {
+    height: 40vh; min-height: 240px;
+    padding: 12px 16px 16px;
+    background: var(--bg);
+  }
+  .main-map {
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.12);
+    height: 100%;
+    width: 100%;
+    border: none;
+  }
+  .map-open-btn {
+    margin: 0 16px 16px;
+    border-radius: 99px;
+  }
 }
