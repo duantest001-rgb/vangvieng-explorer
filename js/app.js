@@ -188,9 +188,13 @@ async function loadStats() {
     const activities  = data.filter(p => p.category === 'activity').length;
 
     const targets = [total, hotels, restaurants, activities];
-    document.querySelectorAll('.stat-num').forEach((el, i) => {
-      el.dataset.target = targets[i];
-      animateCounter(el, targets[i]);
+    // ໃຊ້ stats-widget ເທົ່ານັ້ນ
+    const els = document.querySelectorAll('.stats-widget .stat-num');
+    els.forEach((el, i) => {
+      if (targets[i] !== undefined) {
+        el.dataset.target = targets[i];
+        animateCounter(el, targets[i]);
+      }
     });
   } catch (err) {
     console.error("Stats error:", err);
