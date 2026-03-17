@@ -24,6 +24,8 @@ async function loadDetail(id) {
     renderDetail(place);
     renderReviews(place.id, 'reviewContainer');
     document.title = `${place.name} — VangVieng Explorer`;
+    // increment view count
+    incrementView(place.id);
   } catch (err) {
     showError(t("error.db"));
   }
@@ -78,6 +80,11 @@ function renderDetail(p) {
             <div class="info-item">
               <div class="info-label">⏰ ເວລາເປີດ-ປິດ</div>
               <div class="info-value">${p.opening_hours}</div>
+            </div>` : ''}
+            ${p.view_count ? `
+            <div class="info-item">
+              <div class="info-label">👁️ ຍອດເບິ່ງ</div>
+              <div class="info-value">${p.view_count.toLocaleString()} ຄັ້ງ</div>
             </div>` : ''}
             ${p.tags ? `
             <div class="info-item" style="grid-column:1/-1">
@@ -161,6 +168,26 @@ function sharePlace(method) {
   } else if (method === 'whatsapp') {
     window.open(`https://wa.me/?text=${etxt}`, '_blank');
   }
+}
+
+// ── VIEW COUNTER ──
+async function incrementView(id) {
+  try {
+    // ກວດ session — ບໍ່ນັບຊໍ້າໃນ session ດຽວກັນ
+    const key = `vve_viewed_${id}`;
+    if (sessionStorage.getItem(key)) return;
+    sessionStorage.setItem(key, '1');
+
+    await fetch(`${SUPABASE_URL}/rest/v1/rpc/increment_view`, {
+      method: 'POST',
+      headers: {
+        'apikey': SUPABASE_KEY,
+        'Authorization': `Bearer ${SUPABASE_KEY}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ place_id: id })
+    });
+  } catch { /* silent */ }
 }
 
 function showError(msg) {
