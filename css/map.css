@@ -91,6 +91,6 @@ body { overflow: hidden; }
   body { overflow: auto; }
   .map-layout { flex-direction: column; height: auto; }
   .map-sidebar { width: 100%; min-width: unset; height: auto; overflow: visible; }
-  .map-place-list { max-height: 280px; }
-  .map-container { height: 50vh; }
+  .map-place-list { max-height: 240px; }
+  .map-container { height: 35vh; min-height: 220px; }
 }
