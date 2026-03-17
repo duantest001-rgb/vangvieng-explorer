@@ -279,12 +279,12 @@
         <div id="topRatedList"></div>
       </div>
 
-      <!-- Reviews by Category -->
+      <!-- Top Viewed -->
       <div style="background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:20px;">
         <h3 style="font-size:0.85rem; color:var(--muted); text-transform:uppercase; letter-spacing:0.05em; margin-bottom:16px;">
-          📊 ສະຖານທີ່ຕາມປະເພດ
+          👁️ Most Viewed Places
         </h3>
-        <div id="catBreakdown"></div>
+        <div id="topViewedList"></div>
       </div>
 
     </div>
@@ -562,6 +562,19 @@ function renderStats() {
       <span style="font-size:0.88rem;color:var(--text);">${p.name}</span>
       <span style="color:var(--warn);font-weight:700;font-size:0.88rem;">⭐ ${p.rating}</span>
     </div>`).join('');
+
+  // Top Viewed
+  const topViewed = [...allPlaces]
+    .filter(p => p.view_count)
+    .sort((a,b) => (b.view_count||0) - (a.view_count||0))
+    .slice(0, 5);
+  document.getElementById('topViewedList').innerHTML = topViewed.length
+    ? topViewed.map(p => `
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.05);">
+          <span style="font-size:0.88rem;color:var(--text);">${p.name}</span>
+          <span style="color:var(--accent);font-weight:700;font-size:0.88rem;">👁️ ${(p.view_count||0).toLocaleString()}</span>
+        </div>`).join('')
+    : '<p style="color:var(--muted);font-size:0.82rem;">ຍັງບໍ່ມີຂໍ້ມູນ</p>';
 
   // Category breakdown
   const cats = { attraction:'🏔️ ສະຖານທີ່', hotel:'🏨 ທີ່ພັກ', restaurant:'🍜 ອາຫານ', activity:'🛶 ກິດຈະກຳ' };
