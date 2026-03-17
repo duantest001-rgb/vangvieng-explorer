@@ -281,41 +281,40 @@ button { cursor: pointer; border: none; font-family: var(--font-body); }
   display: flex; flex-wrap: wrap; gap: 10px;
   justify-content: center; margin-top: 16px;
 }
-.weather-widget {
+.weather-widget,
+.stats-widget {
   display: inline-flex; align-items: center; gap: 8px;
   background: rgba(255,255,255,0.12);
   border: 1px solid rgba(255,255,255,0.2);
   backdrop-filter: blur(8px);
   border-radius: var(--radius-xl);
-  padding: 7px 18px;
+  padding: 8px 20px;
   font-family: var(--font-body);
 }
 .stats-widget {
-  display: inline-flex; align-items: center; gap: 6px;
-  background: rgba(255,255,255,0.12);
-  border: 1px solid rgba(255,255,255,0.2);
-  backdrop-filter: blur(8px);
-  border-radius: var(--radius-xl);
-  padding: 7px 18px;
-  font-family: var(--font-body);
-  flex-wrap: wrap; justify-content: center;
+  gap: 6px; flex-wrap: wrap; justify-content: center;
 }
 .weather-icon { font-size: 1rem; }
-.weather-temp { font-size: clamp(0.82rem, 2vw, 0.95rem); font-weight: 700; color: var(--white); }
+.weather-temp {
+  font-size: clamp(0.82rem, 2vw, 0.92rem);
+  font-weight: 700; color: var(--white);
+}
 .weather-desc {
-  font-size: clamp(0.7rem, 1.6vw, 0.78rem); color: rgba(255,255,255,0.7);
-  border-left: 1px solid rgba(255,255,255,0.25); padding-left: 8px;
+  font-size: clamp(0.7rem, 1.6vw, 0.78rem);
+  color: rgba(255,255,255,0.7);
+  border-left: 1px solid rgba(255,255,255,0.25);
+  padding-left: 8px;
 }
 .stats-widget-item {
-  font-size: clamp(0.75rem, 1.8vw, 0.88rem); font-weight: 600;
-  color: var(--white); white-space: nowrap;
+  font-size: clamp(0.75rem, 1.8vw, 0.88rem);
+  font-weight: 600; color: var(--white); white-space: nowrap;
 }
 .stats-widget-item .stat-num { font-weight: 800; }
 .stats-widget-dot { color: rgba(255,255,255,0.35); font-size: 0.8rem; }
 
 @media (max-width: 480px) {
   .hero-widgets { gap: 8px; }
-  .weather-widget, .stats-widget { padding: 6px 12px; gap: 5px; }
+  .weather-widget, .stats-widget { padding: 6px 14px; gap: 5px; }
 }
 
 /* ══════════════════════════════════════════
