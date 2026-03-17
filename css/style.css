@@ -521,7 +521,7 @@ button { cursor: pointer; border: none; font-family: var(--font-body); }
 ══════════════════════════════════════════ */
 .eco-banner {
   background: linear-gradient(135deg, #0e2f5c 0%, #1a6bbf 100%);
-  padding: 80px 0; position: relative; overflow: hidden;
+  padding: clamp(32px,5vw,56px) 0; position: relative; overflow: hidden;
 }
 .eco-bg-shapes { position: absolute; inset: 0; pointer-events: none; }
 .eco-shape { position: absolute; border-radius: 50%; background: rgba(255,255,255,0.05); }
@@ -531,7 +531,7 @@ button { cursor: pointer; border: none; font-family: var(--font-body); }
 .eco-content {
   position: relative; z-index: 2;
   display: flex; align-items: center; justify-content: space-between;
-  flex-wrap: wrap; gap: 40px;
+  flex-wrap: wrap; gap: clamp(20px,4vw,40px);
 }
 .eco-text { max-width: 500px; }
 .eco-tag {
@@ -543,7 +543,7 @@ button { cursor: pointer; border: none; font-family: var(--font-body); }
   font-family: var(--font-display); font-size: clamp(1.8rem, 4vw, 2.5rem);
   color: var(--white); margin-bottom: 16px; font-weight: 600; letter-spacing: 0.01em;
 }
-.eco-text p { color: rgba(255,255,255,0.75); font-size: 0.95rem; margin-bottom: 28px; }
+.eco-text p { color: rgba(255,255,255,0.75); font-size: clamp(0.82rem,2vw,0.95rem); margin-bottom: clamp(14px,2.5vw,24px); }
 .btn-eco {
   display: inline-block; padding: 14px 32px; border-radius: var(--radius-xl);
   background: var(--white); color: var(--green-700);
@@ -551,7 +551,7 @@ button { cursor: pointer; border: none; font-family: var(--font-body); }
 }
 .btn-eco:hover { background: var(--green-100); transform: translateY(-2px); }
 
-.eco-icons { display: flex; gap: 24px; flex-wrap: wrap; }
+.eco-icons { display: flex; gap: clamp(14px,3vw,24px); flex-wrap: wrap; align-items: center; }
 .eco-icon-item {
   display: flex; flex-direction: column; align-items: center; gap: 8px;
   color: rgba(255,255,255,0.8); font-size: 0.8rem; font-weight: 500;
@@ -564,10 +564,10 @@ button { cursor: pointer; border: none; font-family: var(--font-body); }
 ══════════════════════════════════════════ */
 .ai-promo-section { background: var(--white); }
 .ai-promo-card {
-  display: flex; align-items: center; gap: 60px;
+  display: flex; align-items: center; gap: clamp(24px,5vw,60px);
   background: linear-gradient(135deg, #f0f9ff 0%, #e8f2ff 100%);
   border: 1px solid var(--border); border-radius: var(--radius-xl);
-  padding: 60px 48px; flex-wrap: wrap;
+  padding: clamp(28px,4vw,48px) clamp(20px,4vw,48px); flex-wrap: wrap;
 }
 .ai-promo-left { flex: 1; min-width: 280px; display: flex; flex-direction: column; gap: 16px; }
 .ai-bubble {
@@ -600,7 +600,7 @@ button { cursor: pointer; border: none; font-family: var(--font-body); }
   font-family: var(--font-display); font-size: clamp(1.8rem, 3vw, 2.2rem);
   color: var(--dark); margin-bottom: 16px; font-weight: 600; letter-spacing: 0.01em;
 }
-.ai-promo-right p { color: var(--muted); font-size: 0.95rem; margin-bottom: 28px; line-height: 1.7; }
+.ai-promo-right p { color: var(--muted); font-size: clamp(0.82rem,2vw,0.95rem); margin-bottom: clamp(14px,2.5vw,24px); line-height: 1.6; }
 .btn-primary {
   display: inline-block; padding: 14px 32px; border-radius: var(--radius-xl);
   background: var(--green-700); color: var(--white);
@@ -613,11 +613,11 @@ button { cursor: pointer; border: none; font-family: var(--font-body); }
 ══════════════════════════════════════════ */
 .footer {
   background: var(--green-900);
-  padding: 60px 0 0;
+  padding: clamp(32px,5vw,52px) 0 0;
 }
 .footer-grid {
   display: grid; grid-template-columns: 2fr 1fr 1fr 1.5fr;
-  gap: 40px; padding-bottom: 48px;
+  gap: clamp(24px,4vw,40px); padding-bottom: clamp(24px,4vw,40px);
 }
 @media (max-width: 768px) { .footer-grid { grid-template-columns: 1fr 1fr; } }
 @media (max-width: 480px) { .footer-grid { grid-template-columns: 1fr; } }
@@ -637,7 +637,7 @@ button { cursor: pointer; border: none; font-family: var(--font-body); }
 .footer-links a:hover { color: var(--green-300); padding-left: 4px; }
 .footer-bottom {
   border-top: 1px solid rgba(255,255,255,0.08);
-  padding: 20px 24px; text-align: center;
+  padding: 14px 24px; text-align: center;
   font-size: 0.8rem; color: rgba(255,255,255,0.35);
 }
 
@@ -709,7 +709,7 @@ button { cursor: pointer; border: none; font-family: var(--font-body); }
   .categories-grid { grid-template-columns: 1fr 1fr; gap: 10px; }
   .eco-content { flex-direction: column; }
   .eco-icons { justify-content: center; }
-  .ai-promo-card { padding: 32px 24px; gap: 32px; }
+  .ai-promo-card { padding: 24px 20px; gap: 20px; }
 }
 
 @media (max-width: 480px) {
