@@ -3,6 +3,33 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>VangVieng Explorer 🌿 — ສຳຫຼວດວັງວຽງ ລາວ</title>
+
+  <!-- SEO -->
+  <meta name="description" content="ສຳຫຼວດວັງວຽງ ລາວ — ສະຖານທີ່ທ່ອງທ່ຽວ, ທີ່ພັກ, ຮ້ານອາຫານ, ກິດຈະກຳ. Discover Vang Vieng attractions, hotels, restaurants and activities powered by AI.">
+  <meta name="keywords" content="Vang Vieng, ວັງວຽງ, Laos, ລາວ, tourism, travel, eco tourism, Blue Lagoon, Tham Chang, kayak, zipline">
+  <meta name="author" content="VangVieng Explorer">
+  <meta name="robots" content="index, follow">
+  <meta name="google-site-verification" content="aIEkSNs_3NFdKV3iaKgwpjX4M2gqIAVR-UfDAykAiaM">
+  <link rel="canonical" href="https://duantest001-rgb.github.io/vangvieng-explorer/">
+
+  <!-- Open Graph (Facebook, Line, WhatsApp) -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://duantest001-rgb.github.io/vangvieng-explorer/">
+  <meta property="og:title" content="VangVieng Explorer — ສຳຫຼວດວັງວຽງ ລາວ">
+  <meta property="og:description" content="ສະຖານທີ່ທ່ອງທ່ຽວ, ທີ່ພັກ, ຮ້ານອາຫານ, ກິດຈະກຳ ວັງວຽງ ທຸກຢ່າງໃນທີ່ດຽວ ໂດຍ AI">
+  <meta property="og:image" content="https://duantest001-rgb.github.io/vangvieng-explorer/assets/logo.png">
+  <meta property="og:locale" content="lo_LA">
+  <meta property="og:locale:alternate" content="en_US">
+  <meta property="og:site_name" content="VangVieng Explorer">
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="VangVieng Explorer — ສຳຫຼວດວັງວຽງ">
+  <meta name="twitter:description" content="ສະຖານທີ່ທ່ອງທ່ຽວ, ທີ່ພັກ, ຮ້ານອາຫານ ວັງວຽງ ໂດຍ AI">
+  <meta name="twitter:image" content="https://duantest001-rgb.github.io/vangvieng-explorer/assets/logo.png">
+
+  <!-- PWA -->
   <meta name="theme-color" content="#1050a0">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -10,8 +37,6 @@
   <meta name="apple-mobile-web-app-title" content="VVExplorer">
   <link rel="manifest" href="manifest.json">
   <link rel="apple-touch-icon" href="assets/logo.png">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>VangVieng Explorer 🌿</title>
   <link rel="stylesheet" href="css/style.css" />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -75,6 +100,12 @@
         <button class="tag" onclick="searchTag('restaurant')" data-i18n="tag.food">🍜 ອາຫານ</button>
         <button class="tag" onclick="searchTag('adventure')" data-i18n="tag.adventure">🛶 Adventure</button>
         <button class="tag" onclick="searchTag('cafe')" data-i18n="tag.cafe">☕ Cafe</button>
+      </div>
+      <!-- WEATHER WIDGET -->
+      <div class="weather-widget" id="weatherWidget" style="display:none; margin-top:16px;">
+        <span class="weather-icon" id="wIcon">🌤️</span>
+        <span class="weather-temp" id="wTemp">--°C</span>
+        <span class="weather-desc" id="wDesc">ວັງວຽງ</span>
       </div>
     </div>
     <div class="hero-scroll">
@@ -231,6 +262,46 @@
   <script src="js/app.js"></script>
   <script src="js/i18n.js"></script>
   <script>
+    // ── WEATHER — Vang Vieng ──
+    async function loadWeather() {
+      try {
+        const url = 'https://api.openweathermap.org/data/2.5/weather?lat=18.9167&lon=102.4500&appid=25e354c80aa4d1d062271734755205c4&units=metric';
+        const res  = await fetch(url);
+        if (!res.ok) throw new Error('API error');
+        const data = await res.json();
+        const temp = Math.round(data.main.temp);
+        const desc = data.weather[0].main;
+        const icon = getWeatherIcon(desc);
+        document.getElementById('wIcon').textContent = icon;
+        document.getElementById('wTemp').textContent = `${temp}°C`;
+        document.getElementById('wDesc').textContent = getWeatherLao(desc);
+        document.getElementById('weatherWidget').style.display = 'inline-flex';
+      } catch {
+        // ຖ້າ API fail — ເຊື່ອງ widget ໄປເລີຍ
+        const w = document.getElementById('weatherWidget');
+        if (w) w.style.display = 'none';
+      }
+    }
+
+    function getWeatherIcon(main) {
+      const map = {
+        Clear: '☀️', Clouds: '⛅', Rain: '🌧️',
+        Thunderstorm: '⛈️', Drizzle: '🌦️', Snow: '❄️',
+        Mist: '🌫️', Fog: '🌫️', Haze: '🌫️'
+      };
+      return map[main] || '🌤️';
+    }
+
+    function getWeatherLao(main) {
+      const map = {
+        Clear: 'ແດດອອກ', Clouds: 'ມີເມກ', Rain: 'ຝົນຕົກ',
+        Thunderstorm: 'ພາຍຸ', Drizzle: 'ຝົນປອຍ', Snow: 'ຫິມະ',
+        Mist: 'ໝອກ', Fog: 'ໝອກ', Haze: 'ຝຸ່ນ'
+      };
+      return map[main] || 'ສະພາບດີ';
+    }
+
+    loadWeather();
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
         navigator.serviceWorker.register('/vangvieng-explorer/service-worker.js')
@@ -239,5 +310,6 @@
       });
     }
   </script>
+  <script src="js/active-trip.js"></script>
 </body>
 </html>

@@ -24,6 +24,8 @@ async function loadDetail(id) {
     renderDetail(place);
     renderReviews(place.id, 'reviewContainer');
     document.title = `${place.name} — VangVieng Explorer`;
+    // increment view count
+    incrementView(place.id);
   } catch (err) {
     showError(t("error.db"));
   }
@@ -79,6 +81,11 @@ function renderDetail(p) {
               <div class="info-label">⏰ ເວລາເປີດ-ປິດ</div>
               <div class="info-value">${p.opening_hours}</div>
             </div>` : ''}
+            ${p.view_count ? `
+            <div class="info-item">
+              <div class="info-label">👁️ ຍອດເບິ່ງ</div>
+              <div class="info-value">${p.view_count.toLocaleString()} ຄັ້ງ</div>
+            </div>` : ''}
             ${p.tags ? `
             <div class="info-item" style="grid-column:1/-1">
               <div class="info-label">🏷️ Tags</div>
@@ -116,6 +123,36 @@ function renderDetail(p) {
                 font-size:0.9rem;font-weight:600;font-family:var(--font-body);
                 text-align:center;cursor:pointer;transition:var(--transition);"
             >${isSaved(p.id) ? '🔖 ບັນທຶກແລ້ວ' : '🔖 ບັນທຶກສະຖານທີ່ນີ້'}</button>
+          </div>
+          ${(p.phone || p.whatsapp) ? `
+          <div class="sidebar-card">
+            <h4>📞 ຕິດຕໍ່ / ຈອງ</h4>
+            <div style="display:flex;flex-direction:column;gap:10px;margin-top:4px;">
+              ${p.phone ? `
+              <a href="tel:${p.phone}"
+                style="display:flex;align-items:center;gap:10px;padding:12px 14px;
+                  background:var(--green-100);color:var(--green-700);
+                  border:1.5px solid var(--green-300);border-radius:var(--radius-md);
+                  font-size:0.9rem;font-weight:600;text-decoration:none;
+                  transition:var(--transition);"
+                onmouseover="this.style.background='var(--green-700)';this.style.color='#fff'"
+                onmouseout="this.style.background='var(--green-100)';this.style.color='var(--green-700)'">
+                📞 ໂທຫາ ${p.phone}
+              </a>` : ''}
+              ${p.whatsapp ? `
+              <a href="https://wa.me/${p.whatsapp.replace(/[^0-9]/g,'')}"
+                target="_blank"
+                style="display:flex;align-items:center;gap:10px;padding:12px 14px;
+                  background:#e8f8f0;color:#25d366;
+                  border:1.5px solid #9fe3c4;border-radius:var(--radius-md);
+                  font-size:0.9rem;font-weight:600;text-decoration:none;
+                  transition:var(--transition);"
+                onmouseover="this.style.background='#25d366';this.style.color='#fff'"
+                onmouseout="this.style.background='#e8f8f0';this.style.color='#25d366'">
+                💬 WhatsApp
+              </a>` : ''}
+            </div>
+          </div>` : ''}
           </div>
           <div class="sidebar-card">
             <h4>📤 ແຊຣ໌ສະຖານທີ່ນີ້</h4>
@@ -161,6 +198,26 @@ function sharePlace(method) {
   } else if (method === 'whatsapp') {
     window.open(`https://wa.me/?text=${etxt}`, '_blank');
   }
+}
+
+// ── VIEW COUNTER ──
+async function incrementView(id) {
+  try {
+    // ກວດ session — ບໍ່ນັບຊໍ້າໃນ session ດຽວກັນ
+    const key = `vve_viewed_${id}`;
+    if (sessionStorage.getItem(key)) return;
+    sessionStorage.setItem(key, '1');
+
+    await fetch(`${SUPABASE_URL}/rest/v1/rpc/increment_view`, {
+      method: 'POST',
+      headers: {
+        'apikey': SUPABASE_KEY,
+        'Authorization': `Bearer ${SUPABASE_KEY}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ place_id: id })
+    });
+  } catch { /* silent */ }
 }
 
 function showError(msg) {

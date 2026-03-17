@@ -100,6 +100,9 @@ format:
     const itinerary = JSON.parse(clean);
 
     renderPlanResult(itinerary, places, { days, interests, style, pace });
+    if (typeof startActiveTrip === 'function') {
+      startActiveTrip(itinerary, places, { days, interests, style, pace });
+    }
 
   } catch (e) {
     document.getElementById('plannerResult').innerHTML = `
@@ -118,6 +121,18 @@ function renderPlanResult(itinerary, places, meta) {
     '🔥 ເຕັມທີ່': '🔥 ແຜນ pack ເຕັມ — ໄດ້ເຫັນຫຼາຍ'
   };
 
+  // flat list ຂອງ stops ທັງໝົດ
+  const allStops = [];
+  itinerary.forEach(day => {
+    day.stops.forEach(stop => {
+      const place = places.find(p => p.name?.toLowerCase() === stop.place_name?.toLowerCase());
+      allStops.push({ stop, place });
+    });
+  });
+
+  // clear old check state
+  allStops.forEach((_, i) => localStorage.removeItem(`stop_${i}`));
+
   let html = `
     <button class="planner-back-btn" onclick="resetPlanner()">← ວາງແຜນໃໝ່</button>
     <div class="plan-header">
@@ -125,42 +140,100 @@ function renderPlanResult(itinerary, places, meta) {
       <div class="plan-meta">
         <span class="plan-badge">${meta.style}</span>
         <span class="plan-badge">${meta.pace}</span>
+        <span class="plan-badge" id="progressBadge">0/${allStops.length} ຈຸດ</span>
       </div>
     </div>`;
 
+  let idx = 0;
   itinerary.forEach(day => {
     html += `<div class="plan-day"><div class="plan-day-label">ວັນທີ ${day.day} — ${day.label}</div>`;
     day.stops.forEach(stop => {
-      const place = places.find(p => p.name?.toLowerCase() === stop.place_name?.toLowerCase());
+      const place   = places.find(p => p.name?.toLowerCase() === stop.place_name?.toLowerCase());
+      const curIdx  = idx;
+      const nextIdx = idx + 1 < allStops.length ? idx + 1 : null;
+
+      // URL ນຳທາງໄປສະຖານທີ່ນີ້
+      const navUrl = place?.lat && place?.lng
+        ? `https://maps.google.com/maps/dir/?api=1&destination=${place.lat},${place.lng}&travelmode=driving`
+        : `https://maps.google.com/maps/search/${encodeURIComponent(stop.place_name + ' Vang Vieng Laos')}`;
+
+      // URL ນຳທາງຈາກສະຖານທີ່ນີ້ → ຕໍ່ໄປ
+      let nextNavUrl = '';
+      if (nextIdx !== null) {
+        const np = allStops[nextIdx].place;
+        const ns = allStops[nextIdx].stop;
+        if (place?.lat && place?.lng && np?.lat && np?.lng) {
+          nextNavUrl = `https://maps.google.com/maps/dir/${place.lat},${place.lng}/${np.lat},${np.lng}`;
+        } else if (np?.lat && np?.lng) {
+          nextNavUrl = `https://maps.google.com/maps/dir/?api=1&destination=${np.lat},${np.lng}&travelmode=driving`;
+        } else {
+          nextNavUrl = `https://maps.google.com/maps/search/${encodeURIComponent(ns.place_name + ' Vang Vieng')}`;
+        }
+      }
+
       const thumb = place?.image_url
-        ? `<img src="${place.image_url}" alt="" style="width:52px;height:52px;border-radius:var(--radius-sm);object-fit:cover;flex-shrink:0;" onerror="this.outerHTML='<div style=width:52px;height:52px;border-radius:8px;background:var(--green-100);display:flex;align-items:center;justify-content:center;font-size:1.5rem;flex-shrink:0>📍</div>'">`
-        : `<div style="width:52px;height:52px;border-radius:var(--radius-sm);background:var(--green-100);display:flex;align-items:center;justify-content:center;font-size:1.5rem;flex-shrink:0;">${place?.image_emoji || '📍'}</div>`;
+        ? `<img src="${place.image_url}" alt="" style="width:46px;height:46px;border-radius:8px;object-fit:cover;flex-shrink:0;">`
+        : `<div style="width:46px;height:46px;border-radius:8px;background:var(--green-100);display:flex;align-items:center;justify-content:center;font-size:1.3rem;flex-shrink:0;">${place?.image_emoji||'📍'}</div>`;
+
+      const nextName = nextIdx !== null ? allStops[nextIdx].stop.place_name : '';
 
       html += `
-        <div class="plan-stop" onclick="window.location.href='detail.html?id=${place?.id || ''}'">
-          <div class="plan-time">${stop.time}</div>
-          ${thumb}
-          <div class="plan-info">
-            <div class="plan-name">${stop.place_name}</div>
-            ${place?.category ? `<span class="plan-cat">${place.category}</span>` : ''}
-            <div class="plan-note">💡 ${stop.note}</div>
+        <div class="plan-stop-wrap" id="wrap_${curIdx}">
+          <div class="plan-stop-main">
+            <button class="stop-check" id="chk_${curIdx}"
+              onclick="toggleCheck(${curIdx},${allStops.length},'${nextNavUrl}','${nextName}')"
+              title="ທຳເຄື່ອງໝາຍຮອດແລ້ວ">☐</button>
+            <div class="plan-time">${stop.time}</div>
+            ${thumb}
+            <div class="plan-info" onclick="window.location.href='detail.html?id=${place?.id||''}'">
+              <div class="plan-name">${stop.place_name}</div>
+              ${place?.category?`<span class="plan-cat">${place.category}</span>`:''}
+              <div class="plan-note">💡 ${stop.note}</div>
+            </div>
+            <a href="${navUrl}" target="_blank" class="stop-nav-btn" title="ນຳທາງ">🗺️</a>
           </div>
-          <div style="color:var(--border);font-size:1rem;padding-top:2px;flex-shrink:0;">›</div>
+          <div class="stop-next-nav" id="next_${curIdx}" style="display:none;">
+            <span>ຕໍ່ໄປ: ${nextName}</span>
+            <a href="${nextNavUrl}" target="_blank" class="stop-next-btn">🗺️ ນຳທາງໄປ Stop ຕໍ່ໄປ →</a>
+          </div>
         </div>`;
+      idx++;
     });
     html += `</div>`;
   });
 
   html += `
-    <div class="plan-pace-note">${paceMsg[meta.pace] ?? ''}</div>
-    <button class="planner-btn" style="margin-top:1rem;" onclick="savePlan()">
-      💾 ບັນທຶກແຜນນີ້
-    </button>
+    <div class="plan-pace-note">${paceMsg[meta.pace]??''}</div>
+    <button class="planner-btn" style="margin-top:1rem;" onclick="savePlan()">💾 ບັນທຶກແຜນນີ້</button>
     <div id="saveStatus"></div>`;
 
   document.getElementById('plannerResult').innerHTML = html;
-  // store current plan for saving
   window._currentPlan = { itinerary, places, meta };
+}
+
+// ── TOGGLE CHECK ──
+function toggleCheck(idx, total, nextNavUrl, nextName) {
+  const key     = `stop_${idx}`;
+  const checked = localStorage.getItem(key) !== '1';
+  localStorage.setItem(key, checked ? '1' : '0');
+
+  const chk  = document.getElementById(`chk_${idx}`);
+  const wrap  = document.getElementById(`wrap_${idx}`);
+  const nextEl = document.getElementById(`next_${idx}`);
+
+  if (chk)  { chk.textContent = checked ? '✅' : '☐'; chk.classList.toggle('checked', checked); }
+  if (wrap)  { wrap.classList.toggle('stop-done', checked); }
+  if (nextEl && nextNavUrl) { nextEl.style.display = checked ? 'flex' : 'none'; }
+
+  // update progress
+  let done = 0;
+  for (let i = 0; i < total; i++) if (localStorage.getItem(`stop_${i}`) === '1') done++;
+  const badge = document.getElementById('progressBadge');
+  if (badge) {
+    badge.textContent = `${done}/${total} ຈຸດ`;
+    if (done === total) { badge.style.background='var(--green-700)'; badge.style.color='#fff'; }
+    else { badge.style.background=''; badge.style.color=''; }
+  }
 }
 
 // ── RESET ──
