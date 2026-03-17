@@ -80,7 +80,12 @@ function renderActiveBanner() {
       </div>
     </div>
   `;
-  document.body.prepend(banner);
+  const nav = document.querySelector('nav.navbar') || document.querySelector('nav');
+  if (nav) {
+    nav.insertAdjacentElement('afterend', banner);
+  } else {
+    document.body.prepend(banner);
+  }
 }
 
 // ── RENDER DRAWER ──
@@ -182,7 +187,11 @@ function confirmEndTrip() {
   const s = document.createElement('style');
   s.textContent = `
   #activeTripBanner {
-    position: fixed; top: 64px; left: 0; right: 0; z-index: 2000;
+    position: sticky;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 999;
   }
   .atrip-banner {
     display: flex; align-items: center; justify-content: space-between;
@@ -273,11 +282,6 @@ function confirmEndTrip() {
     border: none; font-size: 0.9rem; font-weight: 600;
     cursor: pointer; font-family: inherit;
   }
-
-  /* Offset navbar when banner shows */
-  body.has-active-trip .navbar,
-  body.has-active-trip nav { top: 44px !important; }
-  body.has-active-trip .chat-layout { padding-top: calc(64px + 44px) !important; }
   `;
   document.head.appendChild(s);
 })();
@@ -290,15 +294,3 @@ document.addEventListener('DOMContentLoaded', () => {
     renderActiveBanner();
   }
 });
-
-// ── RECALCULATE BANNER POSITION ──
-function fixBannerPosition() {
-  const nav = document.querySelector('nav');
-  const banner = document.getElementById('activeTripBanner');
-  if (nav && banner) {
-    const h = nav.getBoundingClientRect().height;
-    banner.style.top = h + 'px';
-  }
-}
-window.addEventListener('scroll', fixBannerPosition);
-window.addEventListener('resize', fixBannerPosition);
