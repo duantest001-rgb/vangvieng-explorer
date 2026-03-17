@@ -79,6 +79,46 @@
     .tab-btn:hover:not(.active) { border-color:var(--accent); color:var(--accent); }
     .tab-section { display:none; }
     .tab-section.active { display:block; }
+    .dash-card {
+      background:var(--surface); border:1px solid var(--border);
+      border-radius:var(--radius); padding:20px;
+    }
+    .dash-title {
+      font-size:0.85rem; color:var(--muted);
+      text-transform:uppercase; letter-spacing:0.05em;
+      margin:0 0 16px;
+    }
+    .dash-table {
+      width:100%; border-collapse:collapse;
+      font-size:0.82rem;
+    }
+    .dash-table th {
+      text-align:left; padding:8px 12px;
+      border-bottom:2px solid var(--border);
+      color:var(--muted); font-weight:600;
+      font-size:0.75rem; text-transform:uppercase;
+      white-space:nowrap;
+    }
+    .dash-table td {
+      padding:10px 12px; border-bottom:1px solid rgba(255,255,255,0.05);
+      color:var(--text);
+    }
+    .dash-table tr:hover td { background:rgba(255,255,255,0.03); }
+    .dash-bar-row { margin-bottom:10px; }
+    .dash-bar-label {
+      display:flex; justify-content:space-between;
+      font-size:0.78rem; margin-bottom:4px; color:var(--text);
+    }
+    .dash-bar-track {
+      background:rgba(255,255,255,0.08); border-radius:4px; height:8px;
+    }
+    .dash-bar-fill {
+      height:8px; border-radius:4px;
+      background:var(--accent); transition:width 0.6s ease;
+    }
+    @media(max-width:768px) {
+      #sectionDashboard .grid-2 { grid-template-columns:1fr !important; }
+    }
     .approve-btn { background:var(--accent2); color:#111; }
     .approve-btn:hover { opacity:0.85; }
 
@@ -243,6 +283,7 @@
       <div class="tab-btns">
         <button class="tab-btn active" id="tabPlaces" onclick="switchTab('places')">🏔️ ສະຖານທີ່</button>
         <button class="tab-btn" id="tabReviews" onclick="switchTab('reviews')">⭐ Reviews <span id="reviewBadge" style="display:none;background:#ff6b6b;color:#fff;border-radius:99px;padding:1px 7px;font-size:0.75rem;margin-left:4px;"></span></button>
+        <button class="tab-btn" id="tabDashboard" onclick="switchTab('dashboard')">📊 Dashboard</button>
       </div>
       <button class="btn btn-primary" id="btnAddPlace" onclick="openAddModal()">＋ ເພີ່ມສະຖານທີ່</button>
       <button class="btn btn-ghost" onclick="doLogout()">ອອກ</button>
@@ -354,6 +395,73 @@
       </div>
     </div>
   </div><!-- end sectionReviews -->
+
+  <!-- ── DASHBOARD TAB ── -->
+  <div class="tab-section" id="sectionDashboard">
+    <div style="padding:24px;max-width:1400px;margin:0 auto;">
+
+      <!-- Export buttons -->
+      <div style="display:flex;gap:10px;margin-bottom:24px;flex-wrap:wrap;">
+        <button onclick="exportPlacesCSV()" style="padding:10px 20px;background:var(--accent);color:#fff;border:none;border-radius:8px;font-family:inherit;font-size:0.85rem;font-weight:600;cursor:pointer;">
+          📥 Export Places (Excel)
+        </button>
+        <button onclick="exportReviewsCSV()" style="padding:10px 20px;background:#059669;color:#fff;border:none;border-radius:8px;font-family:inherit;font-size:0.85rem;font-weight:600;cursor:pointer;">
+          📥 Export Reviews (Excel)
+        </button>
+        <button onclick="exportPlansCSV()" style="padding:10px 20px;background:#7c3aed;color:#fff;border:none;border-radius:8px;font-family:inherit;font-size:0.85rem;font-weight:600;cursor:pointer;">
+          📥 Export Trip Plans (Excel)
+        </button>
+      </div>
+
+      <!-- Charts grid -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:20px;">
+
+        <!-- Category chart -->
+        <div class="dash-card">
+          <h3 class="dash-title">📊 ສະຖານທີ່ຕາມປະເພດ</h3>
+          <div id="dashCatChart"></div>
+        </div>
+
+        <!-- Rating distribution -->
+        <div class="dash-card">
+          <h3 class="dash-title">⭐ ການກະຈາຍ Rating</h3>
+          <div id="dashRatingChart"></div>
+        </div>
+
+      </div>
+
+      <!-- Top places table -->
+      <div class="dash-card" style="margin-bottom:20px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:8px;">
+          <h3 class="dash-title" style="margin:0;">🏆 Top Places — ສະຖານທີ່ຍອດນິຍົມ</h3>
+          <span style="font-size:0.75rem;color:var(--muted);">ຮຽງຕາມ Rating + Views</span>
+        </div>
+        <div style="overflow-x:auto;">
+          <table class="dash-table" id="dashTopTable">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>ຊື່</th>
+                <th>ປະເພດ</th>
+                <th>⭐ Rating</th>
+                <th>👁️ Views</th>
+                <th>🌱 Eco</th>
+                <th>📞 Contact</th>
+              </tr>
+            </thead>
+            <tbody id="dashTopBody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Reviews summary -->
+      <div class="dash-card">
+        <h3 class="dash-title">💬 Reviews ຫຼ້າສຸດ</h3>
+        <div id="dashRecentReviews"></div>
+      </div>
+
+    </div>
+  </div><!-- end sectionDashboard -->
 
 <!-- ── ADD/EDIT MODAL ── -->
 <div class="modal-overlay" id="placeModal">
@@ -859,10 +967,120 @@ function showToast(msg, type='success') {
 function switchTab(tab) {
   document.getElementById('sectionPlaces').classList.toggle('active', tab === 'places');
   document.getElementById('sectionReviews').classList.toggle('active', tab === 'reviews');
+  document.getElementById('sectionDashboard').classList.toggle('active', tab === 'dashboard');
   document.getElementById('tabPlaces').classList.toggle('active', tab === 'places');
   document.getElementById('tabReviews').classList.toggle('active', tab === 'reviews');
+  document.getElementById('tabDashboard').classList.toggle('active', tab === 'dashboard');
   document.getElementById('btnAddPlace').style.display = tab === 'places' ? '' : 'none';
   if (tab === 'reviews') loadReviewsAdmin();
+  if (tab === 'dashboard') loadDashboard();
+}
+
+// ── DASHBOARD ──
+async function loadDashboard() {
+  // Category bar chart
+  const cats = { attraction:'🏔️ ສະຖານທີ່', hotel:'🏨 ທີ່ພັກ', restaurant:'🍜 ອາຫານ', activity:'🛶 ກິດຈະກຳ' };
+  const catHtml = Object.entries(cats).map(([key, label]) => {
+    const count = allPlaces.filter(p => p.category === key).length;
+    const pct   = allPlaces.length ? Math.round((count / allPlaces.length) * 100) : 0;
+    return `<div class="dash-bar-row">
+      <div class="dash-bar-label"><span>${label}</span><span>${count} (${pct}%)</span></div>
+      <div class="dash-bar-track"><div class="dash-bar-fill" style="width:${pct}%"></div></div>
+    </div>`;
+  }).join('');
+  document.getElementById('dashCatChart').innerHTML = catHtml;
+
+  // Rating distribution
+  const ratings = [5,4,3,2,1];
+  const ratingHtml = ratings.map(r => {
+    const count = allPlaces.filter(p => Math.round(p.rating) === r).length;
+    const pct   = allPlaces.length ? Math.round((count / allPlaces.length) * 100) : 0;
+    return `<div class="dash-bar-row">
+      <div class="dash-bar-label"><span>${'⭐'.repeat(r)}</span><span>${count}</span></div>
+      <div class="dash-bar-track"><div class="dash-bar-fill" style="width:${pct}%;background:#f59e0b"></div></div>
+    </div>`;
+  }).join('');
+  document.getElementById('dashRatingChart').innerHTML = ratingHtml;
+
+  // Top places table
+  const sorted = [...allPlaces].sort((a,b) => {
+    const aScore = (a.rating||0)*10 + (a.view_count||0)/10;
+    const bScore = (b.rating||0)*10 + (b.view_count||0)/10;
+    return bScore - aScore;
+  }).slice(0, 20);
+
+  document.getElementById('dashTopBody').innerHTML = sorted.map((p,i) => `
+    <tr>
+      <td style="color:var(--muted)">${i+1}</td>
+      <td><strong>${p.name}</strong></td>
+      <td><span style="font-size:0.75rem;padding:2px 8px;border-radius:99px;background:rgba(255,255,255,0.08)">${p.category||'-'}</span></td>
+      <td>${p.rating ? `⭐ ${p.rating}` : '-'}</td>
+      <td>${p.view_count ? `👁️ ${p.view_count.toLocaleString()}` : '-'}</td>
+      <td>${p.is_eco ? '✅' : ''}</td>
+      <td>${p.phone ? `📞` : ''}${p.whatsapp ? ` 💬` : ''}</td>
+    </tr>`).join('');
+
+  // Recent reviews
+  try {
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/reviews?select=*,places(name)&order=created_at.desc&limit=5`,
+      { headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` } });
+    const reviews = await res.json();
+    document.getElementById('dashRecentReviews').innerHTML = reviews.length
+      ? reviews.map(r => `
+          <div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid rgba(255,255,255,0.06);">
+            <span style="font-size:0.85rem;color:var(--text)">${r.places?.name || 'Unknown'}</span>
+            <span style="color:#f59e0b">⭐ ${r.rating} · <span style="color:var(--muted);font-size:0.75rem">${new Date(r.created_at).toLocaleDateString()}</span></span>
+          </div>`).join('')
+      : '<p style="color:var(--muted);font-size:0.82rem">ຍັງບໍ່ມີ reviews</p>';
+  } catch {}
+}
+
+// ── EXPORT CSV ──
+function downloadCSV(filename, rows, headers) {
+  const BOM = '\uFEFF';
+  const csv = BOM + [headers, ...rows.map(r => headers.map(h => {
+    const v = r[h] ?? '';
+    return `"${String(v).replace(/"/g, '""')}"`;
+  }))].map(r => Array.isArray(r) ? r.join(',') : r.join(',')).join('\n');
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
+  a.download = filename; a.click();
+}
+
+function exportPlacesCSV() {
+  const headers = ['id','name','name_en','category','rating','address','is_eco','view_count','phone','whatsapp','opening_hours','tags'];
+  downloadCSV(`vve_places_${new Date().toISOString().slice(0,10)}.csv`, allPlaces, headers);
+  showToast('📥 Export Places ສຳເລັດ!', 'success');
+}
+
+async function exportReviewsCSV() {
+  try {
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/reviews?select=*&order=created_at.desc`,
+      { headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` } });
+    const data = await res.json();
+    const headers = ['id','place_id','rating','approved','created_at'];
+    downloadCSV(`vve_reviews_${new Date().toISOString().slice(0,10)}.csv`, data, headers);
+    showToast('📥 Export Reviews ສຳເລັດ!', 'success');
+  } catch { showToast('❌ Export ຜິດພາດ', 'error'); }
+}
+
+async function exportPlansCSV() {
+  try {
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/saved_plans?select=*&order=created_at.desc`,
+      { headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` } });
+    const data = await res.json();
+    const rows = data.map(p => ({
+      id: p.id,
+      days: p.meta?.days || '',
+      style: p.meta?.style || '',
+      pace: p.meta?.pace || '',
+      stops: (p.plan_data || []).reduce((s,d) => s + (d.stops?.length||0), 0),
+      created_at: p.created_at
+    }));
+    const headers = ['id','days','style','pace','stops','created_at'];
+    downloadCSV(`vve_plans_${new Date().toISOString().slice(0,10)}.csv`, rows, headers);
+    showToast('📥 Export Plans ສຳເລັດ!', 'success');
+  } catch { showToast('❌ Export ຜິດພາດ', 'error'); }
 }
 
 // ── LOAD REVIEWS (ALL — admin sees pending too) ──
@@ -945,5 +1163,6 @@ document.addEventListener('DOMContentLoaded', () => {
   if (sessionStorage.getItem('adminAuth') === '1') { loadPlaces(); }
 });
 </script>
+  <script src="../js/active-trip.js"></script>
 </body>
 </html>
