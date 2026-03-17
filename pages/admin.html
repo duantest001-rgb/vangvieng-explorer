@@ -398,6 +398,14 @@
         <input type="text" class="form-input" id="f_address" placeholder="ເຊັ່ນ: 3km ຈາກຕົວເມືອງ"/>
       </div>
       <div class="form-group">
+        <label>📞 ເບີ້ໂທ</label>
+        <input type="text" class="form-input" id="f_phone" placeholder="ເຊັ່ນ: +85620xxxxxxx"/>
+      </div>
+      <div class="form-group">
+        <label>💬 WhatsApp</label>
+        <input type="text" class="form-input" id="f_whatsapp" placeholder="ເຊັ່ນ: +85620xxxxxxx"/>
+      </div>
+      <div class="form-group">
         <label>⏰ ເວລາເປີດ-ປິດ</label>
         <input type="text" class="form-input" id="f_hours" placeholder="ເຊັ່ນ: 08:00 – 17:00"/>
       </div>
@@ -703,13 +711,15 @@ function openEditModal(id) {
   document.getElementById('f_eco').checked = !!p.is_eco;
   document.getElementById('f_hours').value = p.opening_hours || '';
   document.getElementById('f_tags').value  = p.tags || '';
+  document.getElementById('f_phone').value    = p.phone || '';
+  document.getElementById('f_whatsapp').value = p.whatsapp || '';
   previewImg();
   document.getElementById('placeModal').classList.add('open');
 }
 function closeModal() { document.getElementById('placeModal').classList.remove('open'); }
 
 function clearForm() {
-  ['f_name','f_name_en','f_desc','f_address','f_lat','f_lng','f_emoji','f_rating','f_img_url','f_hours','f_tags'].forEach(id => document.getElementById(id).value = '');
+  ['f_name','f_name_en','f_desc','f_address','f_lat','f_lng','f_emoji','f_rating','f_img_url','f_hours','f_tags','f_phone','f_whatsapp'].forEach(id => document.getElementById(id).value = '');
   document.getElementById('f_category').value = 'attraction';
   document.getElementById('f_price').value = '$';
   document.getElementById('f_bg').value = '#d4eddf';
@@ -811,6 +821,8 @@ async function savePlace() {
     is_eco: document.getElementById('f_eco').checked,
     opening_hours: document.getElementById('f_hours').value.trim() || null,
     tags: document.getElementById('f_tags').value.trim() || null,
+    phone: document.getElementById('f_phone').value.trim() || null,
+    whatsapp: document.getElementById('f_whatsapp').value.trim() || null,
   };
   if (!data.name) { showToast('ໃສ່ຊື່ສະຖານທີ່ກ່ອນ!', 'error'); btn.textContent = '💾 ບັນທຶກ'; btn.disabled = false; return; }
   const ok = editingId ? await apiUpdate(editingId, data) : await apiInsert(data);
