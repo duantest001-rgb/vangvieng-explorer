@@ -83,8 +83,13 @@ function renderActiveBanner() {
   const nav = document.querySelector('nav.navbar') || document.querySelector('nav');
   if (nav) {
     nav.insertAdjacentElement('afterend', banner);
+    // set top based on nav height
+    const h = nav.getBoundingClientRect().height || 64;
+    banner.querySelector('.atrip-banner').style.cssText += '';
+    document.getElementById('activeTripBanner').style.top = h + 'px';
   } else {
     document.body.prepend(banner);
+    document.getElementById('activeTripBanner').style.top = '64px';
   }
 }
 
@@ -187,7 +192,7 @@ function confirmEndTrip() {
   const s = document.createElement('style');
   s.textContent = `
   #activeTripBanner {
-    position: sticky;
+    position: fixed;
     top: 0;
     left: 0;
     right: 0;
