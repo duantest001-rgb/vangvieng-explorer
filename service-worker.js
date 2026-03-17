@@ -26,6 +26,7 @@ const STATIC_ASSETS = [
   '/vangvieng-explorer/js/saved.js',
   '/vangvieng-explorer/js/reviews.js',
   '/vangvieng-explorer/js/trip-planner.js',
+  '/vangvieng-explorer/js/active-trip.js',
   '/vangvieng-explorer/js/i18n.js',
   '/vangvieng-explorer/assets/logo.png',
 ];
