@@ -57,6 +57,12 @@
       <div class="hero-shape s1"></div><div class="hero-shape s2"></div><div class="hero-shape s3"></div>
     </div>
     <div class="hero-content">
+      <!-- WEATHER WIDGET -->
+      <div class="weather-widget" id="weatherWidget">
+        <span class="weather-icon" id="wIcon">⏳</span>
+        <span class="weather-temp" id="wTemp">--°</span>
+        <span class="weather-desc" id="wDesc">ວັງວຽງ</span>
+      </div>
       <div class="hero-badge">✦ <span data-i18n="hero.badge">Eco Tourism Vang Vieng</span></div>
       <h1 class="hero-title">
         <span data-i18n="hero.line1">ຄົ້ນພົບ</span><br/>
@@ -231,6 +237,41 @@
   <script src="js/app.js"></script>
   <script src="js/i18n.js"></script>
   <script>
+    // ── WEATHER — Vang Vieng (lat: 18.9167, lon: 102.4500) ──
+    async function loadWeather() {
+      try {
+        const res  = await fetch(
+          'https://api.openweathermap.org/data/2.5/weather?lat=18.9167&lon=102.4500&appid=25e354c80aa4d1d062271734755205c4&units=metric'
+        );
+        const data = await res.json();
+        const temp = Math.round(data.main.temp);
+        const desc = data.weather[0].main;
+        const icon = getWeatherIcon(desc);
+        document.getElementById('wIcon').textContent = icon;
+        document.getElementById('wTemp').textContent = `${temp}°C`;
+        document.getElementById('wDesc').textContent = `ວັງວຽງ · ${getWeatherLao(desc)}`;
+      } catch { /* silent fail */ }
+    }
+
+    function getWeatherIcon(main) {
+      const map = {
+        Clear: '☀️', Clouds: '⛅', Rain: '🌧️',
+        Thunderstorm: '⛈️', Drizzle: '🌦️', Snow: '❄️',
+        Mist: '🌫️', Fog: '🌫️', Haze: '🌫️'
+      };
+      return map[main] || '🌤️';
+    }
+
+    function getWeatherLao(main) {
+      const map = {
+        Clear: 'ແດດອອກ', Clouds: 'ມີເມກ', Rain: 'ຝົນຕົກ',
+        Thunderstorm: 'ພາຍຸ', Drizzle: 'ຝົນປອຍ', Snow: 'ຫິມະ',
+        Mist: 'ໝອກ', Fog: 'ໝອກ', Haze: 'ຝຸ່ນ'
+      };
+      return map[main] || 'ສະພາບດີ';
+    }
+
+    loadWeather();
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
         navigator.serviceWorker.register('/vangvieng-explorer/service-worker.js')
