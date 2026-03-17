@@ -58,7 +58,7 @@
 .filter-tab {
   padding: 8px 18px; border-radius: var(--radius-xl);
   background: var(--bg); border: 1.5px solid var(--border);
-  color: var(--muted); font-size: 0.85rem; font-weight: 500;
+  color: var(--muted); font-size: clamp(0.75rem, 2vw, 0.85rem); font-weight: 500;
   transition: var(--transition); font-family: var(--font-body);
 }
 .filter-tab:hover { border-color: var(--green-400); color: var(--green-600); }
