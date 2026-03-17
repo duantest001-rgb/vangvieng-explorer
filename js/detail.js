@@ -124,6 +124,36 @@ function renderDetail(p) {
                 text-align:center;cursor:pointer;transition:var(--transition);"
             >${isSaved(p.id) ? '🔖 ບັນທຶກແລ້ວ' : '🔖 ບັນທຶກສະຖານທີ່ນີ້'}</button>
           </div>
+          ${(p.phone || p.whatsapp) ? `
+          <div class="sidebar-card">
+            <h4>📞 ຕິດຕໍ່ / ຈອງ</h4>
+            <div style="display:flex;flex-direction:column;gap:10px;margin-top:4px;">
+              ${p.phone ? `
+              <a href="tel:${p.phone}"
+                style="display:flex;align-items:center;gap:10px;padding:12px 14px;
+                  background:var(--green-100);color:var(--green-700);
+                  border:1.5px solid var(--green-300);border-radius:var(--radius-md);
+                  font-size:0.9rem;font-weight:600;text-decoration:none;
+                  transition:var(--transition);"
+                onmouseover="this.style.background='var(--green-700)';this.style.color='#fff'"
+                onmouseout="this.style.background='var(--green-100)';this.style.color='var(--green-700)'">
+                📞 ໂທຫາ ${p.phone}
+              </a>` : ''}
+              ${p.whatsapp ? `
+              <a href="https://wa.me/${p.whatsapp.replace(/[^0-9]/g,'')}"
+                target="_blank"
+                style="display:flex;align-items:center;gap:10px;padding:12px 14px;
+                  background:#e8f8f0;color:#25d366;
+                  border:1.5px solid #9fe3c4;border-radius:var(--radius-md);
+                  font-size:0.9rem;font-weight:600;text-decoration:none;
+                  transition:var(--transition);"
+                onmouseover="this.style.background='#25d366';this.style.color='#fff'"
+                onmouseout="this.style.background='#e8f8f0';this.style.color='#25d366'">
+                💬 WhatsApp
+              </a>` : ''}
+            </div>
+          </div>` : ''}
+          </div>
           <div class="sidebar-card">
             <h4>📤 ແຊຣ໌ສະຖານທີ່ນີ້</h4>
             <div class="share-grid">
