@@ -279,3 +279,50 @@ body { overflow: hidden; background: var(--bg); }
   border: 1px solid #ffc8c8;
   font-size: 0.78rem; cursor: pointer;
 }
+
+/* ── CHECKLIST + NAVIGATION ── */
+.plan-stop-wrap {
+  margin-bottom: 8px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+  overflow: hidden;
+  transition: var(--transition);
+}
+.plan-stop-wrap.stop-done { opacity: 0.6; }
+.plan-stop-main {
+  display: flex; align-items: flex-start; gap: 10px;
+  background: var(--white); padding: 10px 12px;
+  cursor: default;
+}
+.stop-check {
+  font-size: 1.1rem; background: none; border: none;
+  cursor: pointer; flex-shrink: 0; padding: 0;
+  margin-top: 2px; transition: transform 0.1s;
+  font-family: inherit;
+}
+.stop-check:hover { transform: scale(1.2); }
+.stop-check.checked { color: var(--green-700); }
+.stop-nav-btn {
+  font-size: 1.2rem; text-decoration: none;
+  flex-shrink: 0; padding: 2px 4px;
+  border-radius: 6px; transition: var(--transition);
+  margin-top: 2px;
+}
+.stop-nav-btn:hover { background: var(--green-100); }
+
+.stop-next-nav {
+  display: flex; align-items: center;
+  justify-content: space-between; flex-wrap: wrap;
+  gap: 8px; padding: 8px 14px;
+  background: var(--green-50);
+  border-top: 1px solid var(--green-100);
+}
+.stop-next-nav span { font-size: 0.78rem; color: var(--muted); }
+.stop-next-btn {
+  font-size: 0.8rem; font-weight: 700;
+  color: var(--white); background: var(--green-700);
+  padding: 6px 14px; border-radius: var(--radius-xl);
+  text-decoration: none; white-space: nowrap;
+  transition: var(--transition);
+}
+.stop-next-btn:hover { background: var(--green-600); }
