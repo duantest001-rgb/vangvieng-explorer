@@ -322,13 +322,13 @@ button { cursor: pointer; border: none; font-family: var(--font-body); }
 ══════════════════════════════════════════ */
 .categories-section { background: var(--white); }
 .categories-grid {
-  display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px;
+  display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px;
 }
-@media (min-width: 768px) { .categories-grid { grid-template-columns: repeat(4, 1fr); } }
+@media (min-width: 768px) { .categories-grid { grid-template-columns: repeat(4, 1fr); gap: 16px; } }
 
 .cat-card {
   display: flex; flex-direction: column; align-items: flex-start;
-  padding: 28px 20px; border-radius: var(--radius-lg);
+  padding: 16px 16px 28px; border-radius: var(--radius-lg);
   position: relative; overflow: hidden;
   transition: var(--transition); cursor: pointer;
   border: 1px solid transparent;
@@ -339,9 +339,9 @@ button { cursor: pointer; border: none; font-family: var(--font-body); }
 .cat-restaurant { background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%); border-color: #7dd3fc; }
 .cat-activity   { background: linear-gradient(135deg, #eef2ff 0%, #e0e7ff 100%); border-color: #a5b4fc; }
 
-.cat-icon { font-size: 2rem; margin-bottom: 12px; }
-.cat-info h3 { font-size: 0.95rem; font-weight: 600; color: var(--dark); margin-bottom: 4px; }
-.cat-info p  { font-size: 0.78rem; color: var(--muted); }
+.cat-icon { font-size: 1.6rem; margin-bottom: 8px; }
+.cat-info h3 { font-size: 0.88rem; font-weight: 600; color: var(--dark); margin-bottom: 3px; }
+.cat-info p  { font-size: 0.72rem; color: var(--muted); }
 .cat-arrow {
   position: absolute; bottom: 16px; right: 16px;
   font-size: 1.1rem; color: var(--muted);
@@ -680,7 +680,7 @@ button { cursor: pointer; border: none; font-family: var(--font-body); }
   .search-box { flex-wrap: wrap; border-radius: var(--radius-lg); }
   .search-btn { width: 100%; padding: 12px; border-radius: var(--radius-md); }
 
-  .categories-grid { grid-template-columns: 1fr 1fr; }
+  .categories-grid { grid-template-columns: 1fr 1fr; gap: 10px; }
   .eco-content { flex-direction: column; }
   .eco-icons { justify-content: center; }
   .ai-promo-card { padding: 32px 24px; gap: 32px; }
@@ -691,5 +691,5 @@ button { cursor: pointer; border: none; font-family: var(--font-body); }
   .hero-title { font-size: 2.8rem; }
   .quick-tags { gap: 8px; }
   .tag { font-size: 0.78rem; padding: 6px 14px; }
-  .categories-grid { grid-template-columns: 1fr; }
+  .categories-grid { grid-template-columns: 1fr 1fr; }
 }
