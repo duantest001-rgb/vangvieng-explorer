@@ -158,6 +158,24 @@ button { cursor: pointer; border: none; font-family: var(--font-body); }
   to   { opacity: 1; transform: translateY(0); }
 }
 
+.weather-widget {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: rgba(255,255,255,0.12);
+  border: 1px solid rgba(255,255,255,0.2);
+  backdrop-filter: blur(8px);
+  border-radius: var(--radius-xl);
+  padding: 6px 16px; margin-bottom: 14px;
+  font-family: var(--font-body);
+}
+.weather-icon { font-size: 1.2rem; }
+.weather-temp {
+  font-size: 1rem; font-weight: 700;
+  color: var(--white);
+}
+.weather-desc {
+  font-size: 0.8rem; color: rgba(255,255,255,0.75);
+}
+
 .hero-badge {
   display: inline-block; margin-bottom: 20px;
   padding: 8px 20px; border-radius: var(--radius-xl);
