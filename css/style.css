@@ -278,20 +278,20 @@ button { cursor: pointer; border: none; font-family: var(--font-body); }
 ══════════════════════════════════════════ */
 .stats-bar {
   background: var(--green-800);
-  padding: 28px 0;
+  padding: 14px 0;
 }
 .stats-container {
-  max-width: 800px; margin: 0 auto; padding: 20px 12px;
+  max-width: 800px; margin: 0 auto; padding: 8px 16px;
   display: grid; grid-template-columns: repeat(4, 1fr);
   align-items: center; text-align: center;
 }
 .stat-item {
-  display: flex; align-items: baseline; gap: 6px;
-  color: var(--white); font-size: 1.6rem; font-weight: 700;
+  display: flex; align-items: baseline; gap: 4px; justify-content: center;
+  color: var(--white); font-size: 1.1rem; font-weight: 700;
   font-family: var(--font-body); letter-spacing: 0;
 }
-.stat-label { font-size: 0.85rem; font-weight: 400; color: rgba(255,255,255,0.6); font-family: var(--font-body); }
-.stat-divider { width: 1px; height: 40px; background: rgba(255,255,255,0.15); }
+.stat-label { font-size: 0.75rem; font-weight: 400; color: rgba(255,255,255,0.6); font-family: var(--font-body); }
+.stat-divider { width: 1px; height: 28px; background: rgba(255,255,255,0.15); }
 
 /* ══════════════════════════════════════════
    SECTIONS
@@ -671,12 +671,13 @@ button { cursor: pointer; border: none; font-family: var(--font-body); }
   }
   .hamburger { display: flex; z-index: 1000; }
 
-  /* ── 2. STATS BAR — fix ຕັດຂອບ ── */
+  /* ── 2. STATS BAR — compact ── */
   .stats-container {
     grid-template-columns: repeat(2, 1fr);
-    gap: 16px; padding: 16px;
+    gap: 8px; padding: 8px 16px;
   }
-  .stat-item { font-size: 1.3rem; justify-content: center; }
+  .stat-item { font-size: 0.95rem; justify-content: center; }
+  .stat-label { font-size: 0.68rem; }
   .stat-divider { display: none; }
 
   .hero { padding: 100px 24px 60px; }
