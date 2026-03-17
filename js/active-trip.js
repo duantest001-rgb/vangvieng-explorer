@@ -80,7 +80,12 @@ function renderActiveBanner() {
       </div>
     </div>
   `;
-  document.body.prepend(banner);
+  const nav = document.querySelector('nav.navbar') || document.querySelector('nav');
+  if (nav) {
+    nav.insertAdjacentElement('afterend', banner);
+  } else {
+    document.body.prepend(banner);
+  }
 }
 
 // ── RENDER DRAWER ──
@@ -182,7 +187,11 @@ function confirmEndTrip() {
   const s = document.createElement('style');
   s.textContent = `
   #activeTripBanner {
-    position: fixed; top: 64px; left: 0; right: 0; z-index: 999;
+    position: sticky;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 999;
   }
   .atrip-banner {
     display: flex; align-items: center; justify-content: space-between;
