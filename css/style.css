@@ -288,33 +288,32 @@ button { cursor: pointer; border: none; font-family: var(--font-body); }
   border: 1px solid rgba(255,255,255,0.2);
   backdrop-filter: blur(8px);
   border-radius: var(--radius-xl);
-  padding: 8px 20px;
+  padding: 8px 18px; height: 38px;
   font-family: var(--font-body);
+  box-sizing: border-box;
 }
-.stats-widget {
-  gap: 6px; flex-wrap: wrap; justify-content: center;
-}
-.weather-icon { font-size: 1rem; }
+.stats-widget { gap: 5px; }
+.weather-icon { font-size: 0.95rem; }
 .weather-temp {
-  font-size: clamp(0.82rem, 2vw, 0.92rem);
+  font-size: clamp(0.78rem, 1.8vw, 0.88rem);
   font-weight: 700; color: var(--white);
 }
 .weather-desc {
-  font-size: clamp(0.7rem, 1.6vw, 0.78rem);
+  font-size: clamp(0.68rem, 1.5vw, 0.75rem);
   color: rgba(255,255,255,0.7);
   border-left: 1px solid rgba(255,255,255,0.25);
-  padding-left: 8px;
+  padding-left: 7px;
 }
 .stats-widget-item {
-  font-size: clamp(0.75rem, 1.8vw, 0.88rem);
+  font-size: clamp(0.72rem, 1.7vw, 0.84rem);
   font-weight: 600; color: var(--white); white-space: nowrap;
 }
 .stats-widget-item .stat-num { font-weight: 800; }
-.stats-widget-dot { color: rgba(255,255,255,0.35); font-size: 0.8rem; }
+.stats-widget-dot { color: rgba(255,255,255,0.3); font-size: 0.75rem; }
 
 @media (max-width: 480px) {
   .hero-widgets { gap: 8px; }
-  .weather-widget, .stats-widget { padding: 6px 14px; gap: 5px; }
+  .weather-widget, .stats-widget { padding: 6px 12px; height: 34px; }
 }
 
 /* ══════════════════════════════════════════
