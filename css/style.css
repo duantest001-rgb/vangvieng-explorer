@@ -281,7 +281,7 @@ button { cursor: pointer; border: none; font-family: var(--font-body); }
   padding: 14px 0;
 }
 .stats-container {
-  max-width: 800px; margin: 0 auto; padding: 8px 16px;
+  max-width: 1000px; margin: 0 auto; padding: 8px 24px;
   display: grid; grid-template-columns: repeat(4, 1fr);
   align-items: center; text-align: center;
 }
@@ -334,6 +334,13 @@ button { cursor: pointer; border: none; font-family: var(--font-body); }
   transition: var(--transition); cursor: pointer;
   border: 1px solid transparent;
   min-height: unset;
+}
+@media (min-width: 768px) {
+  .cat-card {
+    flex-direction: column; align-items: flex-start;
+    padding: 24px 20px 32px; gap: 0;
+  }
+  .cat-icon { margin-bottom: 10px; }
 }
 .cat-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
 .cat-attraction { background: linear-gradient(135deg, #e0f2ff 0%, #bae6fd 100%); border-color: #7dd3fc; }
@@ -674,10 +681,10 @@ button { cursor: pointer; border: none; font-family: var(--font-body); }
   /* ── 2. STATS BAR — compact ── */
   .stats-container {
     grid-template-columns: repeat(2, 1fr);
-    gap: 8px; padding: 8px 16px;
+    gap: 4px; padding: 6px 12px;
   }
-  .stat-item { font-size: 0.95rem; justify-content: center; }
-  .stat-label { font-size: 0.68rem; }
+  .stat-item { font-size: 0.88rem; justify-content: center; }
+  .stat-label { font-size: 0.65rem; }
   .stat-divider { display: none; }
 
   .hero { padding: 100px 24px 60px; }
