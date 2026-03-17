@@ -100,6 +100,9 @@ format:
     const itinerary = JSON.parse(clean);
 
     renderPlanResult(itinerary, places, { days, interests, style, pace });
+    if (typeof startActiveTrip === 'function') {
+      startActiveTrip(itinerary, places, { days, interests, style, pace });
+    }
 
   } catch (e) {
     document.getElementById('plannerResult').innerHTML = `
