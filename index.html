@@ -264,20 +264,31 @@
   <script>
     // ── WEATHER — Vang Vieng ──
     async function loadWeather() {
+      // ລອງ direct ກ່ອນ — ຖ້າ fail ໃຊ້ Worker proxy
+      const WEATHER_URL = 'https://api.openweathermap.org/data/2.5/weather?lat=18.9167&lon=102.4500&appid=25e354c80aa4d1d062271734755205c4&units=metric';
+      const PROXY_URL   = 'https://gemini-proxy.duan-test001.workers.dev/weather';
+
+      async function tryFetch(url) {
+        const res = await fetch(url, { signal: AbortSignal.timeout(5000) });
+        if (!res.ok) throw new Error('fail');
+        return res.json();
+      }
+
       try {
-        const url = 'https://api.openweathermap.org/data/2.5/weather?lat=18.9167&lon=102.4500&appid=25e354c80aa4d1d062271734755205c4&units=metric';
-        const res  = await fetch(url);
-        if (!res.ok) throw new Error('API error');
-        const data = await res.json();
+        let data;
+        try {
+          data = await tryFetch(WEATHER_URL);
+        } catch {
+          // fallback ຜ່ານ Worker
+          data = await tryFetch(PROXY_URL);
+        }
         const temp = Math.round(data.main.temp);
         const desc = data.weather[0].main;
-        const icon = getWeatherIcon(desc);
-        document.getElementById('wIcon').textContent = icon;
+        document.getElementById('wIcon').textContent = getWeatherIcon(desc);
         document.getElementById('wTemp').textContent = `${temp}°C`;
         document.getElementById('wDesc').textContent = getWeatherLao(desc);
         document.getElementById('weatherWidget').style.display = 'inline-flex';
       } catch {
-        // ຖ້າ API fail — ເຊື່ອງ widget ໄປເລີຍ
         const w = document.getElementById('weatherWidget');
         if (w) w.style.display = 'none';
       }
