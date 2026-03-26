@@ -1167,7 +1167,7 @@ async function deleteReview(id) {
 
 // load pending badge on init
 // ── CLOSE ON OVERLAY CLICK ──
-document.getElementById('placeModal').addEventListener('click', e => { if(e.target === e.currentTarget) closeModal(); });
+// ✅ ລຶບ backdrop click ສຳລັບ placeModal — ຕ້ອງກົດ ✕ ຫລື ຍົກເລີກ ເທົ່ານັ້ນ
 document.getElementById('deleteModal').addEventListener('click', e => { if(e.target === e.currentTarget) closeDeleteModal(); });
 
 // ── AUTO LOAD ──
