@@ -821,6 +821,11 @@ function openEditModal(id) {
   document.getElementById('f_tags').value  = p.tags || '';
   document.getElementById('f_phone').value    = p.phone || '';
   document.getElementById('f_whatsapp').value = p.whatsapp || '';
+  // ✅ Reset file input ແລະ upload status ເວລາເປີດ edit modal
+  document.getElementById('imgFileInput').value = '';
+  const status = document.getElementById('uploadStatus');
+  status.textContent = '';
+  status.style.color = 'var(--muted)';
   previewImg();
   document.getElementById('placeModal').classList.add('open');
 }
@@ -833,6 +838,11 @@ function clearForm() {
   document.getElementById('f_bg').value = '#d4eddf';
   document.getElementById('f_eco').checked = false;
   document.getElementById('imgPreview').style.display = 'none';
+  // ✅ Reset file input ແລະ status ທຸກເທື່ອທີ່ເປີດ modal ໃໝ່
+  document.getElementById('imgFileInput').value = '';
+  const status = document.getElementById('uploadStatus');
+  status.textContent = '';
+  status.style.color = 'var(--muted)';
 }
 
 const CLOUDINARY_WORKER = 'https://cloudinary-upload.duan-test001.workers.dev';
@@ -878,7 +888,9 @@ async function uploadImage(input) {
 
     // 2. Upload ໄປ Cloudinary
     const formData = new FormData();
-    formData.append('file', compressed, 'image.jpg');
+    // ✅ ຕັ້ງຊື່ unique ທຸກເທື່ອ ເພື່ອບໍ່ໃຫ້ Cloudinary cache ຮູບເກົ່າ
+    const uniqueName = `place_${editingId || 'new'}_${Date.now()}.jpg`;
+    formData.append('file', compressed, uniqueName);
 
     const res  = await fetch(CLOUDINARY_WORKER, { method: 'POST', body: formData });
     const data = await res.json();
