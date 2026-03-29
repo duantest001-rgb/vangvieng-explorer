@@ -1,31 +1,42 @@
 /* ═══════════════════════════════
-   Explore Page Styles
+   Explore Page Styles — v2
 ═══════════════════════════════ */
 
 /* Page Header */
 .page-header {
-  background: linear-gradient(135deg, #071830 0%, #0e3a70 60%, #1a7ac0 100%);
+  background: linear-gradient(160deg, #071830 0%, #0e3a70 55%, #1a7ac0 100%);
   padding: 120px 0 60px;
   text-align: center;
+  position: relative; overflow: hidden;
+}
+.page-header::before {
+  content: '';
+  position: absolute; inset: 0; pointer-events: none;
+  background: radial-gradient(ellipse at 70% 50%, rgba(56,189,248,0.12) 0%, transparent 65%);
 }
 .page-title {
   font-family: var(--font-display);
   font-size: clamp(2rem, 5vw, 3.2rem);
   font-weight: 700; color: var(--white);
   margin: 8px 0 12px; letter-spacing: 0.01em;
+  animation: heroFadeIn 0.7s ease-out 0.1s both;
 }
 .page-sub {
   color: rgba(255,255,255,0.7);
   font-size: 0.95rem; max-width: 500px; margin: 0 auto;
+  animation: heroFadeIn 0.7s ease-out 0.25s both;
 }
 
 /* Filters Section */
 .filters-section {
-  background: var(--white);
-  padding: 28px 0;
+  background: rgba(255,255,255,0.97);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  padding: 20px 0;
   border-bottom: 1px solid var(--border);
   position: sticky; top: 64px; z-index: 100;
-  box-shadow: var(--shadow-sm);
+  box-shadow: 0 4px 24px rgba(16,80,160,0.08);
+  transition: box-shadow 0.3s ease;
 }
 
 /* Explore Search */
@@ -33,11 +44,13 @@
   display: flex; align-items: center; gap: 12px;
   background: var(--bg); border: 1.5px solid var(--border);
   border-radius: var(--radius-xl); padding: 10px 20px;
-  margin-bottom: 16px; transition: var(--transition);
+  margin-bottom: 14px;
+  transition: border-color 0.25s ease, box-shadow 0.25s ease;
 }
 .explore-search-box:focus-within {
   border-color: var(--green-500);
-  box-shadow: 0 0 0 3px rgba(37, 137, 224, 0.1);
+  box-shadow: 0 0 0 3px rgba(37,137,224,0.12);
+  background: var(--white);
 }
 .explore-search-box input {
   flex: 1; border: none; outline: none; background: none;
@@ -51,29 +64,43 @@
 }
 .clear-btn:hover { background: var(--green-100); color: var(--green-700); }
 
-/* Filter Tabs */
+/* Filter Tabs — animated active indicator */
 .filter-tabs {
-  display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px;
+  display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 14px;
 }
 .filter-tab {
   padding: 8px 18px; border-radius: var(--radius-xl);
   background: var(--bg); border: 1.5px solid var(--border);
   color: var(--muted); font-size: clamp(0.75rem, 2vw, 0.85rem); font-weight: 500;
-  transition: var(--transition); font-family: var(--font-body);
+  transition: background 0.22s ease, border-color 0.22s ease, color 0.22s ease,
+              transform 0.22s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.22s ease;
+  font-family: var(--font-body);
 }
-.filter-tab:hover { border-color: var(--green-400); color: var(--green-600); }
+.filter-tab:hover {
+  border-color: var(--green-400); color: var(--green-600);
+  transform: translateY(-1px);
+}
 .filter-tab.active {
   background: var(--green-700); border-color: var(--green-700);
   color: var(--white); font-weight: 600;
+  box-shadow: 0 4px 14px rgba(16,80,160,0.25);
+  transform: translateY(-1px);
 }
-.eco-tab.active { background: #059669; border-color: #059669; }
+.eco-tab.active {
+  background: #059669; border-color: #059669;
+  box-shadow: 0 4px 14px rgba(5,150,105,0.25);
+}
 
 /* Results Bar */
 .results-bar {
   display: flex; align-items: center; justify-content: space-between;
-  flex-wrap: wrap; gap: 12px;
+  flex-wrap: wrap; gap: 10px;
 }
-#resultsCount { font-size: 0.85rem; color: var(--muted); font-weight: 500; }
+#resultsCount {
+  font-size: 0.85rem; color: var(--muted); font-weight: 500;
+  transition: opacity 0.3s ease;
+}
+#resultsCount.updating { opacity: 0.4; }
 .sort-box {
   display: flex; align-items: center; gap: 8px;
   font-size: 0.83rem; color: var(--muted);
@@ -83,7 +110,9 @@
   padding: 6px 12px; background: var(--white);
   font-family: var(--font-body); font-size: 0.83rem; color: var(--text);
   outline: none; cursor: pointer;
+  transition: border-color 0.2s ease;
 }
+.sort-box select:focus { border-color: var(--green-500); }
 
 /* Explore Section */
 .explore-section { background: var(--bg); min-height: 60vh; }
@@ -92,6 +121,7 @@
 .no-results {
   text-align: center; padding: 80px 24px;
   grid-column: 1 / -1;
+  animation: heroFadeIn 0.4s ease;
 }
 .no-results .no-icon { font-size: 3rem; margin-bottom: 16px; }
 .no-results h3 { font-size: 1.1rem; color: var(--dark); margin-bottom: 8px; }
@@ -101,6 +131,7 @@
 .error-state {
   text-align: center; padding: 60px 24px;
   grid-column: 1 / -1; color: var(--muted);
+  animation: heroFadeIn 0.4s ease;
 }
 .error-state .error-icon { font-size: 2.5rem; margin-bottom: 12px; }
 .retry-btn {
@@ -109,12 +140,12 @@
   border-radius: var(--radius-xl); font-size: 0.9rem; font-weight: 600;
   transition: var(--transition);
 }
-.retry-btn:hover { background: var(--green-600); }
+.retry-btn:hover { background: var(--green-600); transform: translateY(-2px); }
 
 @media (max-width: 768px) {
-  .filters-section { top: 56px; }
-  .filter-tabs { gap: 6px; }
-  .filter-tab { padding: 7px 14px; font-size: 0.8rem; }
+  .filters-section { top: 56px; padding: 14px 0; }
+  .filter-tabs { gap: 5px; }
+  .filter-tab { padding: 7px 13px; font-size: 0.78rem; }
 }
 
 /* ── BOOKMARK ICON ON CARD ── */
@@ -124,12 +155,13 @@
   border: none; border-radius: 50%;
   width: 34px; height: 34px; font-size: 0.85rem;
   display: flex; align-items: center; justify-content: center;
-  cursor: pointer; transition: var(--transition);
+  cursor: pointer;
+  transition: transform 0.25s cubic-bezier(0.34,1.56,0.64,1), background 0.2s ease;
   backdrop-filter: blur(8px);
   box-shadow: 0 2px 8px rgba(0,0,0,0.15);
   font-family: var(--font-body); color: var(--green-700);
 }
-.card-bm-btn:hover { transform: scale(1.15); }
+.card-bm-btn:hover { transform: scale(1.2); }
 .card-bm-btn.bm-on { background: var(--green-700); color: white; }
 
 /* ── NAV BADGE ── */
@@ -152,4 +184,76 @@
   background: var(--green-100);
   border: 1px solid var(--green-300);
   padding: 2px 8px; border-radius: 99px;
+  transition: background 0.2s ease, color 0.2s ease;
 }
+.card-tag:hover { background: var(--green-700); color: white; cursor: pointer; }
+
+/* ── RESULTS COUNT PULSE ── */
+@keyframes countPop {
+  0%   { transform: scale(1); }
+  50%  { transform: scale(1.06); color: var(--green-600); }
+  100% { transform: scale(1); }
+}
+.count-pop { animation: countPop 0.3s ease; }
+
+/* ── v2 UPGRADES ── */
+
+/* Filter tab springy animation */
+.filter-tab {
+  transition: all 0.22s cubic-bezier(0.34,1.56,0.64,1) !important;
+}
+.filter-tab:hover {
+  transform: translateY(-2px) !important;
+}
+.filter-tab.active {
+  transform: translateY(-1px) !important;
+  box-shadow: 0 4px 14px rgba(16,80,160,0.25) !important;
+}
+.eco-tab.active { box-shadow: 0 4px 14px rgba(5,150,105,0.25) !important; }
+
+/* Search focus glow */
+.explore-search-box:focus-within {
+  box-shadow: 0 0 0 3px rgba(37,137,224,0.15), var(--shadow-sm) !important;
+  border-color: var(--green-500) !important;
+}
+
+/* Staggered card reveal */
+#exploreGrid .place-card {
+  opacity: 0;
+  animation: cardReveal 0.45s ease forwards;
+}
+#exploreGrid .place-card:nth-child(1)  { animation-delay: 0.03s; }
+#exploreGrid .place-card:nth-child(2)  { animation-delay: 0.07s; }
+#exploreGrid .place-card:nth-child(3)  { animation-delay: 0.11s; }
+#exploreGrid .place-card:nth-child(4)  { animation-delay: 0.15s; }
+#exploreGrid .place-card:nth-child(5)  { animation-delay: 0.19s; }
+#exploreGrid .place-card:nth-child(6)  { animation-delay: 0.23s; }
+#exploreGrid .place-card:nth-child(7)  { animation-delay: 0.27s; }
+#exploreGrid .place-card:nth-child(8)  { animation-delay: 0.31s; }
+#exploreGrid .place-card:nth-child(n+9) { animation-delay: 0.35s; }
+
+@keyframes cardReveal {
+  from { opacity: 0; transform: translateY(18px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Bookmark button spring */
+.card-bm-btn {
+  transition: transform 0.28s cubic-bezier(0.34,1.56,0.64,1),
+              background 0.2s ease !important;
+}
+.card-bm-btn:hover { transform: scale(1.2) !important; }
+.card-bm-btn.bm-on {
+  background: var(--green-700) !important;
+  color: white !important;
+  transform: scale(1.08) !important;
+}
+
+/* Results count transition */
+#resultsCount {
+  transition: opacity 0.2s ease;
+}
+#resultsCount.updating { opacity: 0.4; }
+
+/* Back-to-top on explore page (inherited from style.css) */
+.back-to-top { bottom: 24px; right: 20px; }
