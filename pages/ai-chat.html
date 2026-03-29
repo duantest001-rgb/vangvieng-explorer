@@ -176,5 +176,24 @@
   <script src="../js/active-trip.js"></script>
   <script src="../js/trip-planner.js"></script>
   <script src="../js/i18n.js"></script>
+  <script>
+  // Hamburger X animation for ai-chat page
+  document.addEventListener("DOMContentLoaded", () => {
+    const hb = document.getElementById("hamburger");
+    const nl = document.getElementById("navLinks");
+    if (hb && nl) {
+      const newHb = hb.cloneNode(true);
+      hb.parentNode.replaceChild(newHb, hb);
+      newHb.addEventListener("click", () => {
+        const open = nl.classList.toggle("open");
+        newHb.classList.toggle("active", open);
+      });
+      nl.querySelectorAll(".nav-link").forEach(l =>
+        l.addEventListener("click", () => { nl.classList.remove("open"); newHb.classList.remove("active"); })
+      );
+    }
+    // Back-to-top (not needed in chat, skip)
+  });
+  </script>
 </body>
 </html>
