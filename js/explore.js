@@ -1,5 +1,5 @@
 /* ═══════════════════════════════════════════════
-   Explore Page Logic
+   Explore Page Logic — v2
 ═══════════════════════════════════════════════ */
 
 // ── STATE ──
@@ -19,6 +19,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   setupFilters();
   readURLParams();
   await loadPlaces();
+  setupBackToTop();
 });
 
 // ── READ URL PARAMS ──
@@ -48,34 +49,30 @@ function readURLParams() {
 async function loadPlaces() {
   const grid = document.getElementById("exploreGrid");
   showLoading(grid);
-
   try {
     const data = await db.getPlaces();
     state.allPlaces = data;
     applyFilters();
   } catch (err) {
     grid.innerHTML = `
-      <div class="error-state">
+      <div class="error-state" style="grid-column:1/-1;">
         <div class="error-icon">⚠️</div>
-        <p data-i18n="error.db">ເຊື່ອມຕໍ່ຖານຂໍ້ມູນຜິດພາດ</p>
-        <button class="retry-btn" onclick="loadPlaces()" data-i18n="error.retry">ລອງໃໝ່</button>
+        <p>ເຊື່ອມຕໍ່ຖານຂໍ້ມູນຜິດພາດ</p>
+        <button class="retry-btn" onclick="loadPlaces()">🔄 ລອງໃໝ່</button>
       </div>`;
   }
 }
 
 // ── APPLY FILTERS + SORT ──
 function applyFilters() {
+  // Flash count updating
+  const countEl = document.getElementById("resultsCount");
+  countEl?.classList.add("updating");
+
   let result = [...state.allPlaces];
 
-  // Category
-  if (state.category) {
-    result = result.filter(p => p.category === state.category);
-  }
-  // Eco
-  if (state.eco) {
-    result = result.filter(p => p.is_eco === true);
-  }
-  // Search
+  if (state.category) result = result.filter(p => p.category === state.category);
+  if (state.eco)      result = result.filter(p => p.is_eco === true);
   if (state.search) {
     const q = state.search.toLowerCase();
     result = result.filter(p =>
@@ -86,7 +83,7 @@ function applyFilters() {
       p.tags?.toLowerCase().includes(q)
     );
   }
-  // Sort
+
   if (state.sort === "rating") {
     result.sort((a, b) => (b.rating || 0) - (a.rating || 0));
   } else if (state.sort === "name") {
@@ -98,43 +95,56 @@ function applyFilters() {
 
   state.filtered = result;
   renderGrid(result);
-  updateCount(result.length);
+
+  // Animate count
+  setTimeout(() => {
+    updateCount(result.length);
+    countEl?.classList.remove("updating");
+    countEl?.classList.remove("count-pop");
+    void countEl?.offsetWidth; // reflow
+    countEl?.classList.add("count-pop");
+  }, 80);
 }
 
 // ── RENDER GRID ──
 function renderGrid(places) {
   const grid = document.getElementById("exploreGrid");
-
   if (places.length === 0) {
     grid.innerHTML = `
       <div class="no-results">
         <div class="no-icon">🔍</div>
-        <h3 data-i18n="results.empty.title">ບໍ່ພົບສະຖານທີ່</h3>
-        <p data-i18n="results.empty.sub">ລອງປ່ຽນ filter ຫຼື ຄຳຄົ້ນຫາ</p>
+        <h3>ບໍ່ພົບສະຖານທີ່</h3>
+        <p>ລອງປ່ຽນ filter ຫຼື ຄຳຄົ້ນຫາ</p>
       </div>`;
     return;
   }
 
-  grid.innerHTML = places.map(p => `
-    <div class="place-card" onclick="window.location.href='detail.html?id=${p.id}'">
-      <div style="position:relative">
+  grid.innerHTML = places.map((p, idx) => {
+    const imgContent = p.image_url
+      ? `<img src="${p.image_url}" alt="${p.name}" loading="lazy"
+           style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity 0.4s ease;"
+           onload="this.style.opacity='1'" onerror="this.style.display='none'">`
+      : (p.image_emoji || '📍');
+
+    const delay = Math.min(idx * 0.05, 0.5);
+    return `
+    <div class="place-card" role="button" tabindex="0" aria-label="${p.name}"
+         style="animation-delay:${delay}s"
+         onclick="window.location.href='detail.html?id=${p.id}'"
+         onkeydown="if(event.key==='Enter')window.location.href='detail.html?id=${p.id}'">
+      <div style="position:relative; overflow:hidden;">
         <div style="background:${p.image_bg || '#e0f2ff'}; width:100%; aspect-ratio:3/2;
           display:flex; align-items:center; justify-content:center; font-size:4rem;
           position:relative; overflow:hidden;">
-          ${p.image_url
-            ? `<img src="${p.image_url}" alt="${p.name}"
-                style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;"
-                onerror="this.style.display='none'">`
-            : p.image_emoji || '📍'
-          }
-          <div style="position:absolute;inset:0;background:linear-gradient(to bottom,transparent 50%,rgba(0,0,0,0.3) 100%)"></div>
+          ${imgContent}
+          <div style="position:absolute;inset:0;background:linear-gradient(to bottom,transparent 40%,rgba(0,0,0,0.35) 100%);z-index:1;pointer-events:none;"></div>
         </div>
         ${p.is_eco ? '<span class="card-eco-badge">🌱 Eco</span>' : ''}
         <span class="card-rating-badge">⭐ ${p.rating || '-'}</span>
         <button
           class="card-bm-btn${isSaved(p.id) ? ' bm-on' : ''}"
+          aria-label="${isSaved(p.id) ? 'ລຶບທີ່ບັນທຶກ' : 'ບັນທຶກສະຖານທີ່'}"
           onclick="event.stopPropagation(); toggleSave(${JSON.stringify(p).replace(/"/g,'&quot;')}); this.classList.toggle('bm-on'); this.textContent=isSaved('${p.id}')?'🔖':'➕'"
-          title="ບັນທຶກ"
         >${isSaved(p.id) ? '🔖' : '➕'}</button>
       </div>
       <div class="card-body">
@@ -146,8 +156,8 @@ function renderGrid(places) {
           <span style="font-size:0.75rem;color:var(--muted)">${p.address || ''}</span>
         </div>
       </div>
-    </div>
-  `).join("");
+    </div>`;
+  }).join("");
 }
 
 // ── SHOW LOADING ──
@@ -159,7 +169,9 @@ function showLoading(grid) {
 function updateCount(n) {
   const lang = localStorage.getItem("lang") || "lo";
   const tr = (typeof TRANSLATIONS !== "undefined" && TRANSLATIONS[lang]) || {};
-  const label = tr["results.count"] ? tr["results.count"].replace("{n}", n) : `ພົບ ${n} ສະຖານທີ່`;
+  const label = tr["results.count"]
+    ? tr["results.count"].replace("{n}", n)
+    : `ພົບ ${n} ສະຖານທີ່`;
   document.getElementById("resultsCount").textContent = label;
 }
 
@@ -168,11 +180,9 @@ function setupFilters() {
   document.querySelectorAll(".filter-tab").forEach(tab => {
     tab.addEventListener("click", () => {
       if (tab.dataset.eco) {
-        // Eco toggle
         state.eco = !state.eco;
         tab.classList.toggle("active", state.eco);
       } else {
-        // Category
         document.querySelectorAll(".filter-tab:not(.eco-tab)").forEach(t => t.classList.remove("active"));
         tab.classList.add("active");
         state.category = tab.dataset.cat;
@@ -182,17 +192,16 @@ function setupFilters() {
   });
 }
 
-// ── SEARCH ──
+// ── SEARCH — debounced ──
 function setupSearch() {
   const input = document.getElementById("exploreSearch");
   const clearBtn = document.getElementById("clearSearch");
   let timer;
-
   input.addEventListener("input", () => {
     state.search = input.value.trim();
     clearBtn.style.display = state.search ? "block" : "none";
     clearTimeout(timer);
-    timer = setTimeout(applyFilters, 300);
+    timer = setTimeout(applyFilters, 280);
   });
 }
 
@@ -209,20 +218,52 @@ function handleSort() {
   applyFilters();
 }
 
-// ── NAVBAR ──
+// ── NAVBAR — with X animation ──
 function setupNavbar() {
   const hamburger = document.getElementById("hamburger");
   const navLinks  = document.getElementById("navLinks");
   if (hamburger && navLinks) {
-    hamburger.addEventListener("click", () => navLinks.classList.toggle("open"));
-    navLinks.querySelectorAll(".nav-link").forEach(l =>
-      l.addEventListener("click", () => navLinks.classList.remove("open"))
-    );
+    hamburger.addEventListener("click", () => {
+      const isOpen = navLinks.classList.toggle("open");
+      hamburger.classList.toggle("active", isOpen);
+    });
+    navLinks.querySelectorAll(".nav-link").forEach(l => l.addEventListener("click", () => {
+      navLinks.classList.remove("open");
+      hamburger.classList.remove("active");
+    }));
+    document.addEventListener("click", e => {
+      if (!hamburger.contains(e.target) && !navLinks.contains(e.target)) {
+        navLinks.classList.remove("open");
+        hamburger.classList.remove("active");
+      }
+    });
   }
   updateNavBadge();
+
+  // scroll shadow on sticky filter bar
+  window.addEventListener("scroll", () => {
+    const fs = document.querySelector(".filters-section");
+    if (fs) fs.style.boxShadow = window.scrollY > 120
+      ? "0 4px 24px rgba(16,80,160,0.12)"
+      : "0 4px 24px rgba(16,80,160,0.08)";
+  });
 }
 
-// ── HELPER ──
+// ── BACK TO TOP ──
+function setupBackToTop() {
+  const btt = document.createElement("button");
+  btt.id = "backToTop";
+  btt.className = "back-to-top";
+  btt.innerHTML = "↑";
+  btt.setAttribute("aria-label", "ກັບຂຶ້ນເທິງ");
+  btt.onclick = () => window.scrollTo({ top: 0, behavior: "smooth" });
+  document.body.appendChild(btt);
+  window.addEventListener("scroll", () => {
+    btt.classList.toggle("visible", window.scrollY > 400);
+  });
+}
+
+// ── HELPERS ──
 function t(key) {
   const lang = localStorage.getItem("lang") || "lo";
   return (typeof TRANSLATIONS !== "undefined" && TRANSLATIONS[lang] && TRANSLATIONS[lang][key]) || key;
@@ -231,3 +272,4 @@ function getCatLabel(cat) {
   const map = { attraction: "cat.attraction", hotel: "cat.hotel", restaurant: "cat.restaurant", activity: "cat.activity" };
   return map[cat] ? t(map[cat]) : cat;
 }
+

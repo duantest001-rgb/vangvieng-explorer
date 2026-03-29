@@ -105,21 +105,35 @@ window.addEventListener('scroll', () => {
   } else {
     navbar.classList.remove('scrolled');
   }
+  // Back-to-top visibility
+  const btn = document.getElementById('backToTop');
+  if (btn) btn.classList.toggle('visible', window.scrollY > 400);
 });
 
-// ── HAMBURGER MENU ──
+// ── HAMBURGER MENU — with X animation ──
 const hamburger = document.getElementById('hamburger');
 const navLinks = document.getElementById('navLinks');
 if (hamburger && navLinks) {
   hamburger.addEventListener('click', () => {
-    navLinks.classList.toggle('open');
+    const isOpen = navLinks.classList.toggle('open');
+    hamburger.classList.toggle('active', isOpen);
   });
   navLinks.querySelectorAll('.nav-link').forEach(link => {
-    link.addEventListener('click', () => navLinks.classList.remove('open'));
+    link.addEventListener('click', () => {
+      navLinks.classList.remove('open');
+      hamburger.classList.remove('active');
+    });
+  });
+  // Close on outside click
+  document.addEventListener('click', (e) => {
+    if (!hamburger.contains(e.target) && !navLinks.contains(e.target)) {
+      navLinks.classList.remove('open');
+      hamburger.classList.remove('active');
+    }
   });
 }
 
-// ── SEARCH ──
+// ── SEARCH with debounce ──
 function handleSearch() {
   const query = document.getElementById('heroSearch')?.value?.trim();
   if (query) {
@@ -133,18 +147,41 @@ document.getElementById('heroSearch')?.addEventListener('keydown', (e) => {
   if (e.key === 'Enter') handleSearch();
 });
 
-// ── STATS COUNTER ──
-function animateCounter(el, target, duration = 1500) {
-  let start = 0;
-  const step = target / (duration / 16);
-  const timer = setInterval(() => {
-    start += step;
-    if (start >= target) { el.textContent = target; clearInterval(timer); return; }
-    el.textContent = Math.floor(start);
-  }, 16);
+// ── TOAST ──
+function showToast(msg, type = 'info', duration = 3000) {
+  let container = document.getElementById('toastContainer');
+  if (!container) {
+    container = document.createElement('div');
+    container.id = 'toastContainer';
+    container.className = 'toast-container';
+    document.body.appendChild(container);
+  }
+  const toast = document.createElement('div');
+  toast.className = `toast ${type}`;
+  toast.textContent = msg;
+  container.appendChild(toast);
+  setTimeout(() => {
+    toast.classList.add('toast-out');
+    toast.addEventListener('animationend', () => toast.remove(), { once: true });
+  }, duration);
 }
 
-// ── RENDER FEATURED PLACES ──
+// ── STATS COUNTER ──
+function animateCounter(el, target, duration = 1600) {
+  let start = 0;
+  const startTime = performance.now();
+  function easeOut(t) { return 1 - Math.pow(1 - t, 3); }
+  function update(now) {
+    const elapsed = now - startTime;
+    const progress = Math.min(elapsed / duration, 1);
+    el.textContent = Math.floor(easeOut(progress) * target);
+    if (progress < 1) requestAnimationFrame(update);
+    else el.textContent = target;
+  }
+  requestAnimationFrame(update);
+}
+
+// ── RENDER PLACE CARD ──
 function t(key) {
   const lang = localStorage.getItem("lang") || "lo";
   return (typeof TRANSLATIONS !== "undefined" && TRANSLATIONS[lang] && TRANSLATIONS[lang][key]) || key;
@@ -155,15 +192,18 @@ function getCategoryLabel(cat) {
 }
 
 function renderPlaceCard(place) {
+  const imgContent = place.image_url
+    ? `<img src="${place.image_url}" alt="${place.name}" loading="lazy"
+         style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity 0.4s ease;"
+         onload="this.style.opacity='1'" onerror="this.style.display='none'">`
+    : place.image_emoji || '📍';
   return `
-    <div class="place-card" onclick="goToDetail(${place.id})">
-      <div style="position:relative">
-       <div class="card-img-placeholder" style="background:${place.image_bg || '#e0f2ff'}; width:100%; aspect-ratio:3/2; display:flex; align-items:center; justify-content:center; font-size:4rem; position:relative; overflow:hidden;">
-          ${place.image_url
-            ? `<img src="${place.image_url}" alt="${place.name}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;" onerror="this.style.display='none'">`
-            : place.image_emoji || '📍'
-          }
-          <div style="position:absolute;inset:0;background:linear-gradient(to bottom,transparent 50%,rgba(0,0,0,0.3) 100%)"></div>
+    <div class="place-card" onclick="goToDetail(${place.id})" role="button" tabindex="0"
+         aria-label="${place.name}" onkeydown="if(event.key==='Enter')goToDetail(${place.id})">
+      <div style="position:relative; overflow:hidden;">
+        <div class="card-img-placeholder" style="background:${place.image_bg || '#e0f2ff'};">
+          ${imgContent}
+          <div style="position:absolute;inset:0;background:linear-gradient(to bottom,transparent 40%,rgba(0,0,0,0.35) 100%);z-index:1;pointer-events:none;"></div>
         </div>
         ${place.is_eco ? '<span class="card-eco-badge">🌱 Eco</span>' : ''}
         <span class="card-rating-badge">⭐ ${place.rating || '-'}</span>
@@ -179,16 +219,16 @@ function renderPlaceCard(place) {
     </div>
   `;
 }
-async function loadStats() {
+
+// ── LOAD STATS with retry ──
+async function loadStats(retries = 2) {
   try {
     const data = await db.getPlaces();
     const total       = data.length;
     const hotels      = data.filter(p => p.category === 'hotel').length;
     const restaurants = data.filter(p => p.category === 'restaurant').length;
     const activities  = data.filter(p => p.category === 'activity').length;
-
     const targets = [total, hotels, restaurants, activities];
-    // ໃຊ້ stats-widget ເທົ່ານັ້ນ
     const els = document.querySelectorAll('.stats-widget .stat-num');
     els.forEach((el, i) => {
       if (targets[i] !== undefined) {
@@ -197,25 +237,40 @@ async function loadStats() {
       }
     });
   } catch (err) {
+    if (retries > 0) {
+      setTimeout(() => loadStats(retries - 1), 2000);
+    }
     console.error("Stats error:", err);
   }
 }
-function renderFeatured() {
+
+// ── RENDER FEATURED with retry ──
+async function renderFeatured(retries = 2) {
   const grid = document.getElementById("featuredGrid");
   if (!grid) return;
-
   grid.innerHTML = Array(6).fill('<div class="loading-card"></div>').join("");
-
-  db.getPlaces().then(data => {
+  try {
+    const data = await db.getPlaces();
     const featured = data.slice(0, 6);
     if (featured.length === 0) {
-      grid.innerHTML = `<div class="empty-state"><div class="empty-icon">🌿</div><h3 data-i18n="results.empty.title">ຍັງບໍ່ມີຂໍ້ມູນ</h3></div>`;
+      grid.innerHTML = `<div class="empty-state"><div class="empty-icon">🌿</div><h3>ຍັງບໍ່ມີຂໍ້ມູນ</h3></div>`;
       return;
     }
     grid.innerHTML = featured.map(renderPlaceCard).join("");
-  }).catch(() => {
-    grid.innerHTML = `<div class="empty-state"><div class="empty-icon">⚠️</div><h3 data-i18n="error.db">ໂຫລດຂໍ້ມູນຜິດພາດ</h3></div>`;
-  });
+  } catch (err) {
+    if (retries > 0) {
+      setTimeout(() => renderFeatured(retries - 1), 2000);
+    } else {
+      grid.innerHTML = `
+        <div class="empty-state" style="grid-column:1/-1;">
+          <div class="empty-icon">⚠️</div>
+          <h3>ໂຫລດຂໍ້ມູນຜິດພາດ</h3>
+          <p style="margin-top:8px;font-size:0.85rem;color:var(--muted);">
+            <button onclick="renderFeatured()" style="background:var(--green-700);color:#fff;border:none;padding:8px 20px;border-radius:20px;cursor:pointer;font-size:0.85rem;">🔄 ລອງໃໝ່</button>
+          </p>
+        </div>`;
+    }
+  }
 }
 
 function goToDetail(id) {
@@ -226,4 +281,13 @@ function goToDetail(id) {
 document.addEventListener('DOMContentLoaded', () => {
   renderFeatured();
   loadStats();
+
+  // Back-to-top button
+  const btt = document.createElement('button');
+  btt.id = 'backToTop';
+  btt.className = 'back-to-top';
+  btt.innerHTML = '↑';
+  btt.setAttribute('aria-label', 'ກັບຂຶ້ນເທິງ');
+  btt.onclick = () => window.scrollTo({ top: 0, behavior: 'smooth' });
+  document.body.appendChild(btt);
 });

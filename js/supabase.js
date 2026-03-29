@@ -1,32 +1,52 @@
 /* ═══════════════════════════════════════════════
-   Supabase Config
+   Supabase Config — v2 (retry + timeout)
 ═══════════════════════════════════════════════ */
 const SUPABASE_URL = "https://axqgotrbnglssxhwkfjc.supabase.co";
 const SUPABASE_KEY = "sb_publishable_Jx8kMe3QiaBZ3rE9T7OHtA_hxrbgW5b";
 
+// ── Fetch with timeout helper ──
+async function fetchWithTimeout(url, options = {}, timeout = 8000) {
+  const controller = new AbortController();
+  const id = setTimeout(() => controller.abort(), timeout);
+  try {
+    const res = await fetch(url, { ...options, signal: controller.signal });
+    clearTimeout(id);
+    return res;
+  } catch (e) {
+    clearTimeout(id);
+    throw e;
+  }
+}
+
 // ── Supabase REST API helper ──
 const db = {
-  async getPlaces(filters = {}) {
+  async getPlaces(filters = {}, retries = 2) {
     let url = `${SUPABASE_URL}/rest/v1/places?select=*&order=rating.desc`;
-
     if (filters.category) url += `&category=eq.${filters.category}`;
     if (filters.eco)      url += `&is_eco=eq.true`;
-    if (filters.search)   url += `&or=(name.ilike.*${filters.search}*,description.ilike.*${filters.search}*,name_en.ilike.*${filters.search}*)`;
+    if (filters.search)   url += `&or=(name.ilike.*${encodeURIComponent(filters.search)}*,description.ilike.*${encodeURIComponent(filters.search)}*,name_en.ilike.*${encodeURIComponent(filters.search)}*)`;
 
-    const res = await fetch(url, {
-      headers: {
-        "apikey": SUPABASE_KEY,
-        "Authorization": `Bearer ${SUPABASE_KEY}`,
-        "Content-Type": "application/json"
+    const headers = {
+      "apikey": SUPABASE_KEY,
+      "Authorization": `Bearer ${SUPABASE_KEY}`,
+      "Content-Type": "application/json"
+    };
+
+    for (let attempt = 0; attempt <= retries; attempt++) {
+      try {
+        const res = await fetchWithTimeout(url, { headers });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        return await res.json();
+      } catch (err) {
+        if (attempt === retries) throw new Error("ດຶງຂໍ້ມູນຜິດພາດ: " + err.message);
+        await new Promise(r => setTimeout(r, 1000 * (attempt + 1))); // exponential backoff
       }
-    });
-    if (!res.ok) throw new Error("ດຶງຂໍ້ມູນຜິດພາດ");
-    return res.json();
+    }
   },
 
   async getPlaceById(id) {
     const url = `${SUPABASE_URL}/rest/v1/places?id=eq.${id}&select=*`;
-    const res = await fetch(url, {
+    const res = await fetchWithTimeout(url, {
       headers: {
         "apikey": SUPABASE_KEY,
         "Authorization": `Bearer ${SUPABASE_KEY}`

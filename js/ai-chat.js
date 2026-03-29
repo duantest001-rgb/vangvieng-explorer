@@ -1,11 +1,9 @@
 /* ═══════════════════════════════════════════════
-   AI Chat Logic — Cloudflare Worker Proxy (Claude)
+   AI Chat Logic — v2 (streaming effect + polish)
 ═══════════════════════════════════════════════ */
 
-// ── CONFIG ──
-const CLAUDE_URL = "https://gemini-proxy.duan-test001.workers.dev"; // ຊື່ Worker ຍັງເດີມ, ແຕ່ code Worker ປ່ຽນໄປ Claude ແລ້ວ
+const CLAUDE_URL = "https://gemini-proxy.duan-test001.workers.dev";
 
-// System prompt
 const SYSTEM_PROMPT = `ເຈົ້າຄື AI Travel Assistant ຂອງ VangVieng Explorer — platform ທ່ອງທ່ຽວ eco-tourism ສຳລັບວັງວຽງ, ລາວ.
 
 ກົດລະບຽບ:
@@ -23,14 +21,13 @@ const SYSTEM_PROMPT = `ເຈົ້າຄື AI Travel Assistant ຂອງ VangV
 - ເດືອນດີທີ່ສຸດ: ຕ.ລ - ມ.ສ (dry season)`;
 
 // ── STATE ──
-let chatHistory = []; // format: [{ role: "user", content: "..." }, { role: "assistant", content: "..." }]
+let chatHistory = [];
 let isLoading = false;
 
 // ── INIT ──
 document.addEventListener("DOMContentLoaded", () => {
   setupNavbar();
   setupInput();
-
   const params = new URLSearchParams(window.location.search);
   const place = params.get("place");
   if (place) {
@@ -49,72 +46,101 @@ async function sendMessage() {
   input.value = "";
   autoResize(input);
   input.focus();
-
   document.getElementById("quickSugg").style.display = "none";
-
-  // Claude format: role "user" / "assistant"
   chatHistory.push({ role: "user", content: text });
 
   const typingId = showTyping();
   isLoading = true;
-  document.getElementById("sendBtn").disabled = true;
+  const sendBtn = document.getElementById("sendBtn");
+  sendBtn.disabled = true;
+  sendBtn.style.opacity = "0.5";
 
   try {
     const reply = await callClaude();
     removeTyping(typingId);
-    appendMessage("bot", reply);
+    await typewriterMessage(reply); // ✨ streaming effect
     chatHistory.push({ role: "assistant", content: reply });
   } catch (err) {
     removeTyping(typingId);
-    appendMessage("bot", "⚠️ ຂໍໂທດ ເກີດຂໍ້ຜິດພາດ ລອງໃໝ່ອີກຄັ້ງ", false, true);
+    appendMessage("bot", "⚠️ ເກີດຂໍ້ຜິດພາດ — ກວດ internet ແລ້ວ <button onclick='retryLast()' style='background:none;border:none;color:var(--green-400);cursor:pointer;font-weight:700;text-decoration:underline;font-family:inherit;'>ລອງໃໝ່</button>", true, true);
     console.error("Claude error:", err);
   } finally {
     isLoading = false;
-    document.getElementById("sendBtn").disabled = false;
+    sendBtn.disabled = false;
+    sendBtn.style.opacity = "1";
   }
 }
 
-// ── CALL CLAUDE VIA WORKER ──
-async function callClaude() {
-  const body = {
-    system: SYSTEM_PROMPT,
-    messages: chatHistory
-  };
+// ── RETRY LAST MESSAGE ──
+function retryLast() {
+  const lastUser = [...chatHistory].reverse().find(m => m.role === "user");
+  if (!lastUser) return;
+  // Remove last user msg from history so it re-sends cleanly
+  const lastIdx = chatHistory.lastIndexOf(lastUser);
+  chatHistory.splice(lastIdx, 1);
+  // Remove error bubble from DOM
+  const msgs = document.getElementById("chatMessages");
+  const lastBubbles = msgs.querySelectorAll(".msg-row");
+  if (lastBubbles.length) lastBubbles[lastBubbles.length - 1].remove();
+  // Re-populate input and send
+  document.getElementById("chatInput").value = lastUser.content;
+  sendMessage();
+}
 
+// ── CALL CLAUDE ──
+async function callClaude() {
+  const body = { system: SYSTEM_PROMPT, messages: chatHistory };
   const res = await fetch(CLAUDE_URL, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(body)
+    body: JSON.stringify(body),
+    signal: AbortSignal.timeout(30000)
   });
-
   const data = await res.json();
-
-  // ແກ້ຕ້ອງ — log ດູກ່ອນ + ອ່ານ error ຖືກຕ້ອງ
-  console.log("Claude response:", JSON.stringify(data));
-
   if (!res.ok || data.error) {
-    throw new Error(data.error?.message || data.error?.type || JSON.stringify(data.error) || "API error " + res.status);
+    throw new Error(data.error?.message || "API error " + res.status);
   }
-
   return data.content?.[0]?.text || "ບໍ່ໄດ້ຮັບຄຳຕອບ";
 }
+
+// ── TYPEWRITER EFFECT ──
+async function typewriterMessage(text) {
+  const msgs = document.getElementById("chatMessages");
+  const row = document.createElement("div");
+  row.className = "msg-row bot";
+  row.innerHTML = `<div class="msg-avatar">✨</div><div class="msg-bubble bot-bubble" id="typeTarget"></div>`;
+  msgs.appendChild(row);
+  msgs.scrollTop = msgs.scrollHeight;
+
+  const target = document.getElementById("typeTarget");
+  const formatted = formatText(text);
+
+  // Fast typewriter — reveal HTML char by char (visible chars only)
+  const words = text.split(" ");
+  let built = "";
+  for (let i = 0; i < words.length; i++) {
+    built += (i > 0 ? " " : "") + words[i];
+    target.innerHTML = formatText(built) + '<span class="cursor-blink">▌</span>';
+    msgs.scrollTop = msgs.scrollHeight;
+    await sleep(18 + Math.random() * 12);
+  }
+  target.innerHTML = formatted; // final clean render
+  msgs.scrollTop = msgs.scrollHeight;
+}
+
+function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+
 // ── APPEND MESSAGE ──
 function appendMessage(role, text, isHTML = false, isError = false) {
   const msgs = document.getElementById("chatMessages");
   const row = document.createElement("div");
   row.className = `msg-row ${role}`;
-
   const avatar = role === "bot" ? "✨" : "👤";
   const bubbleClass = role === "bot"
     ? `msg-bubble bot-bubble${isError ? " error-bubble" : ""}`
     : "msg-bubble user-bubble";
-
   const formatted = isHTML ? text : formatText(text);
-
-  row.innerHTML = `
-    <div class="msg-avatar">${avatar}</div>
-    <div class="${bubbleClass}">${formatted}</div>
-  `;
+  row.innerHTML = `<div class="msg-avatar">${avatar}</div><div class="${bubbleClass}">${formatted}</div>`;
   msgs.appendChild(row);
   msgs.scrollTop = msgs.scrollHeight;
 }
@@ -129,13 +155,12 @@ function formatText(text) {
     .replace(/(<li>.*<\/li>)/s, "<ul>$1</ul>");
 }
 
-// ── TYPING INDICATOR ──
+// ── TYPING INDICATOR (animated dots) ──
 function showTyping() {
   const msgs = document.getElementById("chatMessages");
   const id = "typing-" + Date.now();
   const row = document.createElement("div");
-  row.className = "msg-row bot";
-  row.id = id;
+  row.className = "msg-row bot"; row.id = id;
   row.innerHTML = `
     <div class="msg-avatar">✨</div>
     <div class="msg-bubble bot-bubble typing-bubble">
@@ -147,18 +172,15 @@ function showTyping() {
   msgs.scrollTop = msgs.scrollHeight;
   return id;
 }
+function removeTyping(id) { document.getElementById(id)?.remove(); }
 
-function removeTyping(id) {
-  document.getElementById(id)?.remove();
-}
-
-// ── QUICK SUGGESTION ──
+// ── SUGGESTIONS ──
 function sendSuggestion(btn) {
   document.getElementById("chatInput").value = btn.textContent;
   sendMessage();
 }
 
-// ── INPUT SETUP ──
+// ── INPUT — char counter + auto resize ──
 function setupInput() {
   const input = document.getElementById("chatInput");
   input.addEventListener("keydown", e => {
@@ -172,11 +194,19 @@ function autoResize(el) {
   el.style.height = Math.min(el.scrollHeight, 120) + "px";
 }
 
-// ── NAVBAR ──
+// ── NAVBAR — X animation ──
 function setupNavbar() {
   const hamburger = document.getElementById("hamburger");
   const navLinks = document.getElementById("navLinks");
   if (hamburger && navLinks) {
-    hamburger.addEventListener("click", () => navLinks.classList.toggle("open"));
+    hamburger.addEventListener("click", () => {
+      const isOpen = navLinks.classList.toggle("open");
+      hamburger.classList.toggle("active", isOpen);
+    });
+    navLinks.querySelectorAll(".nav-link").forEach(l => l.addEventListener("click", () => {
+      navLinks.classList.remove("open");
+      hamburger.classList.remove("active");
+    }));
   }
 }
+
