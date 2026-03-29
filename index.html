@@ -209,7 +209,7 @@
             <div class="ai-avatar">🤖</div>
             <div class="ai-msg"><p data-i18n="ai.q">"ຂ້ອຍຢາກໄປຖ້ຳ ແລະ ຈະຕ້ອງເອົາຫຍັງໄປດ້ວຍ?"</p></div>
           </div>
-          <div class="ai-bubble reply">
+          <div class="ai-bubble reply" id="aiPromoBubble" style="opacity:0;transform:translateY(8px);transition:opacity 0.5s ease,transform 0.5s ease;">
             <div class="ai-avatar bot">✨</div>
             <div class="ai-msg bot-msg"><p data-i18n="ai.a">ແນະນຳ ຖ້ຳ Tham Phu Kham — ໃກ້ Blue Lagoon! ຕ້ອງເອົາ: ໄຟສ່ອງ, ເກີບ, ນ້ຳດື່ມ 🌄</p></div>
           </div>
@@ -223,6 +223,22 @@
       </div>
     </div>
   </section>
+  <script>
+    // Animate AI reply bubble when in view
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          setTimeout(() => {
+            const el = document.getElementById('aiPromoBubble');
+            if (el) { el.style.opacity = '1'; el.style.transform = 'translateY(0)'; }
+          }, 600);
+          observer.disconnect();
+        }
+      });
+    }, { threshold: 0.4 });
+    const promoSection = document.querySelector('.ai-promo-section');
+    if (promoSection) observer.observe(promoSection);
+  </script>
 
   <!-- FOOTER -->
   <footer class="footer">
