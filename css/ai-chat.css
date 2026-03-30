@@ -1,7 +1,7 @@
 /* ═══════════════════════════════
    AI Chat Page Styles
 ═══════════════════════════════ */
-body { overflow: hidden; background: var(--bg); }
+body { overflow: hidden; background: var(--bg); } /* desktop: chat fills screen */
 
 .chat-layout {
   display: flex; flex-direction: column;
@@ -33,6 +33,8 @@ body { overflow: hidden; background: var(--bg); }
   flex: 1; overflow-y: auto;
   padding: clamp(16px, 3vw, 24px) clamp(16px, 3vw, 24px) 12px;
   display: flex; flex-direction: column; gap: 16px;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
 }
 .chat-messages::-webkit-scrollbar { width: 4px; }
 .chat-messages::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
@@ -134,8 +136,8 @@ body { overflow: hidden; background: var(--bg); }
 }
 
 @media (max-width: 768px) {
-  body { overflow: auto; }
-  .chat-layout { height: 100svh; }
+  body { overflow: hidden; }
+  .chat-layout { height: 100svh; height: 100dvh; }
   .msg-bubble { max-width: 85%; }
   .quick-suggestions { padding: 8px 16px; }
   .chat-input-bar { padding: 10px 16px 16px; }
@@ -157,7 +159,7 @@ body { overflow: hidden; background: var(--bg); }
 .chat-tab:hover:not(.active) { color: var(--text); }
 
 .chat-tab-section { display: none; flex: 1; flex-direction: column; }
-.chat-tab-section.active { display: flex; }
+.chat-tab-section.active { display: flex; overflow: hidden; }
 
 /* ── TRIP PLANNER FORM ── */
 .planner-intro {
