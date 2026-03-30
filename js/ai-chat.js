@@ -1,11 +1,9 @@
 /* ═══════════════════════════════════════════════
-   AI Chat Logic — Cloudflare Worker Proxy (Claude)
+   AI Chat Logic — v2 (streaming effect + polish)
 ═══════════════════════════════════════════════ */
 
-// ── CONFIG ──
-const CLAUDE_URL = "https://gemini-proxy.duan-test001.workers.dev"; // ຊື່ Worker ຍັງເດີມ, ແຕ່ code Worker ປ່ຽນໄປ Claude ແລ້ວ
+const CLAUDE_URL = "https://gemini-proxy.duan-test001.workers.dev";
 
-// System prompt
 const SYSTEM_PROMPT = `ເຈົ້າຄື AI Travel Assistant ຂອງ VangVieng Explorer — platform ທ່ອງທ່ຽວ eco-tourism ສຳລັບວັງວຽງ, ລາວ.
 
 ກົດລະບຽບ:
@@ -23,14 +21,13 @@ const SYSTEM_PROMPT = `ເຈົ້າຄື AI Travel Assistant ຂອງ VangV
 - ເດືອນດີທີ່ສຸດ: ຕ.ລ - ມ.ສ (dry season)`;
 
 // ── STATE ──
-let chatHistory = []; // format: [{ role: "user", content: "..." }, { role: "assistant", content: "..." }]
+let chatHistory = [];
 let isLoading = false;
 
 // ── INIT ──
 document.addEventListener("DOMContentLoaded", () => {
   setupNavbar();
   setupInput();
-
   const params = new URLSearchParams(window.location.search);
   const place = params.get("place");
   if (place) {
@@ -49,84 +46,135 @@ async function sendMessage() {
   input.value = "";
   autoResize(input);
   input.focus();
-
   document.getElementById("quickSugg").style.display = "none";
-
-  // Claude format: role "user" / "assistant"
   chatHistory.push({ role: "user", content: text });
 
   const typingId = showTyping();
   isLoading = true;
-  document.getElementById("sendBtn").disabled = true;
+  const sendBtn = document.getElementById("sendBtn");
+  sendBtn.disabled = true;
+  sendBtn.style.opacity = "0.5";
 
   try {
     const reply = await callClaude();
     removeTyping(typingId);
-    appendMessage("bot", reply);
+    await typewriterMessage(reply);
     chatHistory.push({ role: "assistant", content: reply });
   } catch (err) {
     removeTyping(typingId);
-    appendMessage("bot", "⚠️ ຂໍໂທດ ເກີດຂໍ້ຜິດພາດ ລອງໃໝ່ອີກຄັ້ງ", false, true);
+    const errMsg = (err?.message || String(err)).replace(/</g, "&lt;").replace(/>/g, "&gt;");
+    appendMessage("bot", "⚠️ Error: " + errMsg + " — <button onclick='retryLast()' style='background:none;border:none;color:var(--green-400);cursor:pointer;font-weight:700;text-decoration:underline;font-family:inherit;'>ລອງໃໝ່</button>", true, true);
     console.error("Claude error:", err);
   } finally {
     isLoading = false;
-    document.getElementById("sendBtn").disabled = false;
+    sendBtn.disabled = false;
+    sendBtn.style.opacity = "1";
   }
 }
 
-// ── CALL CLAUDE VIA WORKER ──
+// ── RETRY LAST MESSAGE ──
+function retryLast() {
+  const lastUser = [...chatHistory].reverse().find(m => m.role === "user");
+  if (!lastUser) return;
+  const lastIdx = chatHistory.findLastIndex(m => m.role === "user");
+  chatHistory.splice(lastIdx, 1);
+  const msgs = document.getElementById("chatMessages");
+  const lastBubbles = msgs.querySelectorAll(".msg-row");
+  if (lastBubbles.length >= 2) {
+    lastBubbles[lastBubbles.length - 1].remove();
+    lastBubbles[lastBubbles.length - 2].remove();
+  } else if (lastBubbles.length === 1) {
+    lastBubbles[0].remove();
+  }
+  document.getElementById("chatInput").value = lastUser.content;
+  sendMessage();
+}
+
+// ── CALL CLAUDE ──
 async function callClaude() {
-  const body = {
-    system: SYSTEM_PROMPT,
-    messages: chatHistory
-  };
-
-  const res = await fetch(CLAUDE_URL, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(body)
-  });
-
-  const data = await res.json();
-
-  // ແກ້ຕ້ອງ — log ດູກ່ອນ + ອ່ານ error ຖືກຕ້ອງ
-  console.log("Claude response:", JSON.stringify(data));
-
-  if (!res.ok || data.error) {
-    throw new Error(data.error?.message || data.error?.type || JSON.stringify(data.error) || "API error " + res.status);
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 30000);
+  try {
+    const body = { system: SYSTEM_PROMPT, messages: chatHistory };
+    const res = await fetch(CLAUDE_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+      signal: controller.signal
+    });
+    clearTimeout(timeout);
+    const text = await res.text();
+    let data;
+    try { data = JSON.parse(text); }
+    catch { throw new Error("format error: " + text.slice(0, 100)); }
+    if (!res.ok || data.error) {
+      throw new Error(data.error?.message || "API error " + res.status);
+    }
+    return data.content?.[0]?.text || "ບໍ່ໄດ້ຮັບຄຳຕອບ";
+  } catch (err) {
+    clearTimeout(timeout);
+    if (err.name === "AbortError") throw new Error("ໝົດເວລາ — ລອງໃໝ່");
+    throw err;
   }
-
-  return data.content?.[0]?.text || "ບໍ່ໄດ້ຮັບຄຳຕອບ";
 }
+
+// ── TYPEWRITER EFFECT ──
+async function typewriterMessage(text) {
+  const msgs = document.getElementById("chatMessages");
+  const row = document.createElement("div");
+  row.className = "msg-row bot";
+  row.innerHTML = `<div class="msg-avatar">✨</div><div class="msg-bubble bot-bubble" id="typeTarget"></div>`;
+  msgs.appendChild(row);
+  msgs.scrollTop = msgs.scrollHeight;
+
+  const target = document.getElementById("typeTarget");
+  const formatted = formatText(text);
+
+  const words = text.split(" ");
+  let built = "";
+  for (let i = 0; i < words.length; i++) {
+    built += (i > 0 ? " " : "") + words[i];
+    const escaped = built.replace(/</g, "&lt;").replace(/>/g, "&gt;");
+    target.innerHTML = escaped + '<span class="cursor-blink">▌</span>';
+    msgs.scrollTop = msgs.scrollHeight;
+    await sleep(18 + Math.random() * 12);
+  }
+  target.innerHTML = formatted;
+  msgs.scrollTop = msgs.scrollHeight;
+}
+
+function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+
 // ── APPEND MESSAGE ──
 function appendMessage(role, text, isHTML = false, isError = false) {
   const msgs = document.getElementById("chatMessages");
   const row = document.createElement("div");
   row.className = `msg-row ${role}`;
-
   const avatar = role === "bot" ? "✨" : "👤";
   const bubbleClass = role === "bot"
     ? `msg-bubble bot-bubble${isError ? " error-bubble" : ""}`
     : "msg-bubble user-bubble";
-
   const formatted = isHTML ? text : formatText(text);
-
-  row.innerHTML = `
-    <div class="msg-avatar">${avatar}</div>
-    <div class="${bubbleClass}">${formatted}</div>
-  `;
+  row.innerHTML = `<div class="msg-avatar">${avatar}</div><div class="${bubbleClass}">${formatted}</div>`;
   msgs.appendChild(row);
   msgs.scrollTop = msgs.scrollHeight;
 }
 
 // ── FORMAT TEXT ──
 function formatText(text) {
-  return text
-    .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
-    .replace(/\*(.*?)\*/g, "<em>$1</em>")
-    .replace(/\n/g, "<br>")
-    .replace(/^[-•]\s(.+)/gm, "<li>$1</li>")
-    .replace(/(<li>.*<\/li>)/s, "<ul>$1</ul>");
+  let t = text;
+  t = t.replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>");
+  t = t.replace(/\*(.*?)\*/g, "<em>$1</em>");
+  t = t.replace(/`([^`]+)`/g, "<code style=\"background:#e0f2ff;color:#1050a0;padding:1px 5px;border-radius:4px;font-size:0.85em;\">$1</code>");
+  t = t.replace(/^### (.+)$/gm, "<div style=\"font-weight:700;font-size:0.92rem;color:#071830;margin:8px 0 3px;\">$1</div>");
+  t = t.replace(/^## (.+)$/gm,  "<div style=\"font-weight:700;font-size:0.98rem;color:#071830;margin:10px 0 5px;\">$1</div>");
+  t = t.replace(/^# (.+)$/gm,   "<div style=\"font-weight:800;font-size:1rem;color:#071830;margin:10px 0 5px;\">$1</div>");
+  t = t.replace(/^(\d+)\.\s(.+)$/gm, "<div style=\"padding:2px 0;\"><span style=\"font-weight:700;color:#1a6bbf;\">$1.</span> $2</div>");
+  t = t.replace(/^[-•]\s(.+)$/gm, "<div style=\"padding:2px 0 2px 2px;\">• $1</div>");
+  t = t.replace(/^---$/gm, "<hr style=\"border:none;border-top:1px solid #bde0f8;margin:8px 0;\">");
+  t = t.replace(/\n{2,}/g, "<br>");
+  t = t.replace(/\n/g, "<br>");
+  return t;
 }
 
 // ── TYPING INDICATOR ──
@@ -134,8 +182,7 @@ function showTyping() {
   const msgs = document.getElementById("chatMessages");
   const id = "typing-" + Date.now();
   const row = document.createElement("div");
-  row.className = "msg-row bot";
-  row.id = id;
+  row.className = "msg-row bot"; row.id = id;
   row.innerHTML = `
     <div class="msg-avatar">✨</div>
     <div class="msg-bubble bot-bubble typing-bubble">
@@ -147,18 +194,15 @@ function showTyping() {
   msgs.scrollTop = msgs.scrollHeight;
   return id;
 }
+function removeTyping(id) { document.getElementById(id)?.remove(); }
 
-function removeTyping(id) {
-  document.getElementById(id)?.remove();
-}
-
-// ── QUICK SUGGESTION ──
+// ── SUGGESTIONS ──
 function sendSuggestion(btn) {
   document.getElementById("chatInput").value = btn.textContent;
   sendMessage();
 }
 
-// ── INPUT SETUP ──
+// ── INPUT ──
 function setupInput() {
   const input = document.getElementById("chatInput");
   input.addEventListener("keydown", e => {
@@ -177,6 +221,13 @@ function setupNavbar() {
   const hamburger = document.getElementById("hamburger");
   const navLinks = document.getElementById("navLinks");
   if (hamburger && navLinks) {
-    hamburger.addEventListener("click", () => navLinks.classList.toggle("open"));
+    hamburger.addEventListener("click", () => {
+      const isOpen = navLinks.classList.toggle("open");
+      hamburger.classList.toggle("active", isOpen);
+    });
+    navLinks.querySelectorAll(".nav-link").forEach(l => l.addEventListener("click", () => {
+      navLinks.classList.remove("open");
+      hamburger.classList.remove("active");
+    }));
   }
 }
