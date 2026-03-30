@@ -159,12 +159,19 @@ function appendMessage(role, text, isHTML = false, isError = false) {
 
 // ── FORMAT TEXT ──
 function formatText(text) {
-  return text
-    .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
-    .replace(/\*(.*?)\*/g, "<em>$1</em>")
-    .replace(/\n/g, "<br>")
-    .replace(/^[-•]\s(.+)/gm, "<li>$1</li>")
-    .replace(/(<li>.*<\/li>)/s, "<ul>$1</ul>");
+  let t = text;
+  t = t.replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>");
+  t = t.replace(/\*(.*?)\*/g, "<em>$1</em>");
+  t = t.replace(/`([^`]+)`/g, "<code style=\"background:#e0f2ff;color:#1050a0;padding:1px 5px;border-radius:4px;font-size:0.85em;\">$1</code>");
+  t = t.replace(/^### (.+)$/gm, "<div style=\"font-weight:700;font-size:0.92rem;color:#071830;margin:8px 0 3px;\">$1</div>");
+  t = t.replace(/^## (.+)$/gm,  "<div style=\"font-weight:700;font-size:0.98rem;color:#071830;margin:10px 0 5px;\">$1</div>");
+  t = t.replace(/^# (.+)$/gm,   "<div style=\"font-weight:800;font-size:1rem;color:#071830;margin:10px 0 5px;\">$1</div>");
+  t = t.replace(/^(\d+)\.\s(.+)$/gm, "<div style=\"padding:2px 0;\"><span style=\"font-weight:700;color:#1a6bbf;\">$1.</span> $2</div>");
+  t = t.replace(/^[-•]\s(.+)$/gm, "<div style=\"padding:2px 0 2px 2px;\">• $1</div>");
+  t = t.replace(/^---$/gm, "<hr style=\"border:none;border-top:1px solid #bde0f8;margin:8px 0;\">");
+  t = t.replace(/\n{2,}/g, "<br>");
+  t = t.replace(/\n/g, "<br>");
+  return t;
 }
 
 // ── TYPING INDICATOR (animated dots) ──
