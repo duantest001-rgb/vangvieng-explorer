@@ -5,8 +5,10 @@ body { overflow: hidden; background: var(--bg); } /* desktop: chat fills screen 
 
 .chat-layout {
   display: flex; flex-direction: column;
-  height: 100vh; padding-top: 64px;
+  height: 100vh; height: 100dvh;
+  padding-top: 64px;
   max-width: 800px; margin: 0 auto;
+  overflow: hidden;
 }
 
 /* Header */
@@ -30,7 +32,9 @@ body { overflow: hidden; background: var(--bg); } /* desktop: chat fills screen 
 
 /* Messages */
 .chat-messages {
-  flex: 1; overflow-y: auto;
+  flex: 1;
+  min-height: 0; /* CRITICAL — fixes flex scroll bug */
+  overflow-y: auto;
   padding: clamp(16px, 3vw, 24px) clamp(16px, 3vw, 24px) 12px;
   display: flex; flex-direction: column; gap: 16px;
   overscroll-behavior: contain;
@@ -159,7 +163,13 @@ body { overflow: hidden; background: var(--bg); } /* desktop: chat fills screen 
 .chat-tab:hover:not(.active) { color: var(--text); }
 
 .chat-tab-section { display: none; flex: 1; flex-direction: column; }
-.chat-tab-section.active { display: flex; overflow: hidden; }
+.chat-tab-section.active {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  overflow: hidden;
+  min-height: 0;
+}
 
 /* ── TRIP PLANNER FORM ── */
 .planner-intro {
