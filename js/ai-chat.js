@@ -23,6 +23,9 @@ const SYSTEM_PROMPT = `ເຈົ້າຄື AI Travel Assistant ຂອງ VangV
 // ── STATE ──
 let chatHistory = [];
 let isLoading = false;
+let lastMessageTime = 0;
+const MESSAGE_COOLDOWN = 5000;
+const MAX_HISTORY = 10;
 
 // ── INIT ──
 document.addEventListener("DOMContentLoaded", () => {
@@ -41,6 +44,14 @@ async function sendMessage() {
   const input = document.getElementById("chatInput");
   const text = input.value.trim();
   if (!text || isLoading) return;
+
+  const now = Date.now();
+  if (now - lastMessageTime < MESSAGE_COOLDOWN) {
+    const wait = Math.ceil((MESSAGE_COOLDOWN - (now - lastMessageTime)) / 1000);
+    appendMessage("bot", `⏳ ກະລຸນາລອຍຖ້າ ${wait} ວິ ກ່ອນສົ່ງຄຳຖາມໃໝ່`, false, false);
+    return;
+  }
+  lastMessageTime = now;
 
   appendMessage("user", text);
   input.value = "";
@@ -95,7 +106,8 @@ async function callClaude() {
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), 30000);
   try {
-    const body = { system: SYSTEM_PROMPT, messages: chatHistory };
+    const trimmedHistory = chatHistory.slice(-MAX_HISTORY);
+    const body = { system: SYSTEM_PROMPT, messages: trimmedHistory };
     const res = await fetch(CLAUDE_URL, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
