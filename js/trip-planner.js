@@ -85,19 +85,43 @@ format:
 ກົດ: ${pace === '🌿 ສະບາຍໆ' ? 'ສູງສຸດ 2 stops/ວັນ' : pace === '🔥 ເຕັມທີ່' ? '4-5 stops/ວັນ' : '3 stops/ວັນ'}`;
 
     // 3. Call Claude via Worker
-    const res = await fetch(WORKER_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        system: 'ເຈົ້າຕອບໄດ້ສະເພາະ JSON array ເທົ່ານັ້ນ ບໍ່ມີ text ອື່ນ',
-        messages: [{ role: 'user', content: prompt }]
-      })
-    });
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 45000);
+    let res;
+    try {
+      res = await fetch(WORKER_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          system: 'ເຈົ້າຕອບໄດ້ສະເພາະ JSON array ເທົ່ານັ້ນ ບໍ່ມີ text ອື່ນ',
+          messages: [{ role: 'user', content: prompt }]
+        }),
+        signal: controller.signal
+      });
+    } catch (fetchErr) {
+      clearTimeout(timeout);
+      if (fetchErr.name === 'AbortError') throw new Error('ໝົດເວລາ — ກະລຸນາລອງໃໝ່');
+      throw fetchErr;
+    }
+    clearTimeout(timeout);
+
+    if (!res.ok) throw new Error('API error ' + res.status);
 
     const data = await res.json();
-    const text = data.content?.[0]?.text || '[]';
+    if (data.error) throw new Error(data.error?.message || 'API error');
+
+    const text = data.content?.[0]?.text || '';
     const clean = text.replace(/```json|```/g, '').trim();
-    const itinerary = JSON.parse(clean);
+
+    let itinerary;
+    try {
+      itinerary = JSON.parse(clean);
+    } catch {
+      throw new Error('AI ສົ່ງຂໍ້ມູນຜິດຮູບແບບ — ກະລຸນາລອງໃໝ່');
+    }
+    if (!Array.isArray(itinerary) || itinerary.length === 0) {
+      throw new Error('AI ບໍ່ສາມາດສ້າງແຜນໄດ້ — ກະລຸນາລອງໃໝ່');
+    }
 
     renderPlanResult(itinerary, places, { days, interests, style, pace });
     if (typeof startActiveTrip === 'function') {
