@@ -62,7 +62,8 @@ async function sendMessage() {
     chatHistory.push({ role: "assistant", content: reply });
   } catch (err) {
     removeTyping(typingId);
-    appendMessage("bot", "⚠️ ເກີດຂໍ້ຜິດພາດ — ກວດ internet ແລ້ວ <button onclick='retryLast()' style='background:none;border:none;color:var(--green-400);cursor:pointer;font-weight:700;text-decoration:underline;font-family:inherit;'>ລອງໃໝ່</button>", true, true);
+    const errMsg = err?.message || String(err);
+    appendMessage("bot", "⚠️ Error: " + errMsg + " — <button onclick='retryLast()' style='background:none;border:none;color:var(--green-400);cursor:pointer;font-weight:700;text-decoration:underline;font-family:inherit;'>ລອງໃໝ່</button>", true, true);
     console.error("Claude error:", err);
   } finally {
     isLoading = false;
