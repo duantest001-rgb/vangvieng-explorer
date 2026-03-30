@@ -89,18 +89,30 @@ function retryLast() {
 
 // ── CALL CLAUDE ──
 async function callClaude() {
-  const body = { system: SYSTEM_PROMPT, messages: chatHistory };
-  const res = await fetch(CLAUDE_URL, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(body),
-    signal: AbortSignal.timeout(30000)
-  });
-  const data = await res.json();
-  if (!res.ok || data.error) {
-    throw new Error(data.error?.message || "API error " + res.status);
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 30000);
+  try {
+    const body = { system: SYSTEM_PROMPT, messages: chatHistory };
+    const res = await fetch(CLAUDE_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+      signal: controller.signal
+    });
+    clearTimeout(timeout);
+    const text = await res.text();
+    let data;
+    try { data = JSON.parse(text); }
+    catch { throw new Error("format error: " + text.slice(0, 100)); }
+    if (!res.ok || data.error) {
+      throw new Error(data.error?.message || "API error " + res.status);
+    }
+    return data.content?.[0]?.text || "ບໍ່ໄດ້ຮັບຄຳຕອບ";
+  } catch (err) {
+    clearTimeout(timeout);
+    if (err.name === "AbortError") throw new Error("ໝົດເວລາ — ລອງໃໝ່");
+    throw err;
   }
-  return data.content?.[0]?.text || "ບໍ່ໄດ້ຮັບຄຳຕອບ";
 }
 
 // ── TYPEWRITER EFFECT ──
