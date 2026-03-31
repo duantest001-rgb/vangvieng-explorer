@@ -2,7 +2,9 @@
    AI Chat Logic — v2 (streaming effect + polish)
 ═══════════════════════════════════════════════ */
 
-const CLAUDE_URL = "https://gemini-proxy.duan-test001.workers.dev";
+// Cloudflare Worker proxy → Anthropic Claude API
+// NOTE: Worker ຊື່ "gemini-proxy" ເພາະຊື່ເດີມ — ໃຊ້ງານໄດ້ປົກກະຕິ
+const AI_PROXY_URL = "https://gemini-proxy.duan-test001.workers.dev";
 
 const SYSTEM_PROMPT = `ເຈົ້າຄື "ນ້ອງວຽງ" — AI Travel Guide ສ່ວນຕົວຂອງ VangVieng Explorer ທີ່ຮູ້ຈັກວັງວຽງດີທີ່ສຸດ.
 ເຈົ້າຄືຄົນທ້ອງຖິ່ນທີ່ໄດ້ທ່ຽວທຸກທີ່ ກິນທຸກຮ້ານ ຮູ້ທຸກ tip — ລົມສະໄຕລ໌ friendly, warm, ຄືໝູ່.
@@ -210,7 +212,7 @@ async function callClaude() {
   const timeout = setTimeout(() => controller.abort(), 30000);
   try {
     const body = { system: SYSTEM_PROMPT, messages: chatHistory };
-    const res = await fetch(CLAUDE_URL, {
+    const res = await fetch(AI_PROXY_URL, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(body),

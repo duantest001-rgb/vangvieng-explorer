@@ -189,7 +189,7 @@ function renderDetail(p) {
             <div class="info-item" style="grid-column:1/-1">
               <div class="info-label">🏷️ Tags</div>
               <div class="info-value" style="display:flex;flex-wrap:wrap;gap:6px;justify-content:flex-end">
-                ${p.tags.split(',').map(t => `<span style="font-size:0.75rem;font-weight:600;color:var(--green-700);background:var(--green-100);border:1px solid var(--green-300);padding:2px 10px;border-radius:99px;">${t.trim()}</span>`).join('')}
+                ${(Array.isArray(p.tags) ? p.tags : p.tags.split(',')).map(t => `<span style="font-size:0.75rem;font-weight:600;color:var(--green-700);background:var(--green-100);border:1px solid var(--green-300);padding:2px 10px;border-radius:99px;">${t.trim()}</span>`).join('')}
               </div>
             </div>` : ''}
           </div>

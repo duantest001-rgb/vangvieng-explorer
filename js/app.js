@@ -18,7 +18,7 @@ const PLACES_DATA = [
     price_range: "$",
     rating: 4.7,
     is_eco: true,
-    tags: ["ທ່ອງທ່ຽວ", "ນ້ຳ", "ຖ້ຳ"]
+    tags: "ທ່ອງທ່ຽວ,ນ້ຳ,ຖ້ຳ"
   },
   {
     id: 2,
@@ -33,7 +33,7 @@ const PLACES_DATA = [
     price_range: "$",
     rating: 4.5,
     is_eco: true,
-    tags: ["ນ້ຳ", "ທ່ອງທ່ຽວ"]
+    tags: "ນ້ຳ,ທ່ອງທ່ຽວ"
   },
   {
     id: 3,
@@ -48,7 +48,7 @@ const PLACES_DATA = [
     price_range: "$$$",
     rating: 4.8,
     is_eco: false,
-    tags: ["resort", "pool", "view"]
+    tags: "resort,pool,view"
   },
   {
     id: 4,
@@ -63,7 +63,7 @@ const PLACES_DATA = [
     price_range: "$",
     rating: 4.6,
     is_eco: false,
-    tags: ["ອາຫານລາວ", "local", "ລາຄາຖືກ"]
+    tags: "ອາຫານລາວ,local,ລາຄາຖືກ"
   },
   {
     id: 5,
@@ -78,7 +78,7 @@ const PLACES_DATA = [
     price_range: "$$",
     rating: 4.9,
     is_eco: true,
-    tags: ["adventure", "ນ້ຳ", "kayak"]
+    tags: "adventure,ນ້ຳ,kayak"
   },
   {
     id: 6,
@@ -93,7 +93,7 @@ const PLACES_DATA = [
     price_range: "$$",
     rating: 4.5,
     is_eco: false,
-    tags: ["cafe", "coffee", "breakfast"]
+    tags: "cafe,coffee,breakfast"
   }
 ];
 

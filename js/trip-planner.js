@@ -3,7 +3,9 @@
    Uses: Supabase places + Cloudflare Worker (Claude API)
 ═══════════════════════════════════════════════ */
 
-const WORKER_URL = "https://gemini-proxy.duan-test001.workers.dev";
+// Cloudflare Worker proxy → Anthropic Claude API
+// NOTE: Worker ຊື່ "gemini-proxy" ເພາະຊື່ເດີມ — ໃຊ້ງານໄດ້ປົກກະຕິ
+const AI_PROXY_URL = "https://gemini-proxy.duan-test001.workers.dev";
 
 // ── TAB SWITCHING ──
 function switchChatTab(tab) {
@@ -118,7 +120,7 @@ format:
 ກົດ: ${pace === '🌿 ສະບາຍໆ' ? 'ສູງສຸດ 2 stops/ວັນ' : pace === '🔥 ເຕັມທີ່' ? '4-5 stops/ວັນ' : '3 stops/ວັນ'}`;
 
     // 4. Call Claude via Worker
-    const res = await fetch(WORKER_URL, {
+    const res = await fetch(AI_PROXY_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
