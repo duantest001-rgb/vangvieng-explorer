@@ -261,10 +261,11 @@
       <span>VangVieng<strong>Explorer</strong></span>
     </div>
     <h2 class="login-title">Admin Panel</h2>
-    <p class="login-sub">ໃສ່ລະຫັດຜ່ານເພື່ອເຂົ້າລະບົບ</p>
-    <input type="password" id="pwInput" class="login-input" placeholder="Password" onkeydown="if(event.key==='Enter')doLogin()"/>
-    <button class="login-btn" onclick="doLogin()">🔐 ເຂົ້າລະບົບ</button>
-    <p class="login-error" id="loginErr">❌ ລະຫັດຜ່ານຜິດ</p>
+    <p class="login-sub">ເຂົ້າລະບົບດ້ວຍ Admin Email</p>
+    <input type="email" id="emailInput" class="login-input" placeholder="admin@vve.la" autocomplete="email" onkeydown="if(event.key==='Enter')doLogin()"/>
+    <input type="password" id="pwInput" class="login-input" placeholder="Password" style="margin-top:10px;" autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()"/>
+    <button class="login-btn" id="loginBtn" onclick="doLogin()">🔐 ເຂົ້າລະບົບ</button>
+    <p class="login-error" id="loginErr">❌ Email/Password ຜິດ ຫຼື ບໍ່ມີສິດ Admin</p>
   </div>
 </div>
 
@@ -585,46 +586,94 @@
 // ── CONFIG ──
 const SUPABASE_URL = 'https://axqgotrbnglssxhwkfjc.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_Jx8kMe3QiaBZ3rE9T7OHtA_hxrbgW5b';
-// SHA-256 hash — ບໍ່ເກັບ password plain text ໃນ code
-// ປ່ຽນ hash ໃໝ່: https://emn178.github.io/online-tools/sha256.html
-const ADMIN_HASH = '5684c312d4d964fb9ec8a485f4e99b1b82f084abe2ea27857b94a4d60da7b601';
-
 // ── STATE ──
 let allPlaces = [];
 let editingId = null;
 let deletingId = null;
+let _accessToken = null; // Supabase access token ຂອງ admin
 
 // ── LOGIN ──
 async function doLogin() {
-  const pw = document.getElementById('pwInput').value;
-  if (!pw) return;
-  // hash ທີ່ user ພິມ ແລ້ວ compare
-  const buf  = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(pw));
-  const hash = Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,'0')).join('');
-  if (hash === ADMIN_HASH) {
+  const email = document.getElementById('emailInput').value.trim();
+  const pw    = document.getElementById('pwInput').value;
+  const btn   = document.getElementById('loginBtn');
+  const err   = document.getElementById('loginErr');
+  if (!email || !pw) return;
+
+  btn.disabled = true;
+  btn.textContent = '⏳ ກຳລັງເຂົ້າ...';
+  err.style.display = 'none';
+
+  try {
+    // 1. Sign in ຜ່ານ Supabase Auth
+    const res = await fetch(`${SUPABASE_URL}/auth/v1/token?grant_type=password`, {
+      method: 'POST',
+      headers: { 'apikey': SUPABASE_KEY, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password: pw })
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error_description || 'ເຂົ້າລະບົບຜິດພາດ');
+
+    // 2. ກວດ role ຕ້ອງເປັນ admin ເທົ່ານັ້ນ
+    const profileRes = await fetch(`${SUPABASE_URL}/rest/v1/user_profiles?select=role`, {
+      headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${data.access_token}` }
+    });
+    const profiles = await profileRes.json();
+    const role = profiles[0]?.role;
+
+    if (role !== 'admin') {
+      throw new Error('ບັນຊີນີ້ບໍ່ມີສິດ Admin');
+    }
+
+    // 3. ເຂົ້າໄດ້ — ເກັບ token ໄວ້ໃຊ້
+    _accessToken = data.access_token;
+    sessionStorage.setItem('adminAuth', JSON.stringify({
+      token: data.access_token,
+      email: data.user.email,
+      exp: Date.now() + (data.expires_in * 1000)
+    }));
+
     document.getElementById('loginScreen').style.display = 'none';
     document.getElementById('adminApp').style.display = 'block';
-    sessionStorage.setItem('adminAuth', '1');
     loadPlaces();
-  } else {
-    document.getElementById('loginErr').style.display = 'block';
-    document.getElementById('pwInput').value = '';
+
+  } catch (e) {
+    err.textContent = '❌ ' + e.message;
+    err.style.display = 'block';
+    btn.disabled = false;
+    btn.textContent = '🔐 ເຂົ້າລະບົບ';
   }
 }
+
 function doLogout() {
   sessionStorage.removeItem('adminAuth');
+  _accessToken = null;
   location.reload();
 }
-// Auto-login if session active
-if (sessionStorage.getItem('adminAuth') === '1') {
-  document.getElementById('loginScreen').style.display = 'none';
-  document.getElementById('adminApp').style.display = 'block';
-}
 
-// ── API HELPERS ──
+// ── Auto-login ຖ້າ session ຍັງໃຊ້ໄດ້ ──
+(function() {
+  try {
+    const saved = JSON.parse(sessionStorage.getItem('adminAuth') || 'null');
+    if (saved && saved.token && Date.now() < saved.exp) {
+      _accessToken = saved.token;
+      document.getElementById('loginScreen').style.display = 'none';
+      document.getElementById('adminApp').style.display = 'block';
+    }
+  } catch(_) {}
+})();
+
+// ── API HELPERS (ໃຊ້ _accessToken ຂອງ admin) ──
+function authHeaders(extra = {}) {
+  return {
+    'apikey': SUPABASE_KEY,
+    'Authorization': `Bearer ${_accessToken || SUPABASE_KEY}`,
+    ...extra
+  };
+}
 async function apiGet() {
   const r = await fetch(`${SUPABASE_URL}/rest/v1/places?select=*&order=id`, {
-    headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
+    headers: authHeaders()
   });
   return r.json();
 }
@@ -1172,7 +1221,7 @@ document.getElementById('deleteModal').addEventListener('click', e => { if(e.tar
 
 // ── AUTO LOAD ──
 document.addEventListener('DOMContentLoaded', () => {
-  if (sessionStorage.getItem('adminAuth') === '1') { loadPlaces(); }
+  if (_accessToken) { loadPlaces(); }
 });
 </script>
   <script src="../js/active-trip.js"></script>
