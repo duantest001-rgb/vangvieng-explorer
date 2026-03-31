@@ -121,6 +121,27 @@
       <div class="planner-form" id="plannerForm">
         <p class="planner-intro">ບອກ AI ວ່າເຈົ້າຢາກຫຍັງ — ຮັບແຜນທ່ຽວທີ່ສ້າງຈາກສະຖານທີ່ຈິງໃນ app</p>
 
+        <!-- ກຸ່ມທ່ຽວ -->
+        <div class="planner-group">
+          <label class="planner-label">👥 ມາຈັ່ງໃດ?</label>
+          <div class="planner-chips" id="pGroup">
+            <div class="p-chip on" onclick="pickPChip('pGroup',this);toggleKidsOption()">🧑 ຄົນດຽວ</div>
+            <div class="p-chip"   onclick="pickPChip('pGroup',this);toggleKidsOption()">👫 ຄູ່ຮັກ</div>
+            <div class="p-chip"   onclick="pickPChip('pGroup',this);toggleKidsOption()">👯 ໝູ່ 2-3 ຄົນ</div>
+            <div class="p-chip"   onclick="pickPChip('pGroup',this);toggleKidsOption()">🏠 ຄອບຄົວ</div>
+          </div>
+        </div>
+
+        <!-- ລູກນ້ອຍ (ສະແດງສະເພາະ ຄອບຄົວ) -->
+        <div class="planner-group" id="kidsGroup" style="display:none;">
+          <label class="planner-label">👶 ມີລູກນ້ອຍຕິດໄປດ້ວຍບໍ?</label>
+          <div class="planner-chips" id="pKids">
+            <div class="p-chip on" onclick="pickPChip('pKids',this)">❌ ບໍ່ມີ</div>
+            <div class="p-chip"   onclick="pickPChip('pKids',this)">🍼 ລູກນ້ອຍ (ຕໍ່າ 5 ປີ)</div>
+            <div class="p-chip"   onclick="pickPChip('pKids',this)">🧒 ເດັກ (6-12 ປີ)</div>
+          </div>
+        </div>
+
         <div class="planner-group">
           <label class="planner-label">📅 ຢູ່ກີ່ວັນ?</label>
           <select id="pDays" class="planner-select">
