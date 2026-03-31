@@ -28,6 +28,7 @@ let isLoading = false;
 document.addEventListener("DOMContentLoaded", () => {
   setupNavbar();
   setupInput();
+  updateRateBadge();
   const params = new URLSearchParams(window.location.search);
   const place = params.get("place");
   if (place) {
@@ -36,11 +37,46 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 });
 
+// ── RATE LIMIT UI ──
+function updateRateBadge() {
+  const session = (typeof Auth !== "undefined") ? Auth.getSession() : null;
+  const username = session ? session.username : "guest";
+  const limit    = session ? session.limit    : RateLimit.GUEST_LIMIT;
+  const remaining = RateLimit.remaining(username, limit);
+  const el = document.getElementById("rateLimitInfo");
+  if (!el) return;
+  if (session?.role === "admin") { el.style.display = "none"; return; }
+  el.style.display = "flex";
+  el.innerHTML = `
+    <span style="font-size:0.75rem; color:${remaining <= 2 ? '#c0392b' : '#4a6fa5'}; font-weight:600;">
+      🤖 AI ວັນນີ້: <strong>${remaining}/${limit}</strong> ຄັ້ງທີ່ຍັງເຫຼືອ
+      ${remaining === 0 ? ' — <span style="color:#c0392b">ໝົດໂຄຕ້າແລ້ວ</span>' : ''}
+    </span>`;
+}
+
 // ── SEND MESSAGE ──
 async function sendMessage() {
   const input = document.getElementById("chatInput");
   const text = input.value.trim();
   if (!text || isLoading) return;
+
+  // ── Rate limit check ──
+  const session  = (typeof Auth !== "undefined") ? Auth.getSession() : null;
+  const username = session ? session.username : "guest";
+  const limit    = session ? session.limit    : RateLimit.GUEST_LIMIT;
+
+  if (session?.role !== "admin") {
+    const check = RateLimit.consume(username, limit);
+    if (!check.ok) {
+      appendMessage("bot",
+        `⛔ **ໝົດໂຄຕ້າ AI ປະຈຳວັນ** (${limit} ຄັ້ງ/ວັນ)\n\n` +
+        `ມາໃໝ່ໄດ້ພຣຸ່ງນີ້ ຫຼື <a href="login.html" style="color:#1050a0;font-weight:700;">login ດ້ວຍ account ທີ່ມີໂຄຕ້າຫຼາຍກວ່ານີ້</a>`,
+        true
+      );
+      return;
+    }
+    updateRateBadge();
+  }
 
   appendMessage("user", text);
   input.value = "";
