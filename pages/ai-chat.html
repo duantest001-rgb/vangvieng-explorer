@@ -77,6 +77,14 @@
       </div>
     </div>
 
+    <!-- Rate limit bar -->
+    <div id="rateLimitInfo" style="
+      display:none; justify-content:flex-end;
+      padding: 4px 16px 0;
+      background: #f0f6ff;
+      border-bottom: 1px solid #dce8f8;
+    "></div>
+
     <div class="chat-messages" id="chatMessages">
       <div class="msg-row bot">
         <div class="msg-avatar">✨</div>
@@ -170,6 +178,7 @@
 
   </div><!-- end chat-layout -->
 
+  <script src="../js/auth.js"></script>
   <script src="../js/supabase.js"></script>
   <script src="../js/saved.js"></script>
   <script src="../js/ai-chat.js"></script>

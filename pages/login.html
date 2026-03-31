@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="lo">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ເຂົ້າສູ່ລະບົບ — VangVieng Explorer</title>
+  <meta name="robots" content="noindex">
+  <link rel="stylesheet" href="../css/style.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700;800&family=Outfit:wght@300;400;500;600;700&family=Noto+Sans+Lao:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, #071830 0%, #0d2d54 50%, #1a5a9e 100%);
+      font-family: 'Outfit', 'Noto Sans Lao', sans-serif;
+      padding: 1rem;
+    }
+
+    .login-card {
+      background: #fff;
+      border-radius: 20px;
+      padding: 2.5rem 2rem 2rem;
+      width: 100%;
+      max-width: 380px;
+      box-shadow: 0 20px 60px rgba(7,24,48,0.35);
+      animation: slideUp 0.4s cubic-bezier(.16,1,.3,1) both;
+    }
+
+    @keyframes slideUp {
+      from { opacity:0; transform:translateY(24px); }
+      to   { opacity:1; transform:translateY(0); }
+    }
+
+    .login-logo {
+      text-align: center;
+      margin-bottom: 1.5rem;
+    }
+    .login-logo img {
+      width: 56px; height: 56px;
+      border-radius: 14px;
+      object-fit: cover;
+      box-shadow: 0 4px 16px rgba(16,80,160,0.2);
+    }
+    .login-logo h1 {
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: #071830;
+      margin-top: 10px;
+      letter-spacing: -0.3px;
+    }
+    .login-logo p {
+      font-size: 0.8rem;
+      color: #6b7a99;
+      margin-top: 3px;
+    }
+
+    .login-badge {
+      background: #fff8e1;
+      border: 1px solid #ffd54f;
+      border-radius: 10px;
+      padding: 10px 14px;
+      font-size: 0.78rem;
+      color: #7a5800;
+      margin-bottom: 1.5rem;
+      display: flex;
+      gap: 8px;
+      align-items: flex-start;
+    }
+
+    .form-group {
+      margin-bottom: 1rem;
+    }
+    .form-group label {
+      display: block;
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: #3a4a6b;
+      margin-bottom: 6px;
+    }
+    .form-group input {
+      width: 100%;
+      padding: 11px 14px;
+      border: 1.5px solid #d0d8ec;
+      border-radius: 10px;
+      font-size: 0.9rem;
+      font-family: inherit;
+      color: #071830;
+      background: #f8faff;
+      transition: border-color .2s, box-shadow .2s;
+      outline: none;
+    }
+    .form-group input:focus {
+      border-color: #1050a0;
+      box-shadow: 0 0 0 3px rgba(16,80,160,0.12);
+      background: #fff;
+    }
+
+    .login-btn {
+      width: 100%;
+      padding: 13px;
+      background: linear-gradient(135deg, #1050a0, #1a6bbf);
+      color: #fff;
+      border: none;
+      border-radius: 12px;
+      font-size: 1rem;
+      font-weight: 700;
+      font-family: inherit;
+      cursor: pointer;
+      margin-top: 0.5rem;
+      transition: opacity .2s, transform .15s;
+      letter-spacing: 0.2px;
+    }
+    .login-btn:hover  { opacity: 0.93; }
+    .login-btn:active { transform: scale(0.98); }
+    .login-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+
+    .error-box {
+      background: #ffdede;
+      color: #c0392b;
+      border-radius: 9px;
+      padding: 9px 13px;
+      font-size: 0.82rem;
+      margin-top: 0.8rem;
+      display: none;
+      font-weight: 600;
+    }
+
+    .divider {
+      text-align: center;
+      color: #9aa5be;
+      font-size: 0.78rem;
+      margin: 1.2rem 0 1rem;
+      position: relative;
+    }
+    .divider::before, .divider::after {
+      content: "";
+      position: absolute;
+      top: 50%; width: 38%;
+      height: 1px; background: #e0e8f4;
+    }
+    .divider::before { left: 0; }
+    .divider::after  { right: 0; }
+
+    .guest-btn {
+      width: 100%;
+      padding: 11px;
+      background: #f0f4ff;
+      color: #1050a0;
+      border: 1.5px solid #c8d8f8;
+      border-radius: 12px;
+      font-size: 0.88rem;
+      font-weight: 600;
+      font-family: inherit;
+      cursor: pointer;
+      transition: background .2s;
+    }
+    .guest-btn:hover { background: #e0ecff; }
+
+    .demo-hint {
+      margin-top: 1.2rem;
+      background: #f0f6ff;
+      border-radius: 10px;
+      padding: 10px 14px;
+      font-size: 0.75rem;
+      color: #4a5a8a;
+    }
+    .demo-hint strong { color: #1050a0; }
+    .demo-hint .demo-fill {
+      display: inline-block;
+      margin-top: 6px;
+      cursor: pointer;
+      background: #1050a0;
+      color: #fff;
+      padding: 3px 10px;
+      border-radius: 99px;
+      font-weight: 700;
+      font-size: 0.72rem;
+      transition: opacity .2s;
+    }
+    .demo-fill:hover { opacity: 0.85; }
+  </style>
+</head>
+<body>
+
+<div class="login-card">
+
+  <div class="login-logo">
+    <img src="../assets/logo.png" alt="VangVieng Explorer" />
+    <h1>VangVieng Explorer</h1>
+    <p>Demo Access Portal</p>
+  </div>
+
+  <div class="login-badge">
+    ℹ️
+    <span>ນີ້ແມ່ນ <strong>Demo Version</strong> — AI chat ຖືກຈຳກັດການໃຊ້ງານຕໍ່ວັນ</span>
+  </div>
+
+  <div class="form-group">
+    <label>👤 ຊື່ຜູ້ໃຊ້</label>
+    <input type="text" id="username" placeholder="demo" autocomplete="username" />
+  </div>
+
+  <div class="form-group">
+    <label>🔒 ລະຫັດຜ່ານ</label>
+    <input type="password" id="password" placeholder="••••••••••" autocomplete="current-password" />
+  </div>
+
+  <button class="login-btn" id="loginBtn" onclick="doLogin()">ເຂົ້າສູ່ລະບົບ →</button>
+  <div class="error-box" id="errorBox"></div>
+
+  <div class="divider">ຫຼື</div>
+
+  <button class="guest-btn" onclick="guestAccess()">🚶 ໃຊ້ແບບ Guest (AI 3 ຄັ້ງ/ວັນ)</button>
+
+  <div class="demo-hint">
+    🎯 <strong>Demo credentials:</strong><br>
+    username: <strong>demo</strong> &nbsp;|&nbsp; password: <strong>vangvieng2024</strong><br>
+    <span class="demo-fill" onclick="fillDemo()">ຕື່ມໃສ່ອັດຕະໂນມັດ</span>
+  </div>
+
+</div>
+
+<script>
+  // ── Auto-redirect if already logged in ──
+  const sess = JSON.parse(localStorage.getItem("vve_session") || "null");
+  const params = new URLSearchParams(window.location.search);
+  const nextUrl = params.get("next") || "../index.html";
+
+  if (sess) window.location.replace(nextUrl);
+
+  function doLogin() {
+    const username = document.getElementById("username").value.trim();
+    const password = document.getElementById("password").value;
+    const btn  = document.getElementById("loginBtn");
+    const errBox = document.getElementById("errorBox");
+
+    if (!username || !password) {
+      showError("ກະລຸນາໃສ່ຊື່ຜູ້ໃຊ້ ແລະ ລະຫັດຜ່ານ");
+      return;
+    }
+
+    btn.disabled = true;
+    btn.textContent = "ກຳລັງເຂົ້າ...";
+
+    setTimeout(() => {
+      const DEMO_USERS = [
+        { username: "demo",       password: "vangvieng2024", name: "Demo User",     role: "demo",  limit: 10 },
+        { username: "demo_press", password: "press2024",     name: "Press / Media", role: "press", limit: 30 },
+        { username: "admin",      password: "vve@admin2024", name: "Admin",         role: "admin", limit: 999 },
+      ];
+      const user = DEMO_USERS.find(u => u.username === username.toLowerCase() && u.password === password);
+
+      if (!user) {
+        btn.disabled = false;
+        btn.textContent = "ເຂົ້າສູ່ລະບົບ →";
+        showError("ຊື່ຜູ້ໃຊ້ ຫຼື ລະຫັດຜ່ານບໍ່ຖືກຕ້ອງ");
+        return;
+      }
+
+      localStorage.setItem("vve_session", JSON.stringify({
+        username: user.username,
+        name: user.name,
+        role: user.role,
+        limit: user.limit,
+        loginAt: Date.now()
+      }));
+
+      window.location.replace(nextUrl);
+    }, 600);
+  }
+
+  function guestAccess() {
+    // Guest — just go to app (rate-limit handled by RateLimit.consumeGuest)
+    window.location.replace(nextUrl);
+  }
+
+  function fillDemo() {
+    document.getElementById("username").value = "demo";
+    document.getElementById("password").value = "vangvieng2024";
+    document.getElementById("username").focus();
+  }
+
+  function showError(msg) {
+    const el = document.getElementById("errorBox");
+    el.textContent = "⚠️ " + msg;
+    el.style.display = "block";
+    setTimeout(() => el.style.display = "none", 4000);
+  }
+
+  // Enter key support
+  document.addEventListener("keydown", e => {
+    if (e.key === "Enter") doLogin();
+  });
+</script>
+</body>
+</html>
