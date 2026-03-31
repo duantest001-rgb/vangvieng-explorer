@@ -1,110 +1,140 @@
 /* ═══════════════════════════════════════════════
-   Auth — Demo User Session Manager
-   VangVieng Explorer v3
+   Auth — Supabase Auth v2
+   VangVieng Explorer
 ═══════════════════════════════════════════════ */
 
-const DEMO_USERS = [
-  { username: "demo",       password: "vangvieng2024", name: "Demo User",     role: "demo",  limit: 10 },
-  { username: "demo_press", password: "press2024",     name: "Press / Media", role: "press", limit: 30 },
-  { username: "admin",      password: "vve@admin2024", name: "Admin",         role: "admin", limit: 999 },
-];
+const SUPABASE_URL = "https://axqgotrbnglssxhwkfjc.supabase.co";
+const SUPABASE_KEY = "sb_publishable_Jx8kMe3QiaBZ3rE9T7OHtA_hxrbgW5b";
 
+// ── Supabase Auth helpers ──
+const SupaAuth = {
+
+  async signIn(email, password) {
+    const res = await fetch(`${SUPABASE_URL}/auth/v1/token?grant_type=password`, {
+      method: "POST",
+      headers: { "apikey": SUPABASE_KEY, "Content-Type": "application/json" },
+      body: JSON.stringify({ email, password })
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error_description || data.msg || "ເຂົ້າລະບົບຜິດພາດ");
+    return data;
+  },
+
+  async signOut(accessToken) {
+    await fetch(`${SUPABASE_URL}/auth/v1/logout`, {
+      method: "POST",
+      headers: { "apikey": SUPABASE_KEY, "Authorization": `Bearer ${accessToken}` }
+    });
+  },
+
+  async getProfile(accessToken) {
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/user_profiles?select=role,ai_limit`, {
+      headers: { "apikey": SUPABASE_KEY, "Authorization": `Bearer ${accessToken}` }
+    });
+    if (!res.ok) return { role: "user", ai_limit: 10 };
+    const rows = await res.json();
+    return rows[0] || { role: "user", ai_limit: 10 };
+  },
+
+  async refreshToken(refreshToken) {
+    const res = await fetch(`${SUPABASE_URL}/auth/v1/token?grant_type=refresh_token`, {
+      method: "POST",
+      headers: { "apikey": SUPABASE_KEY, "Content-Type": "application/json" },
+      body: JSON.stringify({ refresh_token: refreshToken })
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error("Token expired");
+    return data;
+  }
+};
+
+// ── Session key ──
 const SESSION_KEY  = "vve_session";
 const RATE_KEY_PFX = "vve_rate_";
 
-// ── Current session ──
+// ── Auth ──
 const Auth = {
 
-  // ── Login ──
-  login(username, password) {
-    const user = DEMO_USERS.find(
-      u => u.username === username.trim().toLowerCase() &&
-           u.password  === password
-    );
-    if (!user) return { ok: false, msg: "ຊື່ຜູ້ໃຊ້ ຫຼື ລະຫັດຜ່ານບໍ່ຖືກຕ້ອງ" };
-
-    const session = {
-      username: user.username,
-      name:     user.name,
-      role:     user.role,
-      limit:    user.limit,
-      loginAt:  Date.now(),
-    };
-    localStorage.setItem(SESSION_KEY, JSON.stringify(session));
-    return { ok: true, session };
+  async login(email, password) {
+    try {
+      const tokenData = await SupaAuth.signIn(email, password);
+      const profile   = await SupaAuth.getProfile(tokenData.access_token);
+      const session = {
+        userId:       tokenData.user.id,
+        email:        tokenData.user.email,
+        name:         tokenData.user.user_metadata?.name || tokenData.user.email.split("@")[0],
+        role:         profile.role,
+        limit:        profile.ai_limit,
+        accessToken:  tokenData.access_token,
+        refreshToken: tokenData.refresh_token,
+        expiresAt:    Date.now() + (tokenData.expires_in * 1000),
+        loginAt:      Date.now()
+      };
+      localStorage.setItem(SESSION_KEY, JSON.stringify(session));
+      return { ok: true, session };
+    } catch (err) {
+      return { ok: false, msg: err.message };
+    }
   },
 
-  // ── Logout ──
-  logout() {
+  async logout() {
+    const session = this.getSession();
+    if (session?.accessToken) {
+      try { await SupaAuth.signOut(session.accessToken); } catch (_) {}
+    }
     localStorage.removeItem(SESSION_KEY);
     window.location.href = this._loginPath();
   },
 
-  // ── Get current session (null if not logged in) ──
   getSession() {
     try {
       const raw = localStorage.getItem(SESSION_KEY);
-      return raw ? JSON.parse(raw) : null;
+      if (!raw) return null;
+      const session = JSON.parse(raw);
+      if (session.expiresAt && Date.now() > session.expiresAt) {
+        this._tryRefresh(session);
+        return null;
+      }
+      return session;
     } catch { return null; }
   },
 
-  // ── Is logged in? ──
-  isLoggedIn() {
-    return !!this.getSession();
+  async _tryRefresh(session) {
+    try {
+      const t = await SupaAuth.refreshToken(session.refreshToken);
+      localStorage.setItem(SESSION_KEY, JSON.stringify({
+        ...session,
+        accessToken:  t.access_token,
+        refreshToken: t.refresh_token,
+        expiresAt:    Date.now() + (t.expires_in * 1000)
+      }));
+    } catch { localStorage.removeItem(SESSION_KEY); }
   },
 
-  // ── Require login — redirect if not ──
+  isLoggedIn() { return !!this.getSession(); },
+
   requireLogin() {
-    if (!this.isLoggedIn()) {
+    if (!this.isLoggedIn())
       window.location.href = this._loginPath() + "?next=" + encodeURIComponent(window.location.href);
-    }
   },
 
-  // ── Inject user badge into navbar ──
   injectBadge() {
     const session = this.getSession();
     if (!session) return;
-
-    // Remove existing badge
     document.getElementById("authBadge")?.remove();
-
     const badge = document.createElement("div");
     badge.id = "authBadge";
-    badge.style.cssText = `
-      display:flex; align-items:center; gap:8px;
-      font-size:0.78rem; font-weight:600;
-      color: var(--dark, #071830);
-      cursor:pointer;
-    `;
-
-    const roleEmoji = { admin: "🔑", press: "🎤", demo: "👤" }[session.role] || "👤";
-    const remaining = RateLimit.remaining(session.username, session.limit);
-    const limitBadge = session.role === "admin" ? "" :
-      `<span style="background:${remaining <= 2 ? '#ffdede' : '#e0f2ff'};
-        color:${remaining <= 2 ? '#c0392b' : '#1050a0'};
-        padding:1px 7px; border-radius:99px; font-size:0.72rem; font-weight:700;">
-        AI ${remaining}/${session.limit}
-      </span>`;
-
-    badge.innerHTML = `
-      ${roleEmoji} ${session.name}
-      ${limitBadge}
-      <button onclick="Auth.logout()" style="
-        background:none; border:1px solid #ccd;
-        padding:2px 9px; border-radius:99px;
-        font-size:0.7rem; cursor:pointer; color:inherit;
-        font-family:inherit;
-      ">ອອກ</button>
-    `;
-
-    // Insert into navbar container
-    const navContainer = document.querySelector(".nav-container");
-    if (navContainer) navContainer.appendChild(badge);
+    badge.style.cssText = "display:flex;align-items:center;gap:8px;font-size:0.78rem;font-weight:600;color:var(--dark,#071830);cursor:pointer;";
+    const roleEmoji   = { admin:"🔑", press:"🎤", user:"👤" }[session.role] || "👤";
+    const remaining   = RateLimit.remaining(session.userId, session.limit);
+    const limitBadge  = session.role === "admin" ? "" :
+      `<span style="background:${remaining<=2?'#ffdede':'#e0f2ff'};color:${remaining<=2?'#c0392b':'#1050a0'};padding:1px 7px;border-radius:99px;font-size:0.72rem;font-weight:700;">AI ${remaining}/${session.limit}</span>`;
+    badge.innerHTML = `${roleEmoji} ${session.name} ${limitBadge}
+      <button onclick="Auth.logout()" style="background:none;border:1px solid #ccd;padding:2px 9px;border-radius:99px;font-size:0.7rem;cursor:pointer;color:inherit;font-family:inherit;">ອອກ</button>`;
+    document.querySelector(".nav-container")?.appendChild(badge);
   },
 
   _loginPath() {
-    // Works from both /pages/ and root
-    const depth = window.location.pathname.split("/").filter(Boolean).length;
     const prefix = window.location.pathname.includes("/pages/") ? "../" : "";
     return prefix + "pages/login.html";
   }
@@ -112,42 +142,21 @@ const Auth = {
 
 // ── Rate Limit ──
 const RateLimit = {
-
-  _key(username) {
-    const today = new Date().toISOString().slice(0, 10); // YYYY-MM-DD
-    return RATE_KEY_PFX + (username || "guest") + "_" + today;
+  _key(userId) {
+    return RATE_KEY_PFX + (userId||"guest") + "_" + new Date().toISOString().slice(0,10);
   },
-
-  // How many uses today
-  usedToday(username) {
-    try { return parseInt(localStorage.getItem(this._key(username)) || "0", 10); }
-    catch { return 0; }
+  usedToday(userId) {
+    try { return parseInt(localStorage.getItem(this._key(userId))||"0",10); } catch { return 0; }
   },
-
-  // Remaining uses
-  remaining(username, limit) {
-    return Math.max(0, limit - this.usedToday(username));
+  remaining(userId, limit) { return Math.max(0, limit - this.usedToday(userId)); },
+  consume(userId, limit) {
+    const used = this.usedToday(userId);
+    if (used >= limit) return { ok:false, remaining:0, limit };
+    localStorage.setItem(this._key(userId), String(used+1));
+    return { ok:true, remaining:limit-used-1, limit };
   },
-
-  // Check + consume one use. Returns { ok, remaining, limit }
-  consume(username, limit) {
-    const used = this.usedToday(username);
-    if (used >= limit) {
-      return { ok: false, remaining: 0, limit };
-    }
-    localStorage.setItem(this._key(username), String(used + 1));
-    return { ok: true, remaining: limit - used - 1, limit };
-  },
-
-  // Guest (no login) limit = 3/day
   GUEST_LIMIT: 3,
-
-  consumeGuest() {
-    return this.consume("guest", this.GUEST_LIMIT);
-  },
+  consumeGuest() { return this.consume("guest", this.GUEST_LIMIT); }
 };
 
-// ── Auto-init badge when DOM ready ──
-document.addEventListener("DOMContentLoaded", () => {
-  Auth.injectBadge();
-});
+document.addEventListener("DOMContentLoaded", () => Auth.injectBadge());

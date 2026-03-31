@@ -122,7 +122,7 @@ document.addEventListener("DOMContentLoaded", () => {
 // ── RATE LIMIT UI ──
 function updateRateBadge() {
   const session = (typeof Auth !== "undefined") ? Auth.getSession() : null;
-  const username = session ? session.username : "guest";
+  const username = session ? session.userId : "guest";
   const limit    = session ? session.limit    : RateLimit.GUEST_LIMIT;
   const remaining = RateLimit.remaining(username, limit);
   const el = document.getElementById("rateLimitInfo");
@@ -144,7 +144,7 @@ async function sendMessage() {
 
   // ── Rate limit check ──
   const session  = (typeof Auth !== "undefined") ? Auth.getSession() : null;
-  const username = session ? session.username : "guest";
+  const username = session ? session.userId : "guest";
   const limit    = session ? session.limit    : RateLimit.GUEST_LIMIT;
 
   if (session?.role !== "admin") {
