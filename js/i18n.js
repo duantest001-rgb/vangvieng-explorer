@@ -46,7 +46,7 @@ const TRANSLATIONS = {
     "saved.title":"ສະຖານທີ່ທີ່ບັນທຶກ","saved.empty.title":"ຍັງບໍ່ມີສະຖານທີ່ທີ່ບັນທຶກ",
     "saved.empty.desc":"ໄປສຳຫຼວດ ແລ້ວກົດ 🔖 ໃສ່ສະຖານທີ່ທີ່ຢາກໄປ",
     "saved.share":"📤 ແບ່ງປັນ","saved.clear":"🗑️ ລ້າງທັງໝົດ",
-    "nav.saved":"🔖 ບັນທຶກ","filter.eco":"🌱 Eco"
+    "nav.saved":"🔖 ບັນທຶກ","filter.eco":"🌱 Eco","planner.intro":"ບອກ AI ວ່າເຈົ້າຢາກຫຍັງ — ຮັບແຜນທ່ຽວທີ່ສ້າງຈາກສະຖານທີ່ຈິງໃນ app","planner.group":"👥 ມາຈັ່ງໃດ?","planner.group.solo":"🧑 ຄົນດຽວ","planner.group.couple":"👫 ຄູ່ຮັກ","planner.group.friends":"👯 ໝູ່ 2-3 ຄົນ","planner.group.family":"🏠 ຄອບຄົວ","planner.kids":"👶 ມີລູກນ້ອຍຕິດໄປດ້ວຍບໍ?","planner.kids.none":"❌ ບໍ່ມີ","planner.kids.toddler":"🍼 ລູກນ້ອຍ (ຕໍ່າ 5 ປີ)","planner.kids.child":"🧒 ເດັກ (6-12 ປີ)","planner.days":"📅 ຢູ່ກີ່ວັນ?","planner.interests":"🎯 ສົນໃຈຫຍັງ?","planner.style":"🏷️ ລະດັບ trip","planner.pace":"⚡ Pace","planner.btn":"✨ ສ້າງແຜນທ່ຽວ","planner.tab.chat":"🤖 ຖາມ AI","planner.tab.plan":"🗺️ Trip Planner","planner.tab.saved":"💾 ແຜນຂອງຂ້ອຍ","planner.pace.slow":"🌿 ສະບາຍໆ","planner.pace.mid":"⚖️ ປານກາງ","planner.pace.fast":"🔥 ເຕັມທີ່","planner.style.budget":"💰 Budget","planner.style.mid":"💰💰 Mid-range","planner.style.premium":"💰💰💰 Premium","planner.interest.nature":"🌊 ທຳມະຊາດ","planner.interest.temple":"🕌 ວັດ/ຖ້ຳ","planner.interest.adventure":"🪂 ຜະຈົນໄພ","planner.interest.food":"🍜 ອາຫານ","planner.interest.sightseeing":"📸 ທ່ອງທ່ຽວ","planner.interest.fun":"🎵 ສະໜຸກ"
   },
   en: {
     "nav.home":"Home","nav.explore":"Explore","nav.map":"Map","nav.ai":"🤖 Ask AI",
@@ -95,7 +95,7 @@ const TRANSLATIONS = {
     "saved.title":"Saved Places","saved.empty.title":"No saved places yet",
     "saved.empty.desc":"Browse and tap 🔖 to save places you want to visit",
     "saved.share":"📤 Share","saved.clear":"🗑️ Clear all",
-    "nav.saved":"🔖 Saved","filter.eco":"🌱 Eco"
+    "nav.saved":"🔖 Saved","filter.eco":"🌱 Eco","planner.intro":"Tell AI what you want — get a trip plan based on real places in the app","planner.group":"👥 Who's coming?","planner.group.solo":"🧑 Solo","planner.group.couple":"👫 Couple","planner.group.friends":"👯 Friends 2-3","planner.group.family":"🏠 Family","planner.kids":"👶 Traveling with kids?","planner.kids.none":"❌ No kids","planner.kids.toddler":"🍼 Toddler (under 5)","planner.kids.child":"🧒 Child (6-12 yrs)","planner.days":"📅 How many days?","planner.interests":"🎯 Interests?","planner.style":"🏷️ Trip level","planner.pace":"⚡ Pace","planner.btn":"✨ Create Trip Plan","planner.tab.chat":"🤖 Ask AI","planner.tab.plan":"🗺️ Trip Planner","planner.tab.saved":"💾 My Plans","planner.pace.slow":"🌿 Relaxed","planner.pace.mid":"⚖️ Moderate","planner.pace.fast":"🔥 Full-on","planner.style.budget":"💰 Budget","planner.style.mid":"💰💰 Mid-range","planner.style.premium":"💰💰💰 Premium","planner.interest.nature":"🌊 Nature","planner.interest.temple":"🕌 Temple/Cave","planner.interest.adventure":"🪂 Adventure","planner.interest.food":"🍜 Food","planner.interest.sightseeing":"📸 Sightseeing","planner.interest.fun":"🎵 Nightlife"
   },
   zh: {
     "nav.home":"首页","nav.explore":"探索","nav.map":"地图","nav.ai":"🤖 问AI",
@@ -144,7 +144,7 @@ const TRANSLATIONS = {
     "saved.title":"收藏的地点","saved.empty.title":"暂无收藏",
     "saved.empty.desc":"浏览并点击 🔖 收藏您想去的地方",
     "saved.share":"📤 分享","saved.clear":"🗑️ 清除全部",
-    "nav.saved":"🔖 收藏","filter.eco":"🌱 生态"
+    "nav.saved":"🔖 收藏","filter.eco":"🌱 生态","planner.intro":"告诉 AI 您想要什么 — 根据真实地点生成行程","planner.group":"👥 出行方式?","planner.group.solo":"🧑 独自","planner.group.couple":"👫 情侣","planner.group.friends":"👯 朋友 2-3人","planner.group.family":"🏠 家庭","planner.kids":"👶 是否携带儿童?","planner.kids.none":"❌ 无儿童","planner.kids.toddler":"🍼 幼儿 (5岁以下)","planner.kids.child":"🧒 儿童 (6-12岁)","planner.days":"📅 住几天?","planner.interests":"🎯 兴趣爱好?","planner.style":"🏷️ 旅行档次","planner.pace":"⚡ 节奏","planner.btn":"✨ 生成行程","planner.tab.chat":"🤖 问AI","planner.tab.plan":"🗺️ 行程规划","planner.tab.saved":"💾 我的计划","planner.pace.slow":"🌿 悠闲","planner.pace.mid":"⚖️ 适中","planner.pace.fast":"🔥 全力","planner.style.budget":"💰 经济","planner.style.mid":"💰💰 中档","planner.style.premium":"💰💰💰 高端","planner.interest.nature":"🌊 自然","planner.interest.temple":"🕌 寺庙/溶洞","planner.interest.adventure":"🪂 冒险","planner.interest.food":"🍜 美食","planner.interest.sightseeing":"📸 观光","planner.interest.fun":"🎵 娱乐"
   },
   th: {
     "nav.home":"หน้าหลัก","nav.explore":"สำรวจ","nav.map":"แผนที่","nav.ai":"🤖 ถาม AI",
@@ -193,7 +193,7 @@ const TRANSLATIONS = {
     "saved.title":"สถานที่ที่บันทึก","saved.empty.title":"ยังไม่มีสถานที่ที่บันทึก",
     "saved.empty.desc":"สำรวจและแตะ 🔖 เพื่อบันทึกสถานที่ที่อยากไป",
     "saved.share":"📤 แชร์","saved.clear":"🗑️ ล้างทั้งหมด",
-    "nav.saved":"🔖 บันทึก","filter.eco":"🌱 อีโค"
+    "nav.saved":"🔖 บันทึก","filter.eco":"🌱 อีโค","planner.intro":"บอก AI ว่าต้องการอะไร — รับแผนท่องเที่ยวจากสถานที่จริงใน app","planner.group":"👥 มากับใคร?","planner.group.solo":"🧑 คนเดียว","planner.group.couple":"👫 คู่รัก","planner.group.friends":"👯 เพื่อน 2-3 คน","planner.group.family":"🏠 ครอบครัว","planner.kids":"👶 มีเด็กเดินทางด้วยไหม?","planner.kids.none":"❌ ไม่มี","planner.kids.toddler":"🍼 เด็กเล็ก (ต่ำกว่า 5 ปี)","planner.kids.child":"🧒 เด็ก (6-12 ปี)","planner.days":"📅 อยู่กี่วัน?","planner.interests":"🎯 สนใจอะไร?","planner.style":"🏷️ ระดับทริป","planner.pace":"⚡ เพซ","planner.btn":"✨ สร้างแผนท่องเที่ยว","planner.tab.chat":"🤖 ถาม AI","planner.tab.plan":"🗺️ Trip Planner","planner.tab.saved":"💾 แผนของฉัน","planner.pace.slow":"🌿 สบายๆ","planner.pace.mid":"⚖️ ปานกลาง","planner.pace.fast":"🔥 เต็มที่","planner.style.budget":"💰 Budget","planner.style.mid":"💰💰 Mid-range","planner.style.premium":"💰💰💰 Premium","planner.interest.nature":"🌊 ธรรมชาติ","planner.interest.temple":"🕌 วัด/ถ้ำ","planner.interest.adventure":"🪂 ผจญภัย","planner.interest.food":"🍜 อาหาร","planner.interest.sightseeing":"📸 ท่องเที่ยว","planner.interest.fun":"🎵 สนุก"
   },
   ko: {
     "nav.home":"홈","nav.explore":"탐색","nav.map":"지도","nav.ai":"🤖 AI 질문",
@@ -242,7 +242,7 @@ const TRANSLATIONS = {
     "saved.title":"저장된 장소","saved.empty.title":"저장된 장소가 없습니다",
     "saved.empty.desc":"탐색하고 🔖 를 눌러 가고 싶은 곳을 저장하세요",
     "saved.share":"📤 공유","saved.clear":"🗑️ 전체 삭제",
-    "nav.saved":"🔖 저장","filter.eco":"🌱 에코"
+    "nav.saved":"🔖 저장","filter.eco":"🌱 에코","planner.intro":"원하는 것을 AI에게 알려주세요 — 앱의 실제 장소로 여행 계획을 받아보세요","planner.group":"👥 누구와 함께?","planner.group.solo":"🧑 혼자","planner.group.couple":"👫 커플","planner.group.friends":"👯 친구 2-3명","planner.group.family":"🏠 가족","planner.kids":"👶 아이와 함께 여행하나요?","planner.kids.none":"❌ 아이 없음","planner.kids.toddler":"🍼 유아 (5세 미만)","planner.kids.child":"🧒 어린이 (6-12세)","planner.days":"📅 며칠 동안?","planner.interests":"🎯 관심사?","planner.style":"🏷️ 여행 등급","planner.pace":"⚡ 페이스","planner.btn":"✨ 여행 계획 만들기","planner.tab.chat":"🤖 AI 질문","planner.tab.plan":"🗺️ 여행 플래너","planner.tab.saved":"💾 내 계획","planner.pace.slow":"🌿 여유롭게","planner.pace.mid":"⚖️ 보통","planner.pace.fast":"🔥 빡빡하게","planner.style.budget":"💰 Budget","planner.style.mid":"💰💰 Mid-range","planner.style.premium":"💰💰💰 Premium","planner.interest.nature":"🌊 자연","planner.interest.temple":"🕌 사원/동굴","planner.interest.adventure":"🪂 어드벤처","planner.interest.food":"🍜 음식","planner.interest.sightseeing":"📸 관광","planner.interest.fun":"🎵 나이트라이프"
   }
 };
 
