@@ -62,9 +62,9 @@
   <div class="chat-layout">
     <!-- TAB SWITCHER -->
     <div class="chat-tabs">
-      <button class="chat-tab active" id="tabChat" onclick="switchChatTab('chat')">🤖 ຖາມ AI</button>
-      <button class="chat-tab" id="tabPlanner" onclick="switchChatTab('planner')">🗺️ Trip Planner</button>
-      <button class="chat-tab" id="tabSaved" onclick="switchChatTab('saved')">💾 ແຜນຂອງຂ້ອຍ</button>
+      <button class="chat-tab active" id="tabChat"    onclick="switchChatTab('chat')"    data-i18n="planner.tab.chat">🤖 ຖາມ AI</button>
+      <button class="chat-tab"        id="tabPlanner" onclick="switchChatTab('planner')" data-i18n="planner.tab.plan">🗺️ Trip Planner</button>
+      <button class="chat-tab"        id="tabSaved"   onclick="switchChatTab('saved')"   data-i18n="planner.tab.saved">💾 ແຜນຂອງຂ້ອຍ</button>
     </div>
 
     <!-- TAB: CHAT -->
@@ -119,31 +119,31 @@
     <div id="sectionPlanner" class="chat-tab-section" style="overflow-y:auto; padding: 1rem 1.5rem 2rem;">
 
       <div class="planner-form" id="plannerForm">
-        <p class="planner-intro">ບອກ AI ວ່າເຈົ້າຢາກຫຍັງ — ຮັບແຜນທ່ຽວທີ່ສ້າງຈາກສະຖານທີ່ຈິງໃນ app</p>
+        <p class="planner-intro" data-i18n="planner.intro">ບອກ AI ວ່າເຈົ້າຢາກຫຍັງ — ຮັບແຜນທ່ຽວທີ່ສ້າງຈາກສະຖານທີ່ຈິງໃນ app</p>
 
         <!-- ກຸ່ມທ່ຽວ -->
         <div class="planner-group">
-          <label class="planner-label">👥 ມາຈັ່ງໃດ?</label>
+          <label class="planner-label" data-i18n="planner.group">👥 ມາຈັ່ງໃດ?</label>
           <div class="planner-chips" id="pGroup">
-            <div class="p-chip on" onclick="pickPChip('pGroup',this);toggleKidsOption()">🧑 ຄົນດຽວ</div>
-            <div class="p-chip"   onclick="pickPChip('pGroup',this);toggleKidsOption()">👫 ຄູ່ຮັກ</div>
-            <div class="p-chip"   onclick="pickPChip('pGroup',this);toggleKidsOption()">👯 ໝູ່ 2-3 ຄົນ</div>
-            <div class="p-chip"   onclick="pickPChip('pGroup',this);toggleKidsOption()">🏠 ຄອບຄົວ</div>
+            <div class="p-chip on" onclick="pickPChip('pGroup',this);toggleKidsOption()" data-i18n="planner.group.solo">🧑 ຄົນດຽວ</div>
+            <div class="p-chip"   onclick="pickPChip('pGroup',this);toggleKidsOption()" data-i18n="planner.group.couple">👫 ຄູ່ຮັກ</div>
+            <div class="p-chip"   onclick="pickPChip('pGroup',this);toggleKidsOption()" data-i18n="planner.group.friends">👯 ໝູ່ 2-3 ຄົນ</div>
+            <div class="p-chip"   onclick="pickPChip('pGroup',this);toggleKidsOption()" data-i18n="planner.group.family">🏠 ຄອບຄົວ</div>
           </div>
         </div>
 
-        <!-- ລູກນ້ອຍ (ສະແດງສະເພາະ ຄອບຄົວ) -->
+        <!-- ລູກນ້ອຍ -->
         <div class="planner-group" id="kidsGroup" style="display:none;">
-          <label class="planner-label">👶 ມີລູກນ້ອຍຕິດໄປດ້ວຍບໍ?</label>
+          <label class="planner-label" data-i18n="planner.kids">👶 ມີລູກນ້ອຍຕິດໄປດ້ວຍບໍ?</label>
           <div class="planner-chips" id="pKids">
-            <div class="p-chip on" onclick="pickPChip('pKids',this)">❌ ບໍ່ມີ</div>
-            <div class="p-chip"   onclick="pickPChip('pKids',this)">🍼 ລູກນ້ອຍ (ຕໍ່າ 5 ປີ)</div>
-            <div class="p-chip"   onclick="pickPChip('pKids',this)">🧒 ເດັກ (6-12 ປີ)</div>
+            <div class="p-chip on" onclick="pickPChip('pKids',this)" data-i18n="planner.kids.none">❌ ບໍ່ມີ</div>
+            <div class="p-chip"   onclick="pickPChip('pKids',this)" data-i18n="planner.kids.toddler">🍼 ລູກນ້ອຍ (ຕໍ່າ 5 ປີ)</div>
+            <div class="p-chip"   onclick="pickPChip('pKids',this)" data-i18n="planner.kids.child">🧒 ເດັກ (6-12 ປີ)</div>
           </div>
         </div>
 
         <div class="planner-group">
-          <label class="planner-label">📅 ຢູ່ກີ່ວັນ?</label>
+          <label class="planner-label" data-i18n="planner.days">📅 ຢູ່ກີ່ວັນ?</label>
           <select id="pDays" class="planner-select">
             <option value="1">1 ວັນ</option>
             <option value="2">2 ວັນ</option>
@@ -154,36 +154,36 @@
         </div>
 
         <div class="planner-group">
-          <label class="planner-label">🎯 ສົນໃຈຫຍັງ?</label>
+          <label class="planner-label" data-i18n="planner.interests">🎯 ສົນໃຈຫຍັງ?</label>
           <div class="planner-tags" id="pInterests">
-            <div class="p-tag on" onclick="togglePTag(this)">🌊 ທຳມະຊາດ</div>
-            <div class="p-tag on" onclick="togglePTag(this)">🕌 ວັດ/ຖ້ຳ</div>
-            <div class="p-tag"   onclick="togglePTag(this)">🪂 ຜະຈົນໄພ</div>
-            <div class="p-tag"   onclick="togglePTag(this)">🍜 ອາຫານ</div>
-            <div class="p-tag on" onclick="togglePTag(this)">📸 ທ່ອງທ່ຽວ</div>
-            <div class="p-tag"   onclick="togglePTag(this)">🎵 ສະໜຸກ</div>
+            <div class="p-tag on" onclick="togglePTag(this)" data-i18n="planner.interest.nature">🌊 ທຳມະຊາດ</div>
+            <div class="p-tag on" onclick="togglePTag(this)" data-i18n="planner.interest.temple">🕌 ວັດ/ຖ້ຳ</div>
+            <div class="p-tag"   onclick="togglePTag(this)" data-i18n="planner.interest.adventure">🪂 ຜະຈົນໄພ</div>
+            <div class="p-tag"   onclick="togglePTag(this)" data-i18n="planner.interest.food">🍜 ອາຫານ</div>
+            <div class="p-tag on" onclick="togglePTag(this)" data-i18n="planner.interest.sightseeing">📸 ທ່ອງທ່ຽວ</div>
+            <div class="p-tag"   onclick="togglePTag(this)" data-i18n="planner.interest.fun">🎵 ສະໜຸກ</div>
           </div>
         </div>
 
         <div class="planner-group">
-          <label class="planner-label">🏷️ ລະດັບ trip</label>
+          <label class="planner-label" data-i18n="planner.style">🏷️ ລະດັບ trip</label>
           <div class="planner-chips" id="pStyle">
-            <div class="p-chip on" onclick="pickPChip('pStyle',this)">💰 Budget</div>
-            <div class="p-chip"   onclick="pickPChip('pStyle',this)">💰💰 Mid-range</div>
-            <div class="p-chip"   onclick="pickPChip('pStyle',this)">💰💰💰 Premium</div>
+            <div class="p-chip on" onclick="pickPChip('pStyle',this)" data-i18n="planner.style.budget">💰 Budget</div>
+            <div class="p-chip"   onclick="pickPChip('pStyle',this)" data-i18n="planner.style.mid">💰💰 Mid-range</div>
+            <div class="p-chip"   onclick="pickPChip('pStyle',this)" data-i18n="planner.style.premium">💰💰💰 Premium</div>
           </div>
         </div>
 
         <div class="planner-group">
-          <label class="planner-label">⚡ Pace</label>
+          <label class="planner-label" data-i18n="planner.pace">⚡ Pace</label>
           <div class="planner-chips" id="pPace">
-            <div class="p-chip"   onclick="pickPChip('pPace',this)">🌿 ສະບາຍໆ</div>
-            <div class="p-chip on" onclick="pickPChip('pPace',this)">⚖️ ປານກາງ</div>
-            <div class="p-chip"   onclick="pickPChip('pPace',this)">🔥 ເຕັມທີ່</div>
+            <div class="p-chip"   onclick="pickPChip('pPace',this)" data-i18n="planner.pace.slow">🌿 ສະບາຍໆ</div>
+            <div class="p-chip on" onclick="pickPChip('pPace',this)" data-i18n="planner.pace.mid">⚖️ ປານກາງ</div>
+            <div class="p-chip"   onclick="pickPChip('pPace',this)" data-i18n="planner.pace.fast">🔥 ເຕັມທີ່</div>
           </div>
         </div>
 
-        <button class="planner-btn" onclick="generatePlan()">✨ ສ້າງແຜນທ່ຽວ</button>
+        <button class="planner-btn" onclick="generatePlan()" data-i18n="planner.btn">✨ ສ້າງແຜນທ່ຽວ</button>
         <div id="plannerError"></div>
       </div>
 
