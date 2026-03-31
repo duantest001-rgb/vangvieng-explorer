@@ -162,13 +162,18 @@ body { overflow: hidden; background: var(--bg); } /* desktop: chat fills screen 
 .chat-tab.active { color: var(--green-700); border-bottom-color: var(--green-700); }
 .chat-tab:hover:not(.active) { color: var(--text); }
 
-.chat-tab-section { display: none; flex: 1; flex-direction: column; }
+.chat-tab-section { display: none; }
 .chat-tab-section.active {
+  display: block;
+  flex: 1;
+  overflow-y: auto;
+  min-height: 0;
+}
+/* Chat tab ຕ້ອງ flex ເພື່ອໃຫ້ input ຢູ່ລຸ່ມ */
+#sectionChat.active {
   display: flex;
   flex-direction: column;
-  flex: 1;
   overflow: hidden;
-  min-height: 0;
 }
 
 /* ── TRIP PLANNER FORM ── */
