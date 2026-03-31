@@ -21,12 +21,25 @@ function pickPChip(gid, el) {
   el.classList.add('on');
 }
 
+// ── ສະແດງ/ເຊື່ອງ option ລູກນ້ອຍ ──
+function toggleKidsOption() {
+  const group    = document.querySelector('#pGroup .p-chip.on')?.textContent?.trim() || '';
+  const kidsGroup = document.getElementById('kidsGroup');
+  if (kidsGroup) {
+    kidsGroup.style.display = group.includes('ຄອບຄົວ') ? 'block' : 'none';
+  }
+}
+
 // ── GENERATE PLAN ──
 async function generatePlan() {
   const days      = parseInt(document.getElementById('pDays').value);
   const interests = [...document.querySelectorAll('#pInterests .p-tag.on')].map(t => t.textContent.trim());
   const style     = document.querySelector('#pStyle .p-chip.on')?.textContent.trim() ?? 'Budget';
   const pace      = document.querySelector('#pPace .p-chip.on')?.textContent.trim() ?? '⚖️ ປານກາງ';
+  const group     = document.querySelector('#pGroup .p-chip.on')?.textContent.trim() ?? '🧑 ຄົນດຽວ';
+  const kids      = document.querySelector('#pKids .p-chip.on')?.textContent.trim() ?? '❌ ບໍ່ມີ';
+  const hasKids   = group.includes('ຄອບຄົວ') && !kids.includes('ບໍ່ມີ');
+  const kidsAge   = hasKids ? kids : null;
 
   if (!interests.length) {
     document.getElementById('plannerError').innerHTML =
@@ -48,7 +61,24 @@ async function generatePlan() {
     // 1. ດຶງ places ຈາກ Supabase
     const places = await db.getPlaces();
 
-    // 2. Build prompt
+    // 2. Safety rules ຕາມກຸ່ມ
+    const safetyRules = hasKids ? (
+      kidsAge.includes('ຕໍ່າ 5 ປີ')
+        ? `⚠️ ສຳຄັນ — ມີເດັກອ່ອນ (ຕໍ່າ 5 ປີ):
+- ຫ້າມລວມ: zipline, kayak, hot air balloon, rock climbing, tubing
+- ຫ້າມ: Blue Lagoon (ລຸ້ມໃຕ້ຕ້ອງລອຍນ້ຳ), ຖ້ຳທີ່ຂັ້ນ climb
+- ເລືອກ: ສວນສາທາລະນະ, ທົ່ງນາ bike (ໂດຍ tuk-tuk), ຮ້ານອາຫານ, ຕະຫຼາດ
+- ຄຳເຕືອນ note ທຸກ stop: ລະບຸວ່າ "✅ ເໝາະເດັກ" ຫຼື "⚠️ ລະວັງ: [ເຫດຜົນ]"`
+        : `⚠️ ສຳຄັນ — ມີເດັກ 6-12 ປີ:
+- ລະວັງ: zipline (ເຊັກ weight limit), hot air balloon (ບາງທີ່ຮັບ), kayak (ຕ້ອງ life jacket)
+- Blue Lagoon 1: ລອຍໄດ້ ແຕ່ຕ້ອງ supervise, ຫ້າມໂດດໂຕ້ໂດຍ side ເລິກ
+- ເລືອກ: ຖ້ຳ, ທົ່ງນາ, ຕະຫຼາດ, ATV (ນັ່ງກັບ parent ໄດ້)
+- ຄຳເຕືອນ note ທຸກ stop: ລະບຸວ່າ "✅ ເໝາະເດັກ" ຫຼື "⚠️ ລະວັງ: [ເຫດຜົນ]"`
+    ) : '';
+
+    const groupContext = `ປະເພດກຸ່ມ: ${group}${hasKids ? ` (${kidsAge})` : ''}`;
+
+    // 3. Build prompt
     const placesText = places.map((p, i) =>
       `${i+1}. ${p.name} | ປະເພດ: ${p.category} | rating: ${p.rating ?? 'N/A'}${p.tags ? ' | tags: '+p.tags : ''}`
     ).join('\n');
@@ -56,10 +86,12 @@ async function generatePlan() {
     const prompt = `ເຈົ້າຄືຜູ້ຊ່ວຍວາງແຜນທ່ຽວວັງວຽງ ລາວ.
 
 ຂໍ້ມູນ tourist:
+- ${groupContext}
 - ຢູ່ ${days} ວັນ
 - ສົນໃຈ: ${interests.join(', ')}
 - ລະດັບ: ${style}
 - Pace: ${pace}
+${safetyRules ? '\n' + safetyRules : ''}
 
 ສະຖານທີ່ທີ່ມີໃນ app:
 ${placesText}
@@ -76,7 +108,8 @@ format:
       {
         "time": "08:00",
         "place_name": "ຊື່ຄືກັນກັບລາຍການ",
-        "note": "ຄຳແນະນຳສັ້ນໆ (ລາວ)"
+        "note": "ຄຳແນະນຳ + ຄຳເຕືອນຄວາມປອດໄພຖ້າຈຳເປັນ (ລາວ)",
+        "safety": "safe|warning|danger"
       }
     ]
   }
@@ -84,7 +117,7 @@ format:
 
 ກົດ: ${pace === '🌿 ສະບາຍໆ' ? 'ສູງສຸດ 2 stops/ວັນ' : pace === '🔥 ເຕັມທີ່' ? '4-5 stops/ວັນ' : '3 stops/ວັນ'}`;
 
-    // 3. Call Claude via Worker
+    // 4. Call Claude via Worker
     const res = await fetch(WORKER_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -99,9 +132,9 @@ format:
     const clean = text.replace(/```json|```/g, '').trim();
     const itinerary = JSON.parse(clean);
 
-    renderPlanResult(itinerary, places, { days, interests, style, pace });
+    renderPlanResult(itinerary, places, { days, interests, style, pace, group, kidsAge, hasKids });
     if (typeof startActiveTrip === 'function') {
-      startActiveTrip(itinerary, places, { days, interests, style, pace });
+      startActiveTrip(itinerary, places, { days, interests, style, pace, group, kidsAge, hasKids });
     }
 
   } catch (e) {
@@ -121,6 +154,9 @@ function renderPlanResult(itinerary, places, meta) {
     '🔥 ເຕັມທີ່': '🔥 ແຜນ pack ເຕັມ — ໄດ້ເຫັນຫຼາຍ'
   };
 
+  const safetyColor = { safe: '#e8f5e9', warning: '#fff8e1', danger: '#fdecea' };
+  const safetyIcon  = { safe: '✅', warning: '⚠️', danger: '🚫' };
+
   // flat list ຂອງ stops ທັງໝົດ
   const allStops = [];
   itinerary.forEach(day => {
@@ -133,16 +169,97 @@ function renderPlanResult(itinerary, places, meta) {
   // clear old check state
   allStops.forEach((_, i) => localStorage.removeItem(`stop_${i}`));
 
+  // ── Banner ຄຳເຕືອນລູກນ້ອຍ ──
+  const kidsBanner = meta.hasKids ? `
+    <div style="background:#fff3e0;border:1.5px solid #ffb74d;border-radius:12px;padding:12px 16px;margin-bottom:12px;font-size:0.82rem;color:#e65100;">
+      <strong>👶 ແຜນນີ້ຖືກປັບສຳລັບ ${meta.kidsAge}</strong><br>
+      ສະຖານທີ່ຖືກຄັດເລືອກຕາມຄວາມປອດໄພ — ກວດຄຳໝາຍ ⚠️ ໃນແຕ່ລະ stop ກ່ອນໄປ
+    </div>` : '';
+
   let html = `
     <button class="planner-back-btn" onclick="resetPlanner()">← ວາງແຜນໃໝ່</button>
+    ${kidsBanner}
     <div class="plan-header">
       <div class="plan-title">ແຜນ ${meta.days} ວັນ ວັງວຽງ</div>
       <div class="plan-meta">
+        ${meta.group ? `<span class="plan-badge">${meta.group}</span>` : ''}
         <span class="plan-badge">${meta.style}</span>
         <span class="plan-badge">${meta.pace}</span>
         <span class="plan-badge" id="progressBadge">0/${allStops.length} ຈຸດ</span>
       </div>
     </div>`;
+
+  let idx = 0;
+  itinerary.forEach(day => {
+    html += `<div class="plan-day"><div class="plan-day-label">ວັນທີ ${day.day} — ${day.label}</div>`;
+    day.stops.forEach(stop => {
+      const place   = places.find(p => p.name?.toLowerCase() === stop.place_name?.toLowerCase());
+      const curIdx  = idx;
+      const nextIdx = idx + 1 < allStops.length ? idx + 1 : null;
+      const safety  = stop.safety || 'safe';
+      const stopBg  = meta.hasKids ? (safetyColor[safety] || '#fff') : '#fff';
+
+      const navUrl = place?.lat && place?.lng
+        ? `https://maps.google.com/maps/dir/?api=1&destination=${place.lat},${place.lng}&travelmode=driving`
+        : `https://maps.google.com/maps/search/${encodeURIComponent(stop.place_name + ' Vang Vieng Laos')}`;
+
+      let nextNavUrl = '';
+      if (nextIdx !== null) {
+        const np = allStops[nextIdx].place;
+        const ns = allStops[nextIdx].stop;
+        if (place?.lat && place?.lng && np?.lat && np?.lng) {
+          nextNavUrl = `https://maps.google.com/maps/dir/${place.lat},${place.lng}/${np.lat},${np.lng}`;
+        } else if (np?.lat && np?.lng) {
+          nextNavUrl = `https://maps.google.com/maps/dir/?api=1&destination=${np.lat},${np.lng}&travelmode=driving`;
+        } else {
+          nextNavUrl = `https://maps.google.com/maps/search/${encodeURIComponent(ns.place_name + ' Vang Vieng')}`;
+        }
+      }
+
+      const thumb = place?.image_url
+        ? `<img src="${place.image_url}" alt="" style="width:46px;height:46px;border-radius:8px;object-fit:cover;flex-shrink:0;">`
+        : `<div style="width:46px;height:46px;border-radius:8px;background:var(--green-100);display:flex;align-items:center;justify-content:center;font-size:1.3rem;flex-shrink:0;">${place?.image_emoji||'📍'}</div>`;
+
+      const nextName = nextIdx !== null ? allStops[nextIdx].stop.place_name : '';
+      const safetyBadge = meta.hasKids
+        ? `<span style="font-size:0.72rem;background:${stopBg};padding:2px 7px;border-radius:99px;border:1px solid #ddd;margin-left:4px;">${safetyIcon[safety]||'✅'} ${safety === 'safe' ? 'ປອດໄພ' : safety === 'warning' ? 'ລະວັງ' : 'ບໍ່ແນະນຳ'}</span>`
+        : '';
+
+      html += `
+        <div class="plan-stop-wrap" id="wrap_${curIdx}" style="background:${meta.hasKids ? stopBg : ''};">
+          <div class="plan-stop-main">
+            <button class="stop-check" id="chk_${curIdx}"
+              onclick="toggleCheck(${curIdx},${allStops.length},'${nextNavUrl}','${nextName}')"
+              title="ທຳເຄື່ອງໝາຍຮອດແລ້ວ">☐</button>
+            <div class="plan-time">${stop.time}</div>
+            ${thumb}
+            <div class="plan-info" onclick="window.location.href='detail.html?id=${place?.id||''}'">
+              <div class="plan-name">${stop.place_name}${safetyBadge}</div>
+              ${place?.category?`<span class="plan-cat">${place.category}</span>`:''}
+              <div class="plan-note">💡 ${stop.note}</div>
+            </div>
+            <a href="${navUrl}" target="_blank" class="stop-nav-btn" title="ນຳທາງ">🗺️</a>
+          </div>
+          <div class="stop-next-nav" id="next_${curIdx}" style="display:none;">
+            <span>ຕໍ່ໄປ: ${nextName}</span>
+            <a href="${nextNavUrl}" target="_blank" class="stop-next-btn">🗺️ ນຳທາງໄປ Stop ຕໍ່ໄປ →</a>
+          </div>
+        </div>`;
+      idx++;
+    });
+    html += `</div>`;
+  });
+
+  html += `
+    <div class="plan-pace-note">${paceMsg[meta.pace]??''}</div>
+    <button class="planner-btn" style="margin-top:1rem;" onclick="savePlan()">💾 ບັນທຶກແຜນນີ້</button>
+    <div id="saveStatus"></div>`;
+
+  document.getElementById('plannerResult').innerHTML = html;
+  window._currentPlan = { itinerary, places, meta };
+}
+
+
 
   let idx = 0;
   itinerary.forEach(day => {
