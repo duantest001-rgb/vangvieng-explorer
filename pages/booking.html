@@ -108,9 +108,12 @@
       const lang = localStorage.getItem('lang') || 'lo';
       document.getElementById('langFlag').textContent = langFlags[lang];
       document.getElementById('langName').textContent = langNames[lang];
-      if (typeof applyLang === 'function') applyLang(lang);
+      // ລໍຖ້າ i18n.js load ແລ້ວ apply lang
+      setTimeout(() => {
+        if (typeof applyLang === 'function') applyLang(lang);
+      }, 50);
       const type = new URLSearchParams(window.location.search).get('type');
-      if (type) setTimeout(() => openBooking(type), 100);
+      if (type) setTimeout(() => openBooking(type), 150);
     });
   </script>
 </body>
