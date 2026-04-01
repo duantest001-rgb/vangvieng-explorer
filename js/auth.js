@@ -186,3 +186,39 @@ const RateLimit = {
 };
 
 document.addEventListener("DOMContentLoaded", () => Auth.injectBadge());
+
+// ── LOGIN REQUIRED POPUP (ໃຊ້ຮ່ວມກັນໄດ້ທົ່ວ app) ──
+function showLoginRequiredPopup(action = 'ໃຊ້ feature ນີ້') {
+  document.getElementById('loginRequiredPopup')?.remove();
+  const loginPath = window.location.pathname.includes('/pages/') ? 'login.html' : 'pages/login.html';
+  const popup = document.createElement('div');
+  popup.id = 'loginRequiredPopup';
+  popup.style.cssText = 'position:fixed;inset:0;background:rgba(7,24,48,0.7);z-index:9999;display:flex;align-items:center;justify-content:center;padding:1rem;';
+  popup.innerHTML = `
+    <div style="background:#fff;border-radius:24px;padding:2rem 1.8rem;max-width:340px;width:100%;
+      box-shadow:0 24px 60px rgba(7,24,48,0.3);text-align:center;">
+      <div style="font-size:2.5rem;margin-bottom:12px;">🔑</div>
+      <h2 style="font-size:1.1rem;font-weight:700;color:#071830;margin-bottom:8px;">
+        ຕ້ອງ Login ກ່ອນ
+      </h2>
+      <p style="font-size:0.85rem;color:#6b7a99;margin-bottom:1.5rem;">
+        ກະລຸນາ login ຫຼື ສ້າງ account ຟຣີ<br>ເພື່ອ${action}
+      </p>
+      <div style="display:flex;flex-direction:column;gap:10px;">
+        <a href="${loginPath}?next=${encodeURIComponent(window.location.href)}"
+          style="display:block;padding:13px;background:linear-gradient(135deg,#1050a0,#1a6bbf);
+          color:#fff;border-radius:12px;font-weight:700;font-size:0.95rem;text-decoration:none;">
+          🚀 Login / ສ້າງ Account ຟຣີ
+        </a>
+        <button onclick="document.getElementById('loginRequiredPopup').remove()"
+          style="padding:11px;background:#f5f7fa;border:none;border-radius:12px;
+          font-size:0.88rem;color:#6b7a99;cursor:pointer;font-family:inherit;font-weight:600;">
+          ຍົກເລີກ
+        </button>
+      </div>
+    </div>
+  `;
+  popup.addEventListener('click', e => { if (e.target === popup) popup.remove(); });
+  document.body.appendChild(popup);
+}
+
