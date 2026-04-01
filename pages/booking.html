@@ -53,30 +53,30 @@
 
   <div class="page-wrap">
   <div class="booking-hero">
-    <h1>🎫 ຈອງ / Book</h1>
-    <p>ເລືອກປະເພດການຈອງທີ່ທ່ານຕ້ອງການ</p>
+    <h1 data-i18n="bk.title">🎫 ຈອງ / Book</h1>
+    <p data-i18n="bk.sub">ເລືອກປະເພດການຈອງທີ່ທ່ານຕ້ອງການ</p>
   </div>
 
   <div class="booking-grid">
     <div class="bk-card" onclick="openBooking('activity')">
       <div class="icon">🏔️</div>
-      <h3>ກິດຈະກຳ</h3>
-      <p>Kayak, Zipline, Cave tour...</p>
+      <h3 data-i18n="bk.activity">ກິດຈະກຳ</h3>
+      <p data-i18n="bk.activity.sub">Kayak, Zipline, Cave tour...</p>
     </div>
     <div class="bk-card" onclick="openBooking('hotel')">
       <div class="icon">🏨</div>
-      <h3>ທີ່ພັກ</h3>
-      <p>Hotel, Resort, Guesthouse</p>
+      <h3 data-i18n="bk.hotel">ທີ່ພັກ</h3>
+      <p data-i18n="bk.hotel.sub">Hotel, Resort, Guesthouse</p>
     </div>
     <div class="bk-card" onclick="openBooking('taxi')">
       <div class="icon">🚕</div>
-      <h3>Taxi/Transfer</h3>
-      <p>ຮັບສົ່ງ, Airport transfer</p>
+      <h3 data-i18n="bk.taxi">Taxi/Transfer</h3>
+      <p data-i18n="bk.taxi.sub">ຮັບສົ່ງ, Airport transfer</p>
     </div>
     <div class="bk-card" onclick="openBooking('bike')">
       <div class="icon">🛵</div>
-      <h3>ລົດຈັກ/ATV</h3>
-      <p>Scooter, ATV, Bicycle</p>
+      <h3 data-i18n="bk.bike">ລົດຈັກ/ATV</h3>
+      <p data-i18n="bk.bike.sub">Scooter, ATV, Bicycle</p>
     </div>
   </div>
 
@@ -87,39 +87,20 @@
   <script src="../js/app.js"></script>
   <script src="../js/i18n.js"></script>
   <script>
-    const langFlags = { lo:'🇱🇦', en:'🇬🇧', zh:'🇨🇳', th:'🇹🇭', ko:'🇰🇷' };
-    const langNames = { lo:'ລາວ', en:'English', zh:'中文', th:'ไทย', ko:'한국어' };
-
-    function setLang(lang) {
-      localStorage.setItem('lang', lang);
-      document.getElementById('langFlag').textContent = langFlags[lang];
-      document.getElementById('langName').textContent = langNames[lang];
-      document.getElementById('langMenu').style.display = 'none';
-      if (typeof applyLang === 'function') applyLang(lang);
-    }
-
-    function toggleLangMenu() {
-      const m = document.getElementById('langMenu');
-      m.style.display = m.style.display === 'none' ? 'block' : 'none';
-    }
-
-    document.addEventListener('click', e => {
-      if (!e.target.closest('.lang-switcher')) {
-        document.getElementById('langMenu').style.display = 'none';
-      }
-    });
-
+    // ── Navbar hamburger ──
     document.addEventListener('DOMContentLoaded', () => {
       Auth.injectBadge();
-      const lang = localStorage.getItem('lang') || 'lo';
-      document.getElementById('langFlag').textContent = langFlags[lang];
-      document.getElementById('langName').textContent = langNames[lang];
-      // ລໍຖ້າ i18n.js load ແລ້ວ apply lang
-      setTimeout(() => {
-        if (typeof applyLang === 'function') applyLang(lang);
-      }, 50);
+      // Hamburger
+      const hamburger = document.getElementById('hamburger');
+      const navLinks  = document.getElementById('navLinks');
+      if (hamburger && navLinks) {
+        hamburger.addEventListener('click', () => {
+          const isOpen = navLinks.classList.toggle('open');
+          hamburger.classList.toggle('active', isOpen);
+        });
+      }
       const type = new URLSearchParams(window.location.search).get('type');
-      if (type) setTimeout(() => openBooking(type), 150);
+      if (type) setTimeout(() => openBooking(type), 100);
     });
   </script>
 </body>
