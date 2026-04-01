@@ -5,6 +5,62 @@
 
 const STORAGE_KEY = "vve_saved";
 
+// ── CLOUD SYNC HELPERS ──
+async function syncSaveToCloud(place) {
+  const session = (typeof Auth !== 'undefined') ? Auth.getSession() : null;
+  if (!session) return;
+  try {
+    await fetch(`${SUPABASE_URL}/rest/v1/saved_places`, {
+      method: 'POST',
+      headers: {
+        'apikey': SUPABASE_KEY,
+        'Authorization': `Bearer ${session.accessToken}`,
+        'Content-Type': 'application/json',
+        'Prefer': 'resolution=merge-duplicates'
+      },
+      body: JSON.stringify({
+        user_id: session.userId,
+        place_id: place.id,
+        place_data: place,
+        saved_at: new Date().toISOString()
+      })
+    });
+  } catch(e) { console.warn('Cloud sync failed:', e); }
+}
+
+async function syncRemoveFromCloud(placeId) {
+  const session = (typeof Auth !== 'undefined') ? Auth.getSession() : null;
+  if (!session) return;
+  try {
+    await fetch(`${SUPABASE_URL}/rest/v1/saved_places?user_id=eq.${session.userId}&place_id=eq.${placeId}`, {
+      method: 'DELETE',
+      headers: {
+        'apikey': SUPABASE_KEY,
+        'Authorization': `Bearer ${session.accessToken}`
+      }
+    });
+  } catch(e) { console.warn('Cloud remove failed:', e); }
+}
+
+async function loadSavedFromCloud() {
+  const session = (typeof Auth !== 'undefined') ? Auth.getSession() : null;
+  if (!session) return;
+  try {
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/saved_places?user_id=eq.${session.userId}&select=place_id,place_data,saved_at`, {
+      headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${session.accessToken}` }
+    });
+    const rows = await res.json();
+    if (!Array.isArray(rows) || rows.length === 0) return;
+    const saved = getSaved();
+    rows.forEach(r => {
+      if (r.place_data && !saved[String(r.place_data.id)]) {
+        saved[String(r.place_data.id)] = { ...r.place_data, savedAt: new Date(r.saved_at).getTime() };
+      }
+    });
+    setSaved(saved);
+  } catch(e) { console.warn('Cloud load failed:', e); }
+}
+
 // ── READ / WRITE ──
 function getSaved() {
   try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}"); }
@@ -24,10 +80,12 @@ function toggleSave(place) {
   if (saved[id]) {
     delete saved[id];
     setSaved(saved);
+    syncRemoveFromCloud(place.id);
     showToast("ລຶບອອກຈາກລາຍການແລ້ວ");
   } else {
     saved[id] = { ...place, savedAt: Date.now() };
     setSaved(saved);
+    syncSaveToCloud(place);
     showToast("🔖 ບັນທຶກແລ້ວ!");
   }
   updateNavBadge();
@@ -67,6 +125,13 @@ function showToast(msg) {
     t.style.transform = "translateX(-50%) translateY(20px)";
   }, 2200);
 }
+
+// ── AUTO LOAD CLOUD ON SAVED PAGE ──
+document.addEventListener('DOMContentLoaded', async () => {
+  await loadSavedFromCloud();
+  renderSavedPage();
+  updateNavBadge();
+});
 
 // ── SAVED PAGE: RENDER ──
 function renderSavedPage() {
