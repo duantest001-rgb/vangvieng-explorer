@@ -89,7 +89,7 @@
       document.getElementById('langFlag').textContent = langFlags[lang];
       document.getElementById('langName').textContent = langNames[lang];
       document.getElementById('langMenu').style.display = 'none';
-      if (typeof applyTranslations === 'function') applyTranslations(lang);
+      if (typeof applyLang === 'function') applyLang(lang);
     }
 
     function toggleLangMenu() {
@@ -108,7 +108,7 @@
       const lang = localStorage.getItem('lang') || 'lo';
       document.getElementById('langFlag').textContent = langFlags[lang];
       document.getElementById('langName').textContent = langNames[lang];
-      if (typeof applyTranslations === 'function') applyTranslations(lang);
+      if (typeof applyLang === 'function') applyLang(lang);
       const type = new URLSearchParams(window.location.search).get('type');
       if (type) setTimeout(() => openBooking(type), 100);
     });
