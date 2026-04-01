@@ -488,3 +488,5 @@ body { overflow: hidden; background: var(--bg); } /* desktop: chat fills screen 
   color: #991b1b !important;
   border: 1px solid #fecaca !important;
 }
+
+@keyframes fadeIn { from{opacity:0} to{opacity:1} }
