@@ -659,8 +659,6 @@ function doLogout() {
       _accessToken = saved.token;
       document.getElementById('loginScreen').style.display = 'none';
       document.getElementById('adminApp').style.display = 'block';
-      // ✅ loadPlaces ຢູ່ທີ່ນີ້ ເພາະ _accessToken ພ້ອມແລ້ວ
-      document.addEventListener('DOMContentLoaded', () => loadPlaces());
     }
   } catch(_) {}
 })();
@@ -706,7 +704,18 @@ async function apiDelete(id) {
 // ── LOAD & RENDER ──
 async function loadPlaces() {
   document.getElementById('placesBody').innerHTML = '<tr class="loading-row"><td colspan="8">⏳ ກຳລັງໂຫລດ...</td></tr>';
+  // ✅ ຖ້າ token ໝົດ ລອງ refresh ກ່ອນ
+  if (!_accessToken) {
+    try {
+      const saved = JSON.parse(sessionStorage.getItem('adminAuth') || 'null');
+      if (saved?.token) _accessToken = saved.token;
+    } catch(_) {}
+  }
   allPlaces = await apiGet();
+  if (!Array.isArray(allPlaces)) {
+    document.getElementById('placesBody').innerHTML = '<tr><td colspan="8"><div class="empty-state"><div class="icon">⚠️</div>Session ໝົດ — ກະລຸນາ <a href="#" onclick="doLogout()" style="color:var(--accent)">login ໃໝ່</a></div></td></tr>';
+    return;
+  }
   renderStats();
   renderTable(allPlaces);
 }
@@ -880,7 +889,11 @@ function openEditModal(id) {
   previewImg();
   document.getElementById('placeModal').classList.add('open');
 }
-function closeModal() { document.getElementById('placeModal').classList.remove('open'); }
+function closeModal() {
+  document.getElementById('placeModal').classList.remove('open');
+  editingId = null;
+  clearForm();
+}
 
 function clearForm() {
   ['f_name','f_name_en','f_desc','f_address','f_lat','f_lng','f_emoji','f_rating','f_img_url','f_hours','f_tags','f_phone','f_whatsapp'].forEach(id => document.getElementById(id).value = '');
@@ -948,9 +961,11 @@ async function uploadImage(input) {
 
     if (data.url) {
       // 3. Transform URL — w_1200,q_80 ອັດຕະໂນມັດ
-      const optimizedUrl = data.url.replace('/upload/', '/upload/w_1200,q_80,f_auto/');
+      const optimizedUrl = data.url.replace("/upload/", "/upload/w_1200,q_80,f_auto/");
       document.getElementById('f_img_url').value = optimizedUrl;
-      previewImg();
+      const prevImg = document.getElementById('imgPreview');
+      prevImg.src = optimizedUrl;
+      prevImg.style.display = 'block';
       status.textContent = `✅ Upload ສຳເລັດ! (${compressedKB}KB)`;
       status.style.color = 'var(--accent2)';
     } else {
@@ -1223,7 +1238,7 @@ document.getElementById('deleteModal').addEventListener('click', e => { if(e.tar
 
 // ── AUTO LOAD ──
 document.addEventListener('DOMContentLoaded', () => {
-  // loadPlaces ຖືກ call ໃນ auto-login block ຫຼື ຫຼັງ doLogin() ສຳເລັດ
+  if (_accessToken) { loadPlaces(); }
 });
 </script>
   <script src="../js/active-trip.js"></script>
