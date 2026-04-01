@@ -1,3 +1,83 @@
+
+// ── UPSELL POPUP ──
+function showUpsellPopup(session) {
+  document.getElementById('upsellPopup')?.remove();
+
+  const isGuest = !session;
+  const loginPath = window.location.pathname.includes('/pages/') ? 'login.html' : 'pages/login.html';
+
+  const popup = document.createElement('div');
+  popup.id = 'upsellPopup';
+  popup.style.cssText = `
+    position:fixed;inset:0;background:rgba(7,24,48,0.7);z-index:9999;
+    display:flex;align-items:center;justify-content:center;padding:1rem;
+    animation:fadeIn .25s ease;
+  `;
+  popup.innerHTML = `
+    <div style="background:#fff;border-radius:24px;padding:2rem 1.8rem;max-width:360px;width:100%;
+      box-shadow:0 24px 60px rgba(7,24,48,0.3);animation:slideUp .3s cubic-bezier(.16,1,.3,1);">
+      <div style="text-align:center;margin-bottom:1.2rem;">
+        <div style="font-size:2.5rem;margin-bottom:8px;">🤖</div>
+        <h2 style="font-size:1.2rem;font-weight:700;color:#071830;margin-bottom:6px;">
+          ໝົດໂຄຕ້າ AI ວັນນີ້
+        </h2>
+        <p style="font-size:0.85rem;color:#6b7a99;">
+          ${isGuest ? 'Guest ໃຊ້ AI ໄດ້ 3 ຄັ້ງ/ວັນ' : 'ທ່ານໃຊ້ AI ຄົບ ' + (session?.limit||10) + ' ຄັ້ງ/ວັນ'}
+        </p>
+      </div>
+
+      ${isGuest ? `
+      <div style="background:#f0f6ff;border-radius:14px;padding:1rem;margin-bottom:1rem;">
+        <div style="font-weight:700;color:#1050a0;margin-bottom:8px;">👤 Free Member</div>
+        <div style="font-size:0.82rem;color:#3a4a6b;line-height:1.7;">
+          ✅ AI 10 ຄັ້ງ/ວັນ<br>
+          ✅ ຂຽນ Review ໄດ້<br>
+          ✅ Booking ໄດ້<br>
+          ✅ Save places cloud<br>
+          <strong style="color:#1050a0;">ຟຣີ 100%</strong>
+        </div>
+      </div>
+      ` : ''}
+
+      <div style="background:linear-gradient(135deg,#fff8e1,#fff3cc);border:1.5px solid #ffd54f;
+        border-radius:14px;padding:1rem;margin-bottom:1.2rem;">
+        <div style="font-weight:700;color:#b8860b;margin-bottom:8px;">⭐ Premium Member</div>
+        <div style="font-size:0.82rem;color:#7a5800;line-height:1.7;">
+          ✅ AI 50 ຄັ້ງ/ວັນ<br>
+          ✅ Priority Booking<br>
+          ✅ Premium Badge<br>
+          ✅ ທຸກ feature<br>
+          <strong style="color:#b8860b;">ເປີດຕົວເร็ວໆນີ້ 🔜</strong>
+        </div>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:10px;">
+        ${isGuest ? `
+        <a href="${loginPath}" style="display:block;text-align:center;padding:13px;
+          background:linear-gradient(135deg,#1050a0,#1a6bbf);color:#fff;border-radius:12px;
+          font-weight:700;font-size:0.95rem;text-decoration:none;">
+          🚀 ສ້າງ Account ຟຣີ
+        </a>
+        ` : `
+        <div style="text-align:center;padding:11px;background:#f0f6ff;border-radius:12px;
+          font-size:0.85rem;color:#1050a0;font-weight:600;">
+          🔜 Premium ເປີດຕົວເ soon
+        </div>
+        `}
+        <button onclick="document.getElementById('upsellPopup').remove()"
+          style="padding:11px;background:#f5f7fa;border:none;border-radius:12px;
+          font-size:0.88rem;color:#6b7a99;cursor:pointer;font-family:inherit;font-weight:600;">
+          ⏰ ລໍຖ້າມື້ອື່ນ
+        </button>
+      </div>
+    </div>
+  `;
+
+  // Close on backdrop click
+  popup.addEventListener('click', e => { if (e.target === popup) popup.remove(); });
+  document.body.appendChild(popup);
+}
+
 /* ═══════════════════════════════════════════════
    AI Chat Logic — v2 (streaming effect + polish)
 ═══════════════════════════════════════════════ */
