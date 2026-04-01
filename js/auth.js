@@ -35,6 +35,17 @@ const SupaAuth = {
     return rows[0] || { role: "user", ai_limit: 10 };
   },
 
+  async signUp(email, password, name) {
+    const res = await fetch(`${SUPABASE_URL}/auth/v1/signup`, {
+      method: 'POST',
+      headers: { 'apikey': SUPABASE_KEY, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password, data: { name } })
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error_description || data.msg || 'ສ້າງບັນຊີຜິດພາດ');
+    return data;
+  },
+
   async refreshToken(refreshToken) {
     const res = await fetch(`${SUPABASE_URL}/auth/v1/token?grant_type=refresh_token`, {
       method: "POST",
@@ -71,6 +82,15 @@ const Auth = {
       };
       localStorage.setItem(SESSION_KEY, JSON.stringify(session));
       return { ok: true, session };
+    } catch (err) {
+      return { ok: false, msg: err.message };
+    }
+  },
+
+  async signup(email, password, name) {
+    try {
+      await SupaAuth.signUp(email, password, name);
+      return { ok: true };
     } catch (err) {
       return { ok: false, msg: err.message };
     }
