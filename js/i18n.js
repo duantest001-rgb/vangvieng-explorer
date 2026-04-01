@@ -287,6 +287,9 @@ function applyLang(lang) {
     const l = document.getElementById("langLabel");
     if (f) f.textContent = m.flag;
     if (l) l.textContent = m.label;
+    // booking.html uses langName instead of langLabel
+    const ln = document.getElementById("langName");
+    if (ln) ln.textContent = m.label;
   }
 
   document.querySelectorAll(".lang-option").forEach(o => o.classList.toggle("active", o.dataset.lang === lang));
