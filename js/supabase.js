@@ -2,7 +2,7 @@
    Supabase Config — v2 (retry + timeout)
 ═══════════════════════════════════════════════ */
 const SUPABASE_URL = "https://axqgotrbnglssxhwkfjc.supabase.co";
-const SUPABASE_KEY = "sb_publishable_Jx8kMe3QiaBZ3rE9T7OHtA_hxrbgW5b";
+const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImF4cWdvdHJibmdsc3N4aHdrZmpjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI0MDQ4NzgsImV4cCI6MjA4Nzk4MDg3OH0.yUGLC-dSAJ3YhfFtws-p_P4mBwyma85GvA1uHoeGtJg";
 
 // ── Fetch with timeout helper ──
 async function fetchWithTimeout(url, options = {}, timeout = 8000) {
