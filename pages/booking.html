@@ -24,24 +24,30 @@
   <!-- Navbar -->
   <nav class="navbar" id="navbar">
     <div class="nav-container">
-      <a href="../index.html" class="nav-logo">
-        <img src="../assets/logo.png" alt="logo" width="36" height="36" style="border-radius:10px;">
-        <span style="color:#071830;">VangVieng<strong>Explorer</strong></span>
+      <a href="../index.html" class="nav-logo" style="color:var(--dark)">
+        <img src="../assets/logo.png" alt="logo" class="nav-logo-img" />
+        <span class="logo-text">VangVieng<strong>Explorer</strong></span>
       </a>
-      <div class="nav-right" style="display:flex;align-items:center;gap:12px;margin-left:auto;">
-        <div class="lang-switcher" style="position:relative;">
-          <button id="langBtn" onclick="toggleLangMenu()" style="background:none;border:1px solid #d0d8ec;border-radius:99px;padding:5px 12px;cursor:pointer;font-size:0.82rem;display:flex;align-items:center;gap:5px;font-family:inherit;">
-            <span id="langFlag">🇱🇦</span><span id="langName">ລາວ</span> ▾
-          </button>
-          <div id="langMenu" style="display:none;position:absolute;right:0;top:110%;background:#fff;border:1px solid #e0e8f4;border-radius:12px;padding:6px;min-width:140px;box-shadow:0 8px 24px rgba(7,24,48,0.12);z-index:999;">
-            <div onclick="setLang('lo')" style="padding:8px 12px;cursor:pointer;border-radius:8px;font-size:0.85rem;" onmouseover="this.style.background='#f0f4ff'" onmouseout="this.style.background='none'">🇱🇦 ລາວ</div>
-            <div onclick="setLang('en')" style="padding:8px 12px;cursor:pointer;border-radius:8px;font-size:0.85rem;" onmouseover="this.style.background='#f0f4ff'" onmouseout="this.style.background='none'">🇬🇧 English</div>
-            <div onclick="setLang('zh')" style="padding:8px 12px;cursor:pointer;border-radius:8px;font-size:0.85rem;" onmouseover="this.style.background='#f0f4ff'" onmouseout="this.style.background='none'">🇨🇳 中文</div>
-            <div onclick="setLang('th')" style="padding:8px 12px;cursor:pointer;border-radius:8px;font-size:0.85rem;" onmouseover="this.style.background='#f0f4ff'" onmouseout="this.style.background='none'">🇹🇭 ไทย</div>
-            <div onclick="setLang('ko')" style="padding:8px 12px;cursor:pointer;border-radius:8px;font-size:0.85rem;" onmouseover="this.style.background='#f0f4ff'" onmouseout="this.style.background='none'">🇰🇷 한국어</div>
-          </div>
+      <div class="nav-links" id="navLinks">
+        <a href="../index.html" class="nav-link" data-i18n="nav.home">ໜ້າຫຼັກ</a>
+        <a href="explore.html" class="nav-link" data-i18n="nav.explore">ສຳຫຼວດ</a>
+        <a href="map.html" class="nav-link" data-i18n="nav.map">ແຜນທີ່</a>
+        <a href="ai-chat.html" class="nav-link nav-ai" data-i18n="nav.ai">🤖 ຖາມ AI</a>
+      </div>
+      <div class="lang-dropdown" id="langDropdown">
+        <button class="lang-toggle" id="langToggle" onclick="toggleLangMenu()">
+          <span id="langFlag">🇱🇦</span>
+          <span class="lang-arrow">▾</span>
+        </button>
+        <div class="lang-menu" id="langMenu">
+          <button class="lang-option active" data-lang="lo" onclick="selectLang('lo','🇱🇦','ລາວ')">🇱🇦 ລາວ</button>
+          <button class="lang-option" data-lang="en" onclick="selectLang('en','🇬🇧','English')">🇬🇧 English</button>
+          <button class="lang-option" data-lang="zh" onclick="selectLang('zh','🇨🇳','中文')">🇨🇳 中文</button>
+          <button class="lang-option" data-lang="th" onclick="selectLang('th','🇹🇭','ไทย')">🇹🇭 ไทย</button>
+          <button class="lang-option" data-lang="ko" onclick="selectLang('ko','🇰🇷','한국어')">🇰🇷 한국어</button>
         </div>
       </div>
+      <button class="hamburger" id="hamburger"><span></span><span></span><span></span></button>
     </div>
   </nav>
 
