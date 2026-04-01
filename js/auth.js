@@ -3,8 +3,7 @@
    VangVieng Explorer
 ═══════════════════════════════════════════════ */
 
-const SUPABASE_URL = "https://axqgotrbnglssxhwkfjc.supabase.co";
-const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImF4cWdvdHJibmdsc3N4aHdrZmpjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI0MDQ4NzgsImV4cCI6MjA4Nzk4MDg3OH0.yUGLC-dSAJ3YhfFtws-p_P4mBwyma85GvA1uHoeGtJg";
+// SUPABASE_URL ແລະ SUPABASE_KEY ດຶງຈາກ supabase.js
 
 // ── Supabase Auth helpers ──
 const SupaAuth = {
