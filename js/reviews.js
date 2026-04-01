@@ -221,6 +221,13 @@ function removePhoto(placeId) {
 
 // ── SUBMIT FULL REVIEW ──
 async function submitReviewFull(placeId, ratedKey) {
+  // ✅ ຕ້ອງ login ກ່ອນ submit review
+  const session = (typeof Auth !== 'undefined') ? Auth.getSession() : null;
+  if (!session) {
+    showLoginRequiredPopup('ຂຽນ Review');
+    return;
+  }
+
   const btn     = document.getElementById(`reviewSubmitBtn_${placeId}`);
   const comment = document.getElementById(`reviewComment_${placeId}`)?.value || '';
   const fileInput = document.getElementById(`reviewPhoto_${placeId}`);
