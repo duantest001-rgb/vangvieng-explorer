@@ -34,23 +34,23 @@ function openBooking(type, placeId = null, placeName = '') {
       <!-- Common Fields -->
       <div style="display:flex;flex-direction:column;gap:12px;">
         <div>
-          <label style="font-size:0.78rem;font-weight:600;color:#3a4a6b;display:block;margin-bottom:5px;">👤 ຊື່ຜູ້ຈອງ *</label>
+          <label style="font-size:0.78rem;font-weight:600;color:#3a4a6b;display:block;margin-bottom:5px;">👤 \${t('bk.name')} *</label>
           <input id="bk_name" type="text" placeholder="ຊື່ ນາມສະກຸນ"
             value="${session.name || ''}"
             style="width:100%;padding:10px 14px;border:1.5px solid #d0d8ec;border-radius:10px;font-size:0.9rem;font-family:inherit;outline:none;">
         </div>
         <div>
-          <label style="font-size:0.78rem;font-weight:600;color:#3a4a6b;display:block;margin-bottom:5px;">📱 ເບີໂທ / WhatsApp *</label>
+          <label style="font-size:0.78rem;font-weight:600;color:#3a4a6b;display:block;margin-bottom:5px;">📱 \${t('bk.phone')} *</label>
           <input id="bk_phone" type="tel" placeholder="+856 20 xxxx xxxx"
             style="width:100%;padding:10px 14px;border:1.5px solid #d0d8ec;border-radius:10px;font-size:0.9rem;font-family:inherit;outline:none;">
         </div>
         <div>
-          <label style="font-size:0.78rem;font-weight:600;color:#3a4a6b;display:block;margin-bottom:5px;">📅 ວັນທີ *</label>
+          <label style="font-size:0.78rem;font-weight:600;color:#3a4a6b;display:block;margin-bottom:5px;">📅 \${t('bk.date')} *</label>
           <input id="bk_date" type="date" min="${new Date().toISOString().slice(0,10)}"
             style="width:100%;padding:10px 14px;border:1.5px solid #d0d8ec;border-radius:10px;font-size:0.9rem;font-family:inherit;outline:none;">
         </div>
         <div>
-          <label style="font-size:0.78rem;font-weight:600;color:#3a4a6b;display:block;margin-bottom:5px;">👥 ຈຳນວນຄົນ</label>
+          <label style="font-size:0.78rem;font-weight:600;color:#3a4a6b;display:block;margin-bottom:5px;">👥 \${t('bk.persons')}</label>
           <input id="bk_persons" type="number" min="1" max="50" value="1"
             style="width:100%;padding:10px 14px;border:1.5px solid #d0d8ec;border-radius:10px;font-size:0.9rem;font-family:inherit;outline:none;">
         </div>
@@ -58,7 +58,7 @@ function openBooking(type, placeId = null, placeName = '') {
         ${getTypeFields(type)}
 
         <div>
-          <label style="font-size:0.78rem;font-weight:600;color:#3a4a6b;display:block;margin-bottom:5px;">📝 ໝາຍເຫດ (ຖ້າມີ)</label>
+          <label style="font-size:0.78rem;font-weight:600;color:#3a4a6b;display:block;margin-bottom:5px;">📝 \${t('bk.notes')}</label>
           <textarea id="bk_notes" rows="2" placeholder="ຕ້ອງການພິເສດ, ຂໍ້ມູນເພີ່ມ..."
             style="width:100%;padding:10px 14px;border:1.5px solid #d0d8ec;border-radius:10px;font-size:0.9rem;font-family:inherit;outline:none;resize:none;"></textarea>
         </div>
@@ -71,7 +71,7 @@ function openBooking(type, placeId = null, placeName = '') {
         style="width:100%;padding:14px;background:linear-gradient(135deg,#1050a0,#1a6bbf);color:#fff;
         border:none;border-radius:12px;font-size:1rem;font-weight:700;font-family:inherit;
         cursor:pointer;margin-top:1rem;">
-        ✅ ຢືນຢັນການຈອງ
+        ✅ \${t('bk.confirm')}
       </button>
     </div>
   `;
@@ -82,7 +82,7 @@ function openBooking(type, placeId = null, placeName = '') {
 
 // ── TYPE HELPERS ──
 function getTypeLabel(type) {
-  return { activity:'ກິດຈະກຳ/ທ່ອງທ່ຽວ', hotel:'ທີ່ພັກ', taxi:'Taxi/Transfer', bike:'ລົດຈັກ/ATV' }[type] || type;
+  return { activity:t('bk.activity'), hotel:t('bk.hotel'), taxi:t('bk.taxi'), bike:t('bk.bike') }[type] || type;
 }
 function getTypeEmoji(type) {
   return { activity:'🏔️', hotel:'🏨', taxi:'🚕', bike:'🛵' }[type] || '📋';
@@ -206,14 +206,14 @@ async function submitBooking(type, placeId, placeName, userId) {
     // ສຳເລັດ
     document.getElementById('bk_success').style.display = 'block';
     document.getElementById('bk_success').innerHTML = `
-      ✅ <strong>ຈອງສຳເລັດ!</strong><br>
-      <span style="font-size:0.8rem;">ທີມງານຈະຕິດຕໍ່ກັບທ່ານທາງ WhatsApp/ໂທລະສັບ ພາຍໃນ 1-2 ຊົ່ວໂມງ</span>
+      ✅ <strong>\${t('bk.success').split('!')[0]}!</strong><br>
+      <span style="font-size:0.8rem;">'+t('bk.success').split('!').slice(1).join('!')+'</span>
     `;
     btn.style.display = 'none';
 
   } catch(e) {
     btn.disabled = false;
-    btn.innerHTML = '✅ ຢືນຢັນການຈອງ';
+    btn.innerHTML = '✅ '+t('bk.confirm');
     showBkError(e.message);
   }
 }
