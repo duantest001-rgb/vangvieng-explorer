@@ -1,6 +1,7 @@
 const TRANSLATIONS = {
   lo: {
     "nav.home":"ໜ້າຫຼັກ","nav.explore":"ສຳຫຼວດ","nav.map":"ແຜນທີ່","nav.ai":"🤖 ຖາມ AI",
+    "bk.title":"ຈອງ / Book","bk.sub":"ເລືອກປະເພດການຈອງທີ່ທ່ານຕ້ອງການ","bk.activity":"ກິດຈະກຳ","bk.activity.sub":"Kayak, Cave, Tour","bk.hotel":"ທີ່ພັກ","bk.hotel.sub":"Hotel, Resort, Guesthouse","bk.taxi":"Taxi/Transfer","bk.taxi.sub":"ຮັບສົ່ງ, Airport","bk.bike":"ລົດຈັກ/ATV","bk.bike.sub":"Scooter, ATV, Bicycle","bk.now":"ຈອງດຽວນີ້ →","bk.name":"ຊື່ຜູ້ຈອງ","bk.phone":"ເບີໂທ / WhatsApp","bk.date":"ວັນທີ","bk.persons":"ຈຳນວນຄົນ","bk.notes":"ໝາຍເຫດ","bk.confirm":"ຢືນຢັນການຈອງ","bk.success":"ຈອງສຳເລັດ! ທີມງານຈະຕິດຕໍ່ພາຍໃນ 1-2 ຊົ່ວໂມງ",
     "hero.badge":"Eco Tourism Vang Vieng","hero.line1":"ຄົ້ນພົບ","hero.line2":"ທີ່ແທ້ຈິງ",
     "hero.sub":"ສະຖານທີ່ທ່ອງທ່ຽວ · ທີ່ພັກ · ຮ້ານອາຫານ · ກິດຈະກຳ<br>ທຸກຢ່າງໃນທີ່ດຽວ ໂດຍ AI",
     "search.placeholder":"ຊອກຫາ... ເຊັ່ນ: ລ້ອງແຄນ, coffee, resort","search.btn":"ຄົ້ນຫາ",
@@ -50,6 +51,7 @@ const TRANSLATIONS = {
   },
   en: {
     "nav.home":"Home","nav.explore":"Explore","nav.map":"Map","nav.ai":"🤖 Ask AI",
+    "bk.title":"Book / Reserve","bk.sub":"Select booking type","bk.activity":"Activities","bk.activity.sub":"Kayak, Cave, Tour","bk.hotel":"Accommodation","bk.hotel.sub":"Hotel, Resort, Guesthouse","bk.taxi":"Taxi/Transfer","bk.taxi.sub":"Pickup, Airport transfer","bk.bike":"Motorbike/ATV","bk.bike.sub":"Scooter, ATV, Bicycle","bk.now":"Book Now →","bk.name":"Full Name","bk.phone":"Phone / WhatsApp","bk.date":"Date","bk.persons":"Number of persons","bk.notes":"Notes","bk.confirm":"Confirm Booking","bk.success":"Booking confirmed! Team will contact you within 1-2 hours",
     "hero.badge":"Eco Tourism Vang Vieng","hero.line1":"Discover","hero.line2":"The Real Experience",
     "hero.sub":"Attractions · Hotels · Restaurants · Activities<br>All in one place, powered by AI",
     "search.placeholder":"Search... e.g. cave, resort, kayak","search.btn":"Search",
@@ -99,6 +101,7 @@ const TRANSLATIONS = {
   },
   zh: {
     "nav.home":"首页","nav.explore":"探索","nav.map":"地图","nav.ai":"🤖 问AI",
+    "bk.title":"预订","bk.sub":"选择预订类型","bk.activity":"活动","bk.activity.sub":"皮划艇，洞穴，旅游","bk.hotel":"住宿","bk.hotel.sub":"酒店，度假村","bk.taxi":"出租车/接送","bk.taxi.sub":"接送，机场","bk.bike":"摩托车/ATV","bk.bike.sub":"摩托车，ATV","bk.now":"立即预订 →","bk.name":"姓名","bk.phone":"电话/WhatsApp","bk.date":"日期","bk.persons":"人数","bk.notes":"备注","bk.confirm":"确认预订","bk.success":"预订成功！工作人员将在1-2小时内联系您",
     "hero.badge":"万荣生态旅游","hero.line1":"发现","hero.line2":"真实的万荣",
     "hero.sub":"景点 · 住宿 · 餐厅 · 活动<br>一站式 AI 旅游助手",
     "search.placeholder":"搜索... 例如: 溶洞, 度假村, 皮划艇","search.btn":"搜索",
@@ -148,6 +151,7 @@ const TRANSLATIONS = {
   },
   th: {
     "nav.home":"หน้าหลัก","nav.explore":"สำรวจ","nav.map":"แผนที่","nav.ai":"🤖 ถาม AI",
+    "bk.title":"จอง","bk.sub":"เลือกประเภทการจอง","bk.activity":"กิจกรรม","bk.activity.sub":"คายัค, ถ้ำ, ทัวร์","bk.hotel":"ที่พัก","bk.hotel.sub":"โรงแรม, รีสอร์ท","bk.taxi":"แท็กซี่/รับส่ง","bk.taxi.sub":"รับส่ง, สนามบิน","bk.bike":"มอเตอร์ไซค์/ATV","bk.bike.sub":"สกู๊ตเตอร์, ATV","bk.now":"จองเลย →","bk.name":"ชื่อผู้จอง","bk.phone":"โทรศัพท์/WhatsApp","bk.date":"วันที่","bk.persons":"จำนวนคน","bk.notes":"หมายเหตุ","bk.confirm":"ยืนยันการจอง","bk.success":"จองสำเร็จ! ทีมงานจะติดต่อภายใน 1-2 ชั่วโมง",
     "hero.badge":"ท่องเที่ยวเชิงนิเวศ วังเวียง","hero.line1":"ค้นพบ","hero.line2":"วังเวียงแท้จริง",
     "hero.sub":"สถานที่ท่องเที่ยว · ที่พัก · ร้านอาหาร · กิจกรรม<br>ทุกอย่างในที่เดียว ด้วย AI",
     "search.placeholder":"ค้นหา... เช่น ถ้ำ, รีสอร์ท, คายัค","search.btn":"ค้นหา",
@@ -197,6 +201,7 @@ const TRANSLATIONS = {
   },
   ko: {
     "nav.home":"홈","nav.explore":"탐색","nav.map":"지도","nav.ai":"🤖 AI 질문",
+    "bk.title":"예약","bk.sub":"예약 유형 선택","bk.activity":"액티비티","bk.activity.sub":"카약, 동굴, 투어","bk.hotel":"숙소","bk.hotel.sub":"호텔, 리조트","bk.taxi":"택시/이동","bk.taxi.sub":"픽업, 공항","bk.bike":"오토바이/ATV","bk.bike.sub":"스쿠터, ATV","bk.now":"지금 예약 →","bk.name":"예약자 이름","bk.phone":"전화/WhatsApp","bk.date":"날짜","bk.persons":"인원수","bk.notes":"메모","bk.confirm":"예약 확인","bk.success":"예약 완료! 1-2시간 내 연락드립니다",
     "hero.badge":"방비엥 에코 투어리즘","hero.line1":"진정한","hero.line2":"방비엥을 발견하세요",
     "hero.sub":"관광지 · 숙소 · 레스토랑 · 액티비티<br>AI로 한 곳에서 모두",
     "search.placeholder":"검색... 예: 동굴, 리조트, 카약","search.btn":"검색",
