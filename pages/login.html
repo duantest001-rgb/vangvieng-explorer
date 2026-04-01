@@ -6,32 +6,38 @@
   <title>ເຂົ້າສູ່ລະບົບ — VangVieng Explorer</title>
   <meta name="robots" content="noindex">
   <link rel="stylesheet" href="../css/style.css" />
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700;800&family=Outfit:wght@300;400;500;600;700&family=Noto+Sans+Lao:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Noto+Sans+Lao:wght@400;600;700;800&display=swap" rel="stylesheet">
   <style>
     *{box-sizing:border-box;margin:0;padding:0;}
     body{min-height:100vh;display:flex;align-items:center;justify-content:center;
       background:linear-gradient(135deg,#071830 0%,#0d2d54 50%,#1a5a9e 100%);
       font-family:'Outfit','Noto Sans Lao',sans-serif;padding:1rem;}
     .login-card{background:#fff;border-radius:20px;padding:2.5rem 2rem 2rem;
-      width:100%;max-width:380px;box-shadow:0 20px 60px rgba(7,24,48,0.35);
+      width:100%;max-width:400px;box-shadow:0 20px 60px rgba(7,24,48,0.35);
       animation:slideUp 0.4s cubic-bezier(.16,1,.3,1) both;}
     @keyframes slideUp{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}
-    .login-logo{text-align:center;margin-bottom:1.8rem;}
-    .login-logo img{width:56px;height:56px;border-radius:14px;object-fit:cover;box-shadow:0 4px 16px rgba(16,80,160,0.2);}
+    .login-logo{text-align:center;margin-bottom:1.5rem;}
+    .login-logo img{width:56px;height:56px;border-radius:14px;object-fit:cover;}
     .login-logo h1{font-size:1.2rem;font-weight:700;color:#071830;margin-top:10px;}
     .login-logo p{font-size:0.8rem;color:#6b7a99;margin-top:3px;}
+    /* Tabs */
+    .tabs{display:flex;background:#f0f4ff;border-radius:12px;padding:4px;margin-bottom:1.5rem;}
+    .tab{flex:1;padding:9px;text-align:center;border-radius:9px;font-size:0.88rem;
+      font-weight:600;cursor:pointer;color:#6b7a99;transition:all .2s;border:none;background:none;font-family:inherit;}
+    .tab.active{background:#fff;color:#1050a0;box-shadow:0 2px 8px rgba(16,80,160,0.12);}
     .form-group{margin-bottom:1rem;}
     .form-group label{display:block;font-size:0.78rem;font-weight:600;color:#3a4a6b;margin-bottom:6px;}
     .form-group input{width:100%;padding:11px 14px;border:1.5px solid #d0d8ec;border-radius:10px;
       font-size:0.9rem;font-family:inherit;color:#071830;background:#f8faff;
       transition:border-color .2s,box-shadow .2s;outline:none;}
     .form-group input:focus{border-color:#1050a0;box-shadow:0 0 0 3px rgba(16,80,160,0.12);background:#fff;}
-    .login-btn{width:100%;padding:13px;background:linear-gradient(135deg,#1050a0,#1a6bbf);
+    .main-btn{width:100%;padding:13px;background:linear-gradient(135deg,#1050a0,#1a6bbf);
       color:#fff;border:none;border-radius:12px;font-size:1rem;font-weight:700;
-      font-family:inherit;cursor:pointer;margin-top:0.5rem;
-      transition:opacity .2s,transform .15s;}
-    .login-btn:hover{opacity:0.93;}.login-btn:active{transform:scale(0.98);}
-    .login-btn:disabled{opacity:0.6;cursor:not-allowed;}
+      font-family:inherit;cursor:pointer;margin-top:0.5rem;transition:opacity .2s,transform .15s;}
+    .main-btn:hover{opacity:0.93;}.main-btn:active{transform:scale(0.98);}
+    .main-btn:disabled{opacity:0.6;cursor:not-allowed;}
+    .success-box{background:#d4edda;color:#155724;border-radius:9px;padding:9px 13px;
+      font-size:0.82rem;margin-top:0.8rem;display:none;font-weight:600;}
     .error-box{background:#ffdede;color:#c0392b;border-radius:9px;padding:9px 13px;
       font-size:0.82rem;margin-top:0.8rem;display:none;font-weight:600;}
     .divider{text-align:center;color:#9aa5be;font-size:0.78rem;margin:1.2rem 0 1rem;position:relative;}
@@ -41,78 +47,129 @@
       border:1.5px solid #c8d8f8;border-radius:12px;font-size:0.88rem;font-weight:600;
       font-family:inherit;cursor:pointer;transition:background .2s;}
     .guest-btn:hover{background:#e0ecff;}
-    .loading-spinner{display:inline-block;width:14px;height:14px;border:2px solid rgba(255,255,255,0.4);
+    .spinner{display:inline-block;width:14px;height:14px;border:2px solid rgba(255,255,255,0.4);
       border-top-color:#fff;border-radius:50%;animation:spin .6s linear infinite;vertical-align:middle;margin-right:6px;}
     @keyframes spin{to{transform:rotate(360deg)}}
+    .hint{font-size:0.75rem;color:#9aa5be;text-align:center;margin-top:1rem;}
   </style>
 </head>
 <body>
-
 <div class="login-card">
   <div class="login-logo">
     <img src="../assets/logo.png" alt="VangVieng Explorer" />
     <h1>VangVieng Explorer</h1>
-    <p>ເຂົ້າສູ່ລະບົບດ້ວຍ Email</p>
+    <p>ທ່ອງທ່ຽວວັງວຽງ ລາວ 🌿</p>
   </div>
 
-  <div class="form-group">
-    <label>📧 Email</label>
-    <input type="email" id="email" placeholder="you@example.com" autocomplete="email" />
+  <!-- Tabs -->
+  <div class="tabs">
+    <button class="tab active" id="tabLogin" onclick="switchTab('login')">ເຂົ້າສູ່ລະບົບ</button>
+    <button class="tab" id="tabSignup" onclick="switchTab('signup')">ສ້າງບັນຊີ</button>
   </div>
 
-  <div class="form-group">
-    <label>🔒 ລະຫັດຜ່ານ</label>
-    <input type="password" id="password" placeholder="••••••••••" autocomplete="current-password" />
+  <!-- Login Form -->
+  <div id="formLogin">
+    <div class="form-group">
+      <label>📧 Email</label>
+      <input type="email" id="loginEmail" placeholder="you@example.com" autocomplete="email" />
+    </div>
+    <div class="form-group">
+      <label>🔒 ລະຫັດຜ່ານ</label>
+      <input type="password" id="loginPassword" placeholder="••••••••••" autocomplete="current-password"
+        onkeydown="if(event.key==='Enter')doLogin()" />
+    </div>
+    <button class="main-btn" id="loginBtn" onclick="doLogin()">ເຂົ້າສູ່ລະບົບ →</button>
+    <div class="error-box" id="loginError"></div>
   </div>
 
-  <button class="login-btn" id="loginBtn" onclick="doLogin()">ເຂົ້າສູ່ລະບົບ →</button>
-  <div class="error-box" id="errorBox"></div>
+  <!-- Signup Form -->
+  <div id="formSignup" style="display:none">
+    <div class="form-group">
+      <label>👤 ຊື່ຂອງທ່ານ</label>
+      <input type="text" id="signupName" placeholder="ຊື່ ນາມສະກຸນ" autocomplete="name" />
+    </div>
+    <div class="form-group">
+      <label>📧 Email</label>
+      <input type="email" id="signupEmail" placeholder="you@example.com" autocomplete="email" />
+    </div>
+    <div class="form-group">
+      <label>🔒 ລະຫັດຜ່ານ (8+ ຕົວ)</label>
+      <input type="password" id="signupPassword" placeholder="••••••••••" autocomplete="new-password"
+        onkeydown="if(event.key==='Enter')doSignup()" />
+    </div>
+    <button class="main-btn" id="signupBtn" onclick="doSignup()">ສ້າງບັນຊີ →</button>
+    <div class="error-box" id="signupError"></div>
+    <div class="success-box" id="signupSuccess"></div>
+  </div>
 
   <div class="divider">ຫຼື</div>
-  <button class="guest-btn" onclick="guestAccess()">🚶 ໃຊ້ແບບ Guest (AI 3 ຄັ້ງ/ວັນ)</button>
+  <button class="guest-btn" onclick="guestAccess()">🚶 ໃຊ້ແບບ Guest (ບໍ່ຕ້ອງ login)</button>
+  <p class="hint">Guest ໃຊ້ AI chat ໄດ້ 3 ຄັ້ງ/ວັນ</p>
 </div>
 
+<script src="../js/supabase.js"></script>
 <script src="../js/auth.js"></script>
 <script>
-  // ── Auto-redirect ຖ້າ login ແລ້ວ ──
   const params  = new URLSearchParams(window.location.search);
   const nextUrl = params.get("next") || "../index.html";
   if (Auth.isLoggedIn()) window.location.replace(nextUrl);
 
+  function switchTab(tab) {
+    document.getElementById('tabLogin').classList.toggle('active', tab === 'login');
+    document.getElementById('tabSignup').classList.toggle('active', tab === 'signup');
+    document.getElementById('formLogin').style.display  = tab === 'login'  ? 'block' : 'none';
+    document.getElementById('formSignup').style.display = tab === 'signup' ? 'block' : 'none';
+  }
+
   async function doLogin() {
-    const email    = document.getElementById("email").value.trim();
-    const password = document.getElementById("password").value;
+    const email    = document.getElementById("loginEmail").value.trim();
+    const password = document.getElementById("loginPassword").value;
     const btn      = document.getElementById("loginBtn");
-
-    if (!email || !password) { showError("ກະລຸນາໃສ່ Email ແລະ ລະຫັດຜ່ານ"); return; }
-
+    if (!email || !password) { showErr("loginError", "ກະລຸນາໃສ່ Email ແລະ ລະຫັດຜ່ານ"); return; }
     btn.disabled = true;
-    btn.innerHTML = '<span class="loading-spinner"></span>ກຳລັງເຂົ້າ...';
-
+    btn.innerHTML = '<span class="spinner"></span>ກຳລັງເຂົ້າ...';
     const result = await Auth.login(email, password);
-
     if (!result.ok) {
       btn.disabled = false;
       btn.innerHTML = "ເຂົ້າສູ່ລະບົບ →";
-      showError(result.msg);
+      showErr("loginError", result.msg);
       return;
     }
-
     window.location.replace(nextUrl);
   }
 
-  function guestAccess() {
-    window.location.replace(nextUrl);
+  async function doSignup() {
+    const name     = document.getElementById("signupName").value.trim();
+    const email    = document.getElementById("signupEmail").value.trim();
+    const password = document.getElementById("signupPassword").value;
+    const btn      = document.getElementById("signupBtn");
+    if (!name || !email || !password) { showErr("signupError", "ກະລຸນາໃສ່ຂໍ້ມູນໃຫ້ຄົບ"); return; }
+    if (password.length < 8) { showErr("signupError", "ລະຫັດຜ່ານຕ້ອງມີຢ່າງໜ້ອຍ 8 ຕົວ"); return; }
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner"></span>ກຳລັງສ້າງ...';
+    const result = await Auth.signup(email, password, name);
+    btn.disabled = false;
+    btn.innerHTML = "ສ້າງບັນຊີ →";
+    if (!result.ok) { showErr("signupError", result.msg); return; }
+    // ສຳເລັດ — login ທັນທີ
+    document.getElementById("signupError").style.display = "none";
+    const loginResult = await Auth.login(email, password);
+    if (loginResult.ok) window.location.replace(nextUrl);
+    else {
+      document.getElementById("signupSuccess").textContent = "✅ ສ້າງບັນຊີສຳເລັດ! ກະລຸນາ login";
+      document.getElementById("signupSuccess").style.display = "block";
+      switchTab('login');
+    }
   }
 
-  function showError(msg) {
-    const el = document.getElementById("errorBox");
+  function guestAccess() { window.location.replace(nextUrl); }
+
+  function showErr(id, msg) {
+    const el = document.getElementById(id);
     el.textContent = "⚠️ " + msg;
     el.style.display = "block";
     setTimeout(() => el.style.display = "none", 5000);
   }
-
-  document.addEventListener("keydown", e => { if (e.key === "Enter") doLogin(); });
 </script>
 </body>
 </html>
