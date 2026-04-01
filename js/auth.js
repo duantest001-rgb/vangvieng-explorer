@@ -139,17 +139,24 @@ const Auth = {
 
   injectBadge() {
     const session = this.getSession();
-    if (!session) return;
     document.getElementById("authBadge")?.remove();
     const badge = document.createElement("div");
     badge.id = "authBadge";
     badge.style.cssText = "display:flex;align-items:center;gap:8px;font-size:0.78rem;font-weight:600;color:var(--dark,#071830);cursor:pointer;";
-    const roleEmoji   = { admin:"🔑", press:"🎤", user:"👤" }[session.role] || "👤";
-    const remaining   = RateLimit.remaining(session.userId, session.limit);
-    const limitBadge  = session.role === "admin" ? "" :
-      `<span style="background:${remaining<=2?'#ffdede':'#e0f2ff'};color:${remaining<=2?'#c0392b':'#1050a0'};padding:1px 7px;border-radius:99px;font-size:0.72rem;font-weight:700;">AI ${remaining}/${session.limit}</span>`;
-    badge.innerHTML = `${roleEmoji} ${session.name} ${limitBadge}
-      <button onclick="Auth.logout()" style="background:none;border:1px solid #ccd;padding:2px 9px;border-radius:99px;font-size:0.7rem;cursor:pointer;color:inherit;font-family:inherit;">ອອກ</button>`;
+
+    if (!session) {
+      // Guest — ສະແດງປຸ່ມ Login
+      const loginPath = this._loginPath();
+      badge.innerHTML = `<a href="${loginPath}" style="background:#1050a0;color:#fff;padding:5px 14px;border-radius:99px;font-size:0.78rem;font-weight:700;text-decoration:none;">🔑 Login</a>`;
+    } else {
+      // Logged in — ສະແດງຊື່ + ອອກ
+      const roleEmoji  = { admin:"🔑", press:"🎤", user:"👤" }[session.role] || "👤";
+      const remaining  = RateLimit.remaining(session.userId, session.limit);
+      const limitBadge = session.role === "admin" ? "" :
+        `<span style="background:${remaining<=2?'#ffdede':'#e0f2ff'};color:${remaining<=2?'#c0392b':'#1050a0'};padding:1px 7px;border-radius:99px;font-size:0.72rem;font-weight:700;">AI ${remaining}/${session.limit}</span>`;
+      badge.innerHTML = `${roleEmoji} ${session.name} ${limitBadge}
+        <button onclick="Auth.logout()" style="background:none;border:1px solid #ccd;padding:2px 9px;border-radius:99px;font-size:0.7rem;cursor:pointer;color:inherit;font-family:inherit;">ອອກ</button>`;
+    }
     document.querySelector(".nav-container")?.appendChild(badge);
   },
 
