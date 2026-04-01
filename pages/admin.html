@@ -285,6 +285,7 @@
         <button class="tab-btn active" id="tabPlaces" onclick="switchTab('places')">🏔️ ສະຖານທີ່</button>
         <button class="tab-btn" id="tabReviews" onclick="switchTab('reviews')">⭐ Reviews <span id="reviewBadge" style="display:none;background:#ff6b6b;color:#fff;border-radius:99px;padding:1px 7px;font-size:0.75rem;margin-left:4px;"></span></button>
         <button class="tab-btn" id="tabDashboard" onclick="switchTab('dashboard')">📊 Dashboard</button>
+        <button class="tab-btn" id="tabBookings" onclick="switchTab('bookings')">🎫 Bookings <span id="bookingBadge" style="display:none;background:#1050a0;color:#fff;border-radius:99px;padding:1px 7px;font-size:0.75rem;margin-left:4px;"></span></button>
       </div>
       <button class="btn btn-primary" id="btnAddPlace" onclick="openAddModal()">＋ ເພີ່ມສະຖານທີ່</button>
       <button class="btn btn-ghost" onclick="doLogout()">ອອກ</button>
@@ -1042,16 +1043,110 @@ function showToast(msg, type='success') {
 }
 
 // ── TAB SWITCHING ──
+// ── BOOKINGS ──
+let allBookings = [];
+
+async function loadBookings() {
+  const body = document.getElementById('bookingsBody');
+  body.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:2rem;color:var(--muted);">⏳ ກຳລັງໂຫລດ...</td></tr>';
+  try {
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/bookings?select=*&order=created_at.desc`, {
+      headers: authHeaders()
+    });
+    allBookings = await res.json();
+    if (!Array.isArray(allBookings)) throw new Error('load failed');
+    renderBookings(allBookings);
+    // Update badge
+    const pending = allBookings.filter(b => b.status === 'pending').length;
+    const badge = document.getElementById('bookingBadge');
+    if (pending > 0) { badge.textContent = pending; badge.style.display = 'inline'; }
+    else badge.style.display = 'none';
+  } catch(e) {
+    body.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:2rem;color:var(--danger);">❌ ໂຫລດ bookings ຜິດພາດ</td></tr>';
+  }
+}
+
+function renderBookings(bookings) {
+  const body = document.getElementById('bookingsBody');
+  if (!bookings.length) {
+    body.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:2rem;color:var(--muted);">ຍັງບໍ່ມີ booking</td></tr>';
+    return;
+  }
+  const typeEmoji = { activity:'🏔️', hotel:'🏨', taxi:'🚕', bike:'🛵' };
+  const statusStyle = {
+    pending:   'background:#fff8e1;color:#b8860b;',
+    confirmed: 'background:#d4edda;color:#155724;',
+    cancelled: 'background:#ffdede;color:#c0392b;'
+  };
+  body.innerHTML = bookings.map(b => `
+    <tr style="border-bottom:1px solid var(--border);">
+      <td style="padding:10px 12px;color:var(--muted);font-size:0.78rem;">#${b.id}</td>
+      <td style="padding:10px 12px;">${typeEmoji[b.booking_type]||'📋'} ${b.booking_type}</td>
+      <td style="padding:10px 12px;font-weight:600;">${b.name}<br><span style="font-size:0.75rem;color:var(--muted);">${b.place_name||''}</span></td>
+      <td style="padding:10px 12px;">
+        <a href="tel:${b.phone}" style="color:var(--accent);">${b.phone}</a>
+      </td>
+      <td style="padding:10px 12px;">${b.date}</td>
+      <td style="padding:10px 12px;font-size:0.8rem;color:var(--muted);">
+        ${b.booking_type==='taxi' ? `📍 ${b.pickup||''} → ${b.dropoff||''}` : ''}
+        ${b.booking_type==='bike' ? `🛵 ${b.bike_type||''} x${b.bike_qty||1}` : ''}
+        ${b.booking_type==='hotel' ? `🛏️ ${b.room_type||''}` : ''}
+        ${b.persons ? `👥 ${b.persons} ຄົນ` : ''}
+        ${b.notes ? `<br>📝 ${b.notes}` : ''}
+      </td>
+      <td style="padding:10px 12px;">
+        <span style="padding:3px 10px;border-radius:99px;font-size:0.75rem;font-weight:700;${statusStyle[b.status]||''}">
+          ${b.status}
+        </span>
+      </td>
+      <td style="padding:10px 12px;">
+        <div style="display:flex;gap:6px;">
+          ${b.status==='pending' ? `
+          <button onclick="updateBookingStatus(${b.id},'confirmed')"
+            style="padding:4px 10px;background:#d4edda;color:#155724;border:none;border-radius:6px;font-size:0.75rem;cursor:pointer;font-family:inherit;font-weight:700;">
+            ✅
+          </button>
+          <button onclick="updateBookingStatus(${b.id},'cancelled')"
+            style="padding:4px 10px;background:#ffdede;color:#c0392b;border:none;border-radius:6px;font-size:0.75rem;cursor:pointer;font-family:inherit;font-weight:700;">
+            ❌
+          </button>` : ''}
+        </div>
+      </td>
+    </tr>
+  `).join('');
+}
+
+function filterBookings() {
+  const status = document.getElementById('bkStatusFilter').value;
+  const type   = document.getElementById('bkTypeFilter').value;
+  let filtered = allBookings;
+  if (status) filtered = filtered.filter(b => b.status === status);
+  if (type)   filtered = filtered.filter(b => b.booking_type === type);
+  renderBookings(filtered);
+}
+
+async function updateBookingStatus(id, status) {
+  const res = await fetch(`${SUPABASE_URL}/rest/v1/bookings?id=eq.${id}`, {
+    method: 'PATCH',
+    headers: authHeaders({ 'Content-Type': 'application/json', 'Prefer': 'return=minimal' }),
+    body: JSON.stringify({ status })
+  });
+  if (res.ok) { showToast(status === 'confirmed' ? '✅ Confirmed!' : '❌ Cancelled', 'success'); loadBookings(); }
+}
+
 function switchTab(tab) {
   document.getElementById('sectionPlaces').classList.toggle('active', tab === 'places');
   document.getElementById('sectionReviews').classList.toggle('active', tab === 'reviews');
   document.getElementById('sectionDashboard').classList.toggle('active', tab === 'dashboard');
+  document.getElementById('sectionBookings').style.display = tab === 'bookings' ? 'block' : 'none';
   document.getElementById('tabPlaces').classList.toggle('active', tab === 'places');
   document.getElementById('tabReviews').classList.toggle('active', tab === 'reviews');
   document.getElementById('tabDashboard').classList.toggle('active', tab === 'dashboard');
+  document.getElementById('tabBookings').classList.toggle('active', tab === 'bookings');
   document.getElementById('btnAddPlace').style.display = tab === 'places' ? '' : 'none';
   if (tab === 'reviews') loadReviewsAdmin();
   if (tab === 'dashboard') loadDashboard();
+  if (tab === 'bookings') loadBookings();
 }
 
 // ── DASHBOARD ──
