@@ -659,6 +659,8 @@ function doLogout() {
       _accessToken = saved.token;
       document.getElementById('loginScreen').style.display = 'none';
       document.getElementById('adminApp').style.display = 'block';
+      // ✅ loadPlaces ຢູ່ທີ່ນີ້ ເພາະ _accessToken ພ້ອມແລ້ວ
+      document.addEventListener('DOMContentLoaded', () => loadPlaces());
     }
   } catch(_) {}
 })();
@@ -1221,7 +1223,7 @@ document.getElementById('deleteModal').addEventListener('click', e => { if(e.tar
 
 // ── AUTO LOAD ──
 document.addEventListener('DOMContentLoaded', () => {
-  if (_accessToken) { loadPlaces(); }
+  // loadPlaces ຖືກ call ໃນ auto-login block ຫຼື ຫຼັງ doLogin() ສຳເລັດ
 });
 </script>
   <script src="../js/active-trip.js"></script>
