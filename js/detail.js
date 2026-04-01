@@ -229,14 +229,25 @@ function renderDetail(p) {
             </button>
           </div>
 
-          ${(p.phone || p.whatsapp) ? `
           <div class="sidebar-card">
-            <h4>📞 ຕິດຕໍ່ / ຈອງ</h4>
+            <h4>🎫 ຈອງ / ນັດໝາຍ</h4>
             <div style="display:flex;flex-direction:column;gap:10px;margin-top:4px;">
+              ${p.category === 'activity' || p.category === 'attraction' ? `
+              <button onclick="openBooking('activity', ${p.id}, '${p.name.replace(/'/g,"\\'")}' )"
+                style="padding:12px;background:linear-gradient(135deg,#1050a0,#1a6bbf);color:#fff;
+                border:none;border-radius:10px;font-size:0.9rem;font-weight:700;font-family:inherit;cursor:pointer;">
+                🏔️ ຈອງກິດຈະກຳ
+              </button>` : ''}
+              ${p.category === 'hotel' ? `
+              <button onclick="openBooking('hotel', ${p.id}, '${p.name.replace(/'/g,"\\'")}' )"
+                style="padding:12px;background:linear-gradient(135deg,#1050a0,#1a6bbf);color:#fff;
+                border:none;border-radius:10px;font-size:0.9rem;font-weight:700;font-family:inherit;cursor:pointer;">
+                🏨 ຈອງທີ່ພັກ
+              </button>` : ''}
               ${p.phone ? `<a href="tel:${p.phone}" class="contact-btn phone-btn">📞 ໂທຫາ ${p.phone}</a>` : ''}
               ${p.whatsapp ? `<a href="https://wa.me/${p.whatsapp.replace(/[^0-9]/g,'')}" target="_blank" class="contact-btn wa-btn">💬 WhatsApp</a>` : ''}
             </div>
-          </div>` : ''}
+          </div>
 
           <div class="sidebar-card">
             <h4>📤 ແຊຣ໌ສະຖານທີ່ນີ້</h4>
