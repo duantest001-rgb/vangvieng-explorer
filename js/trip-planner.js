@@ -129,8 +129,28 @@ format:
 
     const data = await res.json();
     const text = data.content?.[0]?.text || '[]';
-    const clean = text.replace(/```json|```/g, '').trim();
-    const itinerary = JSON.parse(clean);
+
+    // Clean: ລຶບ markdown fences
+    let clean = text.replace(/```json|```/gi, '').trim();
+
+    // ຄັດສະເພາະ JSON array [ ... ] ອອກ (ຖ້າ AI ໃສ່ text ກ່ອນ/ຫຼັງ)
+    const arrStart = clean.indexOf('[');
+    const arrEnd   = clean.lastIndexOf(']');
+    if (arrStart !== -1 && arrEnd !== -1) {
+      clean = clean.slice(arrStart, arrEnd + 1);
+    }
+
+    // ລຶບ unescaped control chars ໃນ string values ທີ່ break JSON
+    clean = clean.replace(/"(?:[^"\\]|\\.)*"/g, m =>
+      m.replace(/[\n\r\t]/g, s => s === '\n' ? '\\n' : s === '\r' ? '\\r' : '\\t')
+    );
+
+    let itinerary;
+    try {
+      itinerary = JSON.parse(clean);
+    } catch (parseErr) {
+      throw new Error('AI ສົ່ງ JSON ຜິດຮູບແບບ — ລອງ Generate ໃໝ່ອີກຄັ້ງ');
+    }
 
     renderPlanResult(itinerary, places, { days, interests, style, pace, group, kidsAge, hasKids });
     if (typeof startActiveTrip === 'function') {
