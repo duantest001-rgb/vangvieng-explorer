@@ -1,0 +1,27 @@
+# Environment & Secrets
+.env
+.env.*
+*.env
+config.local.js
+secrets.js
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Editors
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Logs
+*.log
+npm-debug.log*
+
+# Dependencies
+node_modules/
+
+# Build
+dist/
+build/
