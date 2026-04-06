@@ -369,7 +369,7 @@
     loadWeather();
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
-        navigator.serviceWorker.register('/vangvieng-explorer/service-worker.js')
+        navigator.serviceWorker.register('/service-worker.js')
           .then(r => console.log('SW registered'))
           .catch(e => console.log('SW error:', e));
       });
