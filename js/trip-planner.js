@@ -300,17 +300,25 @@ async function savePlan() {
   if (btn) { btn.textContent = '⏳ ກຳລັງບັນທຶກ...'; btn.disabled = true; }
 
   try {
+    const session = Auth.getSession();
+    if (!session?.accessToken) {
+      document.getElementById('saveStatus').innerHTML =
+        `<p style="color:#c0392b;font-size:0.85rem;text-align:center;margin-top:8px;">⚠️ ກະລຸນາ Login ກ່ອນບັນທຶກ</p>`;
+      if (btn) { btn.textContent = '💾 ບັນທຶກແຜນນີ້'; btn.disabled = false; }
+      return;
+    }
     const res = await fetch(`${SUPABASE_URL}/rest/v1/saved_plans`, {
       method: 'POST',
       headers: {
         'apikey': SUPABASE_KEY,
-        'Authorization': `Bearer ${SUPABASE_KEY}`,
+        'Authorization': `Bearer ${session.accessToken}`,
         'Content-Type': 'application/json',
         'Prefer': 'return=minimal'
       },
       body: JSON.stringify({
+        user_id:   session.userId,
         plan_data: plan.itinerary,
-        meta: plan.meta
+        meta:      plan.meta
       })
     });
     if (res.ok) {
@@ -334,9 +342,14 @@ async function loadSavedPlans() {
   container.innerHTML = `<div style="text-align:center;padding:2rem;"><div class="planner-spinner"></div></div>`;
 
   try {
+    const session = Auth.getSession();
+    if (!session?.accessToken) {
+      container.innerHTML = `<p style="color:var(--muted);font-size:0.9rem;text-align:center;padding:2rem;">⚠️ ກະລຸນາ Login ກ່ອນເບິ່ງແຜນ</p>`;
+      return;
+    }
     const res = await fetch(
-      `${SUPABASE_URL}/rest/v1/saved_plans?select=*&order=created_at.desc`,
-      { headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` } }
+      `${SUPABASE_URL}/rest/v1/saved_plans?user_id=eq.${session.userId}&select=*&order=created_at.desc`,
+      { headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${session.accessToken}` } }
     );
     const plans = await res.json();
     renderSavedPlans(plans);
@@ -379,9 +392,11 @@ function renderSavedPlans(plans) {
 
 // ── OPEN SAVED PLAN ──
 async function openSavedPlan(id) {
+  const session = Auth.getSession();
+  if (!session?.accessToken) return;
   const res = await fetch(
-    `${SUPABASE_URL}/rest/v1/saved_plans?id=eq.${id}&select=*`,
-    { headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` } }
+    `${SUPABASE_URL}/rest/v1/saved_plans?id=eq.${id}&user_id=eq.${session.userId}&select=*`,
+    { headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${session.accessToken}` } }
   );
   const data = await res.json();
   const plan = data[0];
@@ -395,9 +410,11 @@ async function openSavedPlan(id) {
 
 // ── DELETE SAVED PLAN ──
 async function deleteSavedPlan(id) {
-  await fetch(`${SUPABASE_URL}/rest/v1/saved_plans?id=eq.${id}`, {
+  const session = Auth.getSession();
+  if (!session?.accessToken) return;
+  await fetch(`${SUPABASE_URL}/rest/v1/saved_plans?id=eq.${id}&user_id=eq.${session.userId}`, {
     method: 'DELETE',
-    headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
+    headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${session.accessToken}` }
   });
   loadSavedPlans();
 }
