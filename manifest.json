@@ -2,8 +2,8 @@
   "name": "VangVieng Explorer",
   "short_name": "VVExplorer",
   "description": "ສຳຫຼວດວັງວຽງ — ສະຖານທີ່, ທີ່ພັກ, ອາຫານ, ກິດຈະກຳ",
-  "start_url": "/vangvieng-explorer/",
-  "scope": "/vangvieng-explorer/",
+  "start_url": "/",
+  "scope": "/",
   "display": "standalone",
   "orientation": "portrait",
   "background_color": "#f4faff",
@@ -11,13 +11,13 @@
   "lang": "lo",
   "icons": [
     {
-      "src": "/vangvieng-explorer/assets/logo.png",
+      "src": "/assets/logo.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any maskable"
     },
     {
-      "src": "/vangvieng-explorer/assets/logo.png",
+      "src": "/assets/logo.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"
@@ -25,7 +25,7 @@
   ],
   "screenshots": [
     {
-      "src": "/vangvieng-explorer/assets/logo.png",
+      "src": "/assets/logo.png",
       "sizes": "390x844",
       "type": "image/png",
       "form_factor": "narrow"
@@ -35,13 +35,13 @@
   "shortcuts": [
     {
       "name": "ສຳຫຼວດ",
-      "url": "/vangvieng-explorer/pages/explore.html",
-      "icons": [{ "src": "/vangvieng-explorer/assets/logo.png", "sizes": "96x96" }]
+      "url": "/pages/explore.html",
+      "icons": [{ "src": "/assets/logo.png", "sizes": "96x96" }]
     },
     {
       "name": "ຖາມ AI",
-      "url": "/vangvieng-explorer/pages/ai-chat.html",
-      "icons": [{ "src": "/vangvieng-explorer/assets/logo.png", "sizes": "96x96" }]
+      "url": "/pages/ai-chat.html",
+      "icons": [{ "src": "/assets/logo.png", "sizes": "96x96" }]
     }
   ]
 }
