@@ -84,7 +84,7 @@ function showUpsellPopup(session) {
 
 // Cloudflare Worker proxy → Anthropic Claude API
 // Cloudflare Worker proxy → Anthropic Claude API
-const AI_PROXY_URL = "https://vve-ai-proxy.gogogo-thong.workers.dev";
+const AI_PROXY_URL = "https://api.lao-trips.com";
 
 const SYSTEM_PROMPT = `ເຈົ້າຄື "ນ້ອງວຽງ" — AI Travel Guide ສ່ວນຕົວຂອງ VangVieng Explorer ທີ່ຮູ້ຈັກວັງວຽງດີທີ່ສຸດ.
 ເຈົ້າຄືຄົນທ້ອງຖິ່ນທີ່ໄດ້ທ່ຽວທຸກທີ່ ກິນທຸກຮ້ານ ຮູ້ທຸກ tip — ລົມສະໄຕລ໌ friendly, warm, ຄືໝູ່.
