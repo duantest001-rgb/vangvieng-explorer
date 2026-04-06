@@ -21,7 +21,7 @@ async function fetchWithTimeout(url, options = {}, timeout = 8000) {
 // ── Supabase REST API helper ──
 const db = {
   async getPlaces(filters = {}, retries = 2) {
-    let url = `${SUPABASE_URL}/rest/v1/places?select=*&order=rating.desc`;
+    let url = `${SUPABASE_URL}/rest/v1/places?select=*&order=rating.desc.nullslast,id.asc`;
     if (filters.category) url += `&category=eq.${filters.category}`;
     if (filters.eco)      url += `&is_eco=eq.true`;
     if (filters.search)   url += `&or=(name.ilike.*${encodeURIComponent(filters.search)}*,description.ilike.*${encodeURIComponent(filters.search)}*,name_en.ilike.*${encodeURIComponent(filters.search)}*)`;
