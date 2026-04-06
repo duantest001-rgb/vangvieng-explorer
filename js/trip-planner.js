@@ -3,9 +3,7 @@
    Uses: Supabase places + Cloudflare Worker (Claude API)
 ═══════════════════════════════════════════════ */
 
-// Cloudflare Worker proxy → Anthropic Claude API
-// NOTE: Worker ຊື່ "gemini-proxy" ເພາະຊື່ເດີມ — ໃຊ້ງານໄດ້ປົກກະຕິ
-const AI_PROXY_URL = "https://gemini-proxy.duan-test001.workers.dev";
+// AI_PROXY_URL declared in ai-chat.js (shared)
 
 // ── TAB SWITCHING ──
 function switchChatTab(tab) {
