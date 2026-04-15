@@ -82,14 +82,11 @@ function renderActiveBanner() {
   `;
   const nav = document.querySelector('nav.navbar') || document.querySelector('nav');
   if (nav) {
-    nav.insertAdjacentElement('afterend', banner);
-    // set top based on nav height
     const h = nav.getBoundingClientRect().height || 64;
-    banner.querySelector('.atrip-banner').style.cssText += '';
-    document.getElementById('activeTripBanner').style.top = h + 'px';
+    nav.insertAdjacentElement('afterend', banner);
+    banner.style.top = h + 'px';
   } else {
     document.body.prepend(banner);
-    document.getElementById('activeTripBanner').style.top = '64px';
   }
 }
 
@@ -193,10 +190,14 @@ function confirmEndTrip() {
   s.textContent = `
   #activeTripBanner {
     position: fixed;
-    top: 0;
+    top: 64px;
     left: 0;
     right: 0;
-    z-index: 999;
+    z-index: 900;
+  }
+  body.has-active-trip .navbar,
+  body.has-active-trip nav {
+    z-index: 950;
   }
   .atrip-banner {
     display: flex; align-items: center; justify-content: space-between;
