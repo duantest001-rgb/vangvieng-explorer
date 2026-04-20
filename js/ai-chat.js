@@ -1,4 +1,3 @@
-
 // ── UPSELL POPUP ──
 function showUpsellPopup(session) {
   document.getElementById('upsellPopup')?.remove();
@@ -79,11 +78,10 @@ function showUpsellPopup(session) {
 }
 
 /* ═══════════════════════════════════════════════
-   AI Chat Logic — v2 (streaming effect + polish)
+   AI Chat Logic — v3 (server-side quota via Supabase)
 ═══════════════════════════════════════════════ */
 
-// Cloudflare Worker proxy → Anthropic Claude API
-// Cloudflare Worker proxy → Anthropic Claude API
+// Cloudflare Worker proxy → Anthropic Claude API (with quota enforcement)
 const AI_PROXY_URL = "https://api.lao-trips.com";
 
 const SYSTEM_PROMPT = `ເຈົ້າຄື "ນ້ອງວຽງ" — AI Travel Guide ສ່ວນຕົວຂອງ VangVieng Explorer ທີ່ຮູ້ຈັກວັງວຽງດີທີ່ສຸດ.
@@ -199,15 +197,60 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 });
 
-// ── RATE LIMIT UI ──
-function updateRateBadge() {
+// ── RATE LIMIT UI (async — fetches from Supabase) ──
+async function updateRateBadge() {
   const session = (typeof Auth !== "undefined") ? Auth.getSession() : null;
-  const username = session ? session.userId : "guest";
-  const limit    = session ? session.limit    : RateLimit.GUEST_LIMIT;
-  const remaining = RateLimit.remaining(username, limit);
   const el = document.getElementById("rateLimitInfo");
   if (!el) return;
+
+  // Admin: hide badge
   if (session?.role === "admin") { el.style.display = "none"; return; }
+
+  // Guest: read from localStorage
+  if (!session) {
+    const limit = RateLimit.GUEST_LIMIT;
+    const remaining = RateLimit.remaining("guest", limit);
+    el.style.display = "flex";
+    el.innerHTML = `
+      <span style="font-size:0.75rem; color:${remaining <= 1 ? '#c0392b' : '#4a6fa5'}; font-weight:600;">
+        🤖 Guest: <strong>${remaining}/${limit}</strong> ຄັ້ງທີ່ຍັງເຫຼືອ
+        ${remaining === 0 ? ' — <span style="color:#c0392b">ໝົດແລ້ວ</span>' : ''}
+      </span>`;
+    return;
+  }
+
+  // Logged-in: fetch real usage from Supabase
+  try {
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/rpc/get_ai_usage`, {
+      method: "POST",
+      headers: {
+        "Content-Type":  "application/json",
+        "Authorization": `Bearer ${session.accessToken}`,
+        "apikey":        SUPABASE_KEY,
+      },
+      body: JSON.stringify({ p_user_id: session.userId })
+    });
+    if (res.ok) {
+      const data = await res.json();
+      const used = data.used || 0;
+      const remaining = Math.max(0, session.limit - used);
+      renderBadge(remaining, session.limit);
+    } else {
+      // Fallback to localStorage if Supabase unreachable
+      const remaining = RateLimit.remaining(session.userId, session.limit);
+      renderBadge(remaining, session.limit);
+    }
+  } catch (e) {
+    // Network error — fallback
+    const remaining = RateLimit.remaining(session.userId, session.limit);
+    renderBadge(remaining, session.limit);
+  }
+}
+
+// Helper to render the badge
+function renderBadge(remaining, limit) {
+  const el = document.getElementById("rateLimitInfo");
+  if (!el) return;
   el.style.display = "flex";
   el.innerHTML = `
     <span style="font-size:0.75rem; color:${remaining <= 2 ? '#c0392b' : '#4a6fa5'}; font-weight:600;">
@@ -216,28 +259,36 @@ function updateRateBadge() {
     </span>`;
 }
 
+// Update badge directly from server response (after sendMessage)
+function updateRateBadgeFromServer(usage) {
+  if (!usage) return;
+  const session = (typeof Auth !== "undefined") ? Auth.getSession() : null;
+  const el = document.getElementById("rateLimitInfo");
+  if (!el) return;
+  if (session?.role === "admin") { el.style.display = "none"; return; }
+  renderBadge(usage.remaining, usage.limit);
+}
+
 // ── SEND MESSAGE ──
 async function sendMessage() {
   const input = document.getElementById("chatInput");
   const text = input.value.trim();
   if (!text || isLoading) return;
 
-  // ── Rate limit check ──
-  const session  = (typeof Auth !== "undefined") ? Auth.getSession() : null;
-  const username = session ? session.userId : "guest";
-  const limit    = session ? session.limit    : RateLimit.GUEST_LIMIT;
+  const session = (typeof Auth !== "undefined") ? Auth.getSession() : null;
 
-  if (session?.role !== "admin") {
-    const check = RateLimit.consume(username, limit);
-    if (!check.ok) {
+  // ── Guest quota check (client-side only) ──
+  // Logged-in users: Worker handles quota on server (atomic, cross-device)
+  if (!session) {
+    const limit = RateLimit.GUEST_LIMIT;
+    if (RateLimit.remaining("guest", limit) <= 0) {
       appendMessage("bot",
-        `⛔ **ໝົດໂຄຕ້າ AI ປະຈຳວັນ** (${limit} ຄັ້ງ/ວັນ)\n\n` +
-        `ມາໃໝ່ໄດ້ພຣຸ່ງນີ້ ຫຼື <a href="login.html" style="color:#1050a0;font-weight:700;">login ດ້ວຍ account ທີ່ມີໂຄຕ້າຫຼາຍກວ່ານີ້</a>`,
+        `⛔ **Guest ໃຊ້ຄົບ ${limit} ຄັ້ງແລ້ວ**\n\n` +
+        `<a href="login.html" style="color:#1050a0;font-weight:700;">Login ຟຣີເພື່ອໃຊ້ເພີ່ມອີກ 10 ຄັ້ງ/ວັນ</a>`,
         true
       );
       return;
     }
-    updateRateBadge();
   }
 
   appendMessage("user", text);
@@ -254,15 +305,43 @@ async function sendMessage() {
   sendBtn.style.opacity = "0.5";
 
   try {
-    const reply = await callClaude();
+    const result = await callClaude(session);
     removeTyping(typingId);
-    await typewriterMessage(reply); // ✨ streaming effect
-    chatHistory.push({ role: "assistant", content: reply });
+
+    // Guest: consume AFTER successful call (avoid losing quota on errors)
+    if (!session) {
+      RateLimit.consume("guest", RateLimit.GUEST_LIMIT);
+    }
+
+    // Update badge with server usage (if logged in) or local (guest)
+    if (result.usage) {
+      updateRateBadgeFromServer(result.usage);
+    } else {
+      updateRateBadge();
+    }
+
+    await typewriterMessage(result.reply);
+    chatHistory.push({ role: "assistant", content: result.reply });
   } catch (err) {
     removeTyping(typingId);
-    const errMsg = err?.message || String(err);
-    appendMessage("bot", "⚠️ Error: " + errMsg + " — <button onclick='retryLast()' style='background:none;border:none;color:var(--green-400);cursor:pointer;font-weight:700;text-decoration:underline;font-family:inherit;'>ລອງໃໝ່</button>", true, true);
-    console.error("Claude error:", err);
+
+    // Handle quota_exceeded specially
+    if (err.quotaExceeded) {
+      appendMessage("bot",
+        `⛔ **ໝົດໂຄຕ້າ AI ປະຈຳວັນ** (${err.limit} ຄັ້ງ/ວັນ)\n\n` +
+        `ມາໃໝ່ໄດ້ພຣຸ່ງນີ້ ຫຼື ຕິດຕໍ່ admin ເພື່ອເພີ່ມໂຄຕ້າ`,
+        true
+      );
+      updateRateBadgeFromServer({ used: err.limit, remaining: 0, limit: err.limit });
+    } else {
+      const errMsg = err?.message || String(err);
+      appendMessage("bot",
+        "⚠️ Error: " + errMsg +
+        " — <button onclick='retryLast()' style='background:none;border:none;color:var(--green-400);cursor:pointer;font-weight:700;text-decoration:underline;font-family:inherit;'>ລອງໃໝ່</button>",
+        true, true
+      );
+      console.error("Claude error:", err);
+    }
   } finally {
     isLoading = false;
     sendBtn.disabled = false;
@@ -274,39 +353,55 @@ async function sendMessage() {
 function retryLast() {
   const lastUser = [...chatHistory].reverse().find(m => m.role === "user");
   if (!lastUser) return;
-  // Remove last user msg from history so it re-sends cleanly
   const lastIdx = chatHistory.lastIndexOf(lastUser);
   chatHistory.splice(lastIdx, 1);
-  // Remove error bubble from DOM
   const msgs = document.getElementById("chatMessages");
   const lastBubbles = msgs.querySelectorAll(".msg-row");
   if (lastBubbles.length) lastBubbles[lastBubbles.length - 1].remove();
-  // Re-populate input and send
   document.getElementById("chatInput").value = lastUser.content;
   sendMessage();
 }
 
-// ── CALL CLAUDE ──
-async function callClaude() {
+// ── CALL CLAUDE (with auth token for logged-in users) ──
+async function callClaude(session) {
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), 30000);
   try {
+    const headers = { "Content-Type": "application/json" };
+    if (session?.accessToken) {
+      headers["Authorization"] = `Bearer ${session.accessToken}`;
+    }
+
     const body = { system: SYSTEM_PROMPT, messages: chatHistory };
     const res = await fetch(AI_PROXY_URL, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers,
       body: JSON.stringify(body),
       signal: controller.signal
     });
     clearTimeout(timeout);
+
     const text = await res.text();
     let data;
     try { data = JSON.parse(text); }
     catch { throw new Error("format error: " + text.slice(0, 100)); }
+
+    // Handle quota_exceeded specially
+    if (res.status === 429 && data.error?.type === "quota_exceeded") {
+      const err = new Error(data.error.message);
+      err.quotaExceeded = true;
+      err.limit = data.error.limit;
+      throw err;
+    }
+
     if (!res.ok || data.error) {
       throw new Error(data.error?.message || "API error " + res.status);
     }
-    return data.content?.[0]?.text || "ບໍ່ໄດ້ຮັບຄຳຕອບ";
+
+    return {
+      reply: data.content?.[0]?.text || "ບໍ່ໄດ້ຮັບຄຳຕອບ",
+      usage: data._usage || null,
+    };
   } catch (err) {
     clearTimeout(timeout);
     if (err.name === "AbortError") throw new Error("ໝົດເວລາ — ລອງໃໝ່");
@@ -326,7 +421,6 @@ async function typewriterMessage(text) {
   const target = document.getElementById("typeTarget");
   const formatted = formatText(text);
 
-  // Fast typewriter — reveal HTML char by char (visible chars only)
   const words = text.split(" ");
   let built = "";
   for (let i = 0; i < words.length; i++) {
@@ -335,7 +429,7 @@ async function typewriterMessage(text) {
     msgs.scrollTop = msgs.scrollHeight;
     await sleep(18 + Math.random() * 12);
   }
-  target.innerHTML = formatted; // final clean render
+  target.innerHTML = formatted;
   msgs.scrollTop = msgs.scrollHeight;
 }
 
@@ -373,7 +467,7 @@ function formatText(text) {
   return t;
 }
 
-// ── TYPING INDICATOR (animated dots) ──
+// ── TYPING INDICATOR ──
 function showTyping() {
   const msgs = document.getElementById("chatMessages");
   const id = "typing-" + Date.now();
@@ -398,7 +492,7 @@ function sendSuggestion(btn) {
   sendMessage();
 }
 
-// ── INPUT — char counter + auto resize ──
+// ── INPUT ──
 function setupInput() {
   const input = document.getElementById("chatInput");
   input.addEventListener("keydown", e => {
@@ -412,7 +506,7 @@ function autoResize(el) {
   el.style.height = Math.min(el.scrollHeight, 120) + "px";
 }
 
-// ── NAVBAR — X animation ──
+// ── NAVBAR ──
 function setupNavbar() {
   const hamburger = document.getElementById("hamburger");
   const navLinks = document.getElementById("navLinks");
@@ -427,4 +521,3 @@ function setupNavbar() {
     }));
   }
 }
-
