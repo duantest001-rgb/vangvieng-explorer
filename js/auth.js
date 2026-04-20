@@ -1,5 +1,5 @@
 /* ═══════════════════════════════════════════════
-   Auth — Supabase Auth v2
+   Auth — Supabase Auth v3 (server-side quota sync)
    VangVieng Explorer
 ═══════════════════════════════════════════════ */
 
@@ -137,7 +137,8 @@ const Auth = {
       window.location.href = this._loginPath() + "?next=" + encodeURIComponent(window.location.href);
   },
 
-  injectBadge() {
+  // ── ສະແດງ badge ເທິງນາວບາ (sync ກັບ Supabase) ──
+  async injectBadge() {
     const session = this.getSession();
     document.getElementById("authBadge")?.remove();
     const badge = document.createElement("div");
@@ -149,15 +150,38 @@ const Auth = {
       const loginPath = this._loginPath();
       badge.innerHTML = `<a href="${loginPath}" style="background:#1050a0;color:#fff;padding:5px 14px;border-radius:99px;font-size:0.78rem;font-weight:700;text-decoration:none;">🔑 Login</a>`;
     } else {
-      // Logged in — ສະແດງຊື່ + ອອກ
+      // Logged in — ສະແດງຊື່ + ໂຄຕ້າຈາກ Supabase
       const roleEmoji  = { admin:"🔑", press:"🎤", user:"👤" }[session.role] || "👤";
-      const remaining  = RateLimit.remaining(session.userId, session.limit);
+
+      // Fetch usage ຈາກ Supabase, fallback ໄປ localStorage ຖ້າ network fail
+      let remaining = RateLimit.remaining(session.userId, session.limit);
+      try {
+        const res = await fetch(`${SUPABASE_URL}/rest/v1/rpc/get_ai_usage`, {
+          method: "POST",
+          headers: {
+            "Content-Type":  "application/json",
+            "Authorization": `Bearer ${session.accessToken}`,
+            "apikey":        SUPABASE_KEY,
+          },
+          body: JSON.stringify({ p_user_id: session.userId })
+        });
+        if (res.ok) {
+          const data = await res.json();
+          remaining = Math.max(0, session.limit - (data.used || 0));
+        }
+      } catch (e) { /* ໃຊ້ fallback value ທີ່ກຳນົດໄວ້ຂ້າງເທິງ */ }
+
       const limitBadge = session.role === "admin" ? "" :
-        `<span style="background:${remaining<=2?'#ffdede':'#e0f2ff'};color:${remaining<=2?'#c0392b':'#1050a0'};padding:1px 7px;border-radius:99px;font-size:0.72rem;font-weight:700;">AI ${remaining}/${session.limit}</span>`;
+        `<span id="navbarAiBadge" style="background:${remaining<=2?'#ffdede':'#e0f2ff'};color:${remaining<=2?'#c0392b':'#1050a0'};padding:1px 7px;border-radius:99px;font-size:0.72rem;font-weight:700;">AI ${remaining}/${session.limit}</span>`;
       badge.innerHTML = `${roleEmoji} ${session.name} ${limitBadge}
         <button onclick="Auth.logout()" style="background:none;border:1px solid #ccd;padding:2px 9px;border-radius:99px;font-size:0.7rem;cursor:pointer;color:inherit;font-family:inherit;">ອອກ</button>`;
     }
     document.querySelector(".nav-container")?.appendChild(badge);
+  },
+
+  // ── ໃຫ້ ai-chat.js ເອີ້ນຫຼັງ send message ເພື່ອ refresh badge ເທິງ ──
+  async refreshBadge() {
+    return this.injectBadge();
   },
 
   _loginPath() {
@@ -166,7 +190,7 @@ const Auth = {
   }
 };
 
-// ── Rate Limit ──
+// ── Rate Limit (ຍັງໃຊ້ສຳລັບ guest + fallback) ──
 const RateLimit = {
   _key(userId) {
     return RATE_KEY_PFX + (userId||"guest") + "_" + new Date().toISOString().slice(0,10);
@@ -221,4 +245,3 @@ function showLoginRequiredPopup(action = 'ໃຊ້ feature ນີ້') {
   popup.addEventListener('click', e => { if (e.target === popup) popup.remove(); });
   document.body.appendChild(popup);
 }
-
