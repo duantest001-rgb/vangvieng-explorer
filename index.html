@@ -404,5 +404,49 @@
     }
   </script>
   <script src="js/active-trip.js"></script>
+  <script src="js/active-trip.js"></script>
+  
+  <script>
+    let slideIndex = 1;
+    let slideInterval;
+
+    // ລໍຖ້າໃຫ້ໜ້າເວັບໂຫຼດສຳເລັດແລ້ວຈຶ່ງເອີ້ນໃຊ້
+    document.addEventListener("DOMContentLoaded", function() {
+      showSlides(slideIndex);
+      startAutoSlide();
+    });
+
+    function changeSlide(n) {
+      showSlides(slideIndex += n);
+      resetAutoSlide(); 
+    }
+
+    function showSlides(n) {
+      let i;
+      let slides = document.getElementsByClassName("event-slide");
+      if (slides.length === 0) return; // ປ້ອງກັນ Error ຖ້າບໍ່ມີສະໄລ້
+      
+      if (n > slides.length) {slideIndex = 1}    
+      if (n < 1) {slideIndex = slides.length}
+      
+      for (i = 0; i < slides.length; i++) {
+        slides[i].style.display = "none";  
+      }
+      slides[slideIndex-1].style.display = "block";  
+    }
+
+    function startAutoSlide() {
+      slideInterval = setInterval(function() {
+        changeSlide(1);
+      }, 5000); 
+    }
+
+    function resetAutoSlide() {
+      clearInterval(slideInterval);
+      startAutoSlide();
+    }
+  </script>
+</body>
+</html>
 </body>
 </html>
