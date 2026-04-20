@@ -1,59 +1,52 @@
-/* ═══════════════════════════════════════════════
-   Supabase Config — v2 (retry + timeout)
-═══════════════════════════════════════════════ */
-const SUPABASE_URL = "https://axqgotrbnglssxhwkfjc.supabase.co";
-const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImF4cWdvdHJibmdsc3N4aHdrZmpjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI0MDQ4NzgsImV4cCI6MjA4Nzk4MDg3OH0.yUGLC-dSAJ3YhfFtws-p_P4mBwyma85GvA1uHoeGtJg";
+/**
+ * 🌿 VangVieng Explorer - Supabase API Client
+ * Optimized for performance and error handling.
+ */
+const supabaseUrl = 'https://axqgotrbnglssxhwkfjc.supabase.co';
+const supabaseKey = 'YOUR_SUPABASE_ANON_KEY'; // ກະລຸນາວາງ Key ຂອງເຈົ້າໃສ່ນີ້
+const supabase = supabase.createClient(supabaseUrl, supabaseKey);
 
-// ── Fetch with timeout helper ──
-async function fetchWithTimeout(url, options = {}, timeout = 8000) {
-  const controller = new AbortController();
-  const id = setTimeout(() => controller.abort(), timeout);
-  try {
-    const res = await fetch(url, { ...options, signal: controller.signal });
-    clearTimeout(id);
-    return res;
-  } catch (e) {
-    clearTimeout(id);
-    throw e;
-  }
-}
+const vveApi = {
+    // ດຶງຂໍ້ມູນສະຖານທີ່ທັງໝົດ ພ້ອມລະບົບ Filter
+    async getPlaces(options = {}) {
+        try {
+            let query = supabase.from('places').select('*');
 
-// ── Supabase REST API helper ──
-const db = {
-  async getPlaces(filters = {}, retries = 2) {
-    let url = `${SUPABASE_URL}/rest/v1/places?select=*&order=rating.desc.nullslast,id.asc`;
-    if (filters.category) url += `&category=eq.${filters.category}`;
-    if (filters.eco)      url += `&is_eco=eq.true`;
-    if (filters.search)   url += `&or=(name.ilike.*${encodeURIComponent(filters.search)}*,description.ilike.*${encodeURIComponent(filters.search)}*,name_en.ilike.*${encodeURIComponent(filters.search)}*)`;
+            if (options.category && options.category !== 'all') {
+                query = query.eq('category', options.category);
+            }
+            if (options.is_eco) {
+                query = query.eq('is_eco', true);
+            }
 
-    const headers = {
-      "apikey": SUPABASE_KEY,
-      "Authorization": `Bearer ${SUPABASE_KEY}`,
-      "Content-Type": "application/json"
-    };
+            // ລຽງລໍາດັບຕາມ Rating ຫຼື ວັນທີ
+            const orderBy = options.orderBy || 'rating';
+            query = query.order(orderBy, { ascending: false });
 
-    for (let attempt = 0; attempt <= retries; attempt++) {
-      try {
-        const res = await fetchWithTimeout(url, { headers });
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        return await res.json();
-      } catch (err) {
-        if (attempt === retries) throw new Error("ດຶງຂໍ້ມູນຜິດພາດ: " + err.message);
-        await new Promise(r => setTimeout(r, 1000 * (attempt + 1))); // exponential backoff
-      }
+            const { data, error } = await query;
+            if (error) throw error;
+            return data;
+        } catch (err) {
+            console.error("API Error [getPlaces]:", err.message);
+            vveApp.showToast("ບໍ່ສາມາດດຶງຂໍ້ມູນສະຖານທີ່ໄດ້", "error");
+            return [];
+        }
+    },
+
+    // ດຶງຂໍ້ມູນສະຖານທີ່ດຽວຕາມ ID
+    async getPlaceById(id) {
+        try {
+            const { data, error } = await supabase
+                .from('places')
+                .select('*')
+                .eq('id', id)
+                .single();
+            
+            if (error) throw error;
+            return data;
+        } catch (err) {
+            console.error("API Error [getPlaceById]:", err.message);
+            return null;
+        }
     }
-  },
-
-  async getPlaceById(id) {
-    const url = `${SUPABASE_URL}/rest/v1/places?id=eq.${id}&select=*`;
-    const res = await fetchWithTimeout(url, {
-      headers: {
-        "apikey": SUPABASE_KEY,
-        "Authorization": `Bearer ${SUPABASE_KEY}`
-      }
-    });
-    if (!res.ok) throw new Error("ດຶງຂໍ້ມູນຜິດພາດ");
-    const data = await res.json();
-    return data[0] || null;
-  }
 };
