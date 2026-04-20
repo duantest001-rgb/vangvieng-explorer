@@ -6,94 +6,40 @@
 // ── MOCK DATA (Phase 2 ຈະດຶງຈາກ Supabase ແທນ) ──
 const PLACES_DATA = [
   {
-    id: 1,
-    name: "ຖ້ຳທາມ ພູຄາມ",
-    name_en: "Tham Phu Kham Cave",
-    category: "attraction",
+    id: 1, name: "ຖ້ຳທາມ ພູຄາມ", name_en: "Tham Phu Kham Cave", category: "attraction",
     description: "ຖ້ຳທີ່ສວຍງາມ ພ້ອມ Blue Lagoon ທີ່ຮູ້ຈັກທົ່ວໂລກ ເໝາະສຳລັບລອຍນ້ຳ ແລະ ສຳຫຼວດ",
-    address: "4km ຈາກຕົວເມືອງ",
-    lat: 18.9167, lng: 102.4333,
-    image_emoji: "🏔️",
-    image_bg: "#d4eddf",
-    price_range: "$",
-    rating: 4.7,
-    is_eco: true,
-    tags: "ທ່ອງທ່ຽວ,ນ້ຳ,ຖ້ຳ"
+    address: "4km ຈາກຕົວເມືອງ", lat: 18.9167, lng: 102.4333, image_emoji: "🏔️",
+    image_bg: "#d4eddf", price_range: "$", rating: 4.7, is_eco: true, tags: "ທ່ອງທ່ຽວ,ນ້ຳ,ຖ້ຳ"
   },
   {
-    id: 2,
-    name: "Blue Lagoon 2",
-    name_en: "Blue Lagoon 2",
-    category: "attraction",
+    id: 2, name: "Blue Lagoon 2", name_en: "Blue Lagoon 2", category: "attraction",
     description: "ສະລອຍນ້ຳທຳມະຊາດທີ່ງຽບສະຫງົບ ນ້ຳສີຟ້າໃສ ບ່ອນທ່ຽວທີ່ຄົນຮູ້ຈັກໜ້ອຍກວ່າ",
-    address: "7km ຈາກຕົວເມືອງ",
-    lat: 18.9300, lng: 102.4500,
-    image_emoji: "💙",
-    image_bg: "#d8e8ff",
-    price_range: "$",
-    rating: 4.5,
-    is_eco: true,
-    tags: "ນ້ຳ,ທ່ອງທ່ຽວ"
+    address: "7km ຈາກຕົວເມືອງ", lat: 18.9300, lng: 102.4500, image_emoji: "💙",
+    image_bg: "#d8e8ff", price_range: "$", rating: 4.5, is_eco: true, tags: "ນ້ຳ,ທ່ອງທ່ຽວ"
   },
   {
-    id: 3,
-    name: "ວ້ານ ວຽງ ວິວ ຣີສອດ",
-    name_en: "Vang Vieng View Resort",
-    category: "hotel",
+    id: 3, name: "ວ້ານ ວຽງ ວິວ ຣີສອດ", name_en: "Vang Vieng View Resort", category: "hotel",
     description: "ຣີສອດທີ່ສວຍງາມ ມອງເຫັນທ້ອງທົ່ງ ແລະ ພູ Nam Xay ພ້ອມ infinity pool",
-    address: "ໃຈກາງຕົວເມືອງ",
-    lat: 18.9228, lng: 102.4441,
-    image_emoji: "🏨",
-    image_bg: "#fdf0d0",
-    price_range: "$$$",
-    rating: 4.8,
-    is_eco: false,
-    tags: "resort,pool,view"
+    address: "ໃຈກາງຕົວເມືອງ", lat: 18.9228, lng: 102.4441, image_emoji: "🏨",
+    image_bg: "#fdf0d0", price_range: "$$$", rating: 4.8, is_eco: false, tags: "resort,pool,view"
   },
   {
-    id: 4,
-    name: "ຮ້ານ ສ່ວງໃຈ",
-    name_en: "Suang Jai Restaurant",
-    category: "restaurant",
+    id: 4, name: "ຮ້ານ ສ່ວງໃຈ", name_en: "Suang Jai Restaurant", category: "restaurant",
     description: "ອາຫານລາວແທ້ ລ້ວງຈາກສ່ວນຄົວທ້ອງຖິ່ນ ລາຄາໄມ່ແພງ ບ່ອນນັ່ງທ່ຽວຊິວ",
-    address: "ຖະໜົນຫຼວງ, ໃຈກາງ",
-    lat: 18.9215, lng: 102.4430,
-    image_emoji: "🍜",
-    image_bg: "#ffe0cc",
-    price_range: "$",
-    rating: 4.6,
-    is_eco: false,
-    tags: "ອາຫານລາວ,local,ລາຄາຖືກ"
+    address: "ຖະໜົນຫຼວງ, ໃຈກາງ", lat: 18.9215, lng: 102.4430, image_emoji: "🍜",
+    image_bg: "#ffe0cc", price_range: "$", rating: 4.6, is_eco: false, tags: "ອາຫານລາວ,local,ລາຄາຖືກ"
   },
   {
-    id: 5,
-    name: "ລ້ອງຄາຍັກ ນາມຊອງ",
-    name_en: "Nam Song Kayak",
-    category: "activity",
+    id: 5, name: "ລ້ອງຄາຍັກ ນາມຊອງ", name_en: "Nam Song Kayak", category: "activity",
     description: "ລ້ອງຄາຍັກໃນແມ່ນ້ຳ Nam Song ໄດ້ 2-4 ຊົ່ວໂມງ ຜ່ານທ້ອງທົ່ງ ແລະ ຖ້ຳ",
-    address: "ທ່າ North ຂອງຕົວເມືອງ",
-    lat: 18.9280, lng: 102.4420,
-    image_emoji: "🛶",
-    image_bg: "#d8e8ff",
-    price_range: "$$",
-    rating: 4.9,
-    is_eco: true,
-    tags: "adventure,ນ້ຳ,kayak"
+    address: "ທ່າ North ຂອງຕົວເມືອງ", lat: 18.9280, lng: 102.4420, image_emoji: "🛶",
+    image_bg: "#d8e8ff", price_range: "$$", rating: 4.9, is_eco: true, tags: "adventure,ນ້ຳ,kayak"
   },
   {
-    id: 6,
-    name: "The Hive Cafe",
-    name_en: "The Hive Cafe",
-    category: "restaurant",
+    id: 6, name: "The Hive Cafe", name_en: "The Hive Cafe", category: "restaurant",
     description: "Specialty coffee ເກດດີ ແລະ ຂອງຫວານ ບ່ອນນັ່ງຮ່ອງໆ ຕິດ balcony ມອງແມ່ນ້ຳ",
-    address: "ຖະໜົນ Luang Prabang",
-    lat: 18.9220, lng: 102.4445,
-    image_emoji: "☕",
-    image_bg: "#fdf0d0",
-    price_range: "$$",
-    rating: 4.5,
-    is_eco: false,
-    tags: "cafe,coffee,breakfast"
+    address: "ຖະໜົນ Luang Prabang", lat: 18.9220, lng: 102.4445, image_emoji: "☕",
+    image_bg: "#fdf0d0", price_range: "$$", rating: 4.5, is_eco: false, tags: "cafe,coffee,breakfast"
   }
 ];
 
@@ -105,12 +51,11 @@ window.addEventListener('scroll', () => {
   } else {
     navbar.classList.remove('scrolled');
   }
-  // Back-to-top visibility
   const btn = document.getElementById('backToTop');
   if (btn) btn.classList.toggle('visible', window.scrollY > 400);
 });
 
-// ── HAMBURGER MENU — with X animation ──
+// ── HAMBURGER MENU ──
 const hamburger = document.getElementById('hamburger');
 const navLinks = document.getElementById('navLinks');
 if (hamburger && navLinks) {
@@ -124,7 +69,6 @@ if (hamburger && navLinks) {
       hamburger.classList.remove('active');
     });
   });
-  // Close on outside click
   document.addEventListener('click', (e) => {
     if (!hamburger.contains(e.target) && !navLinks.contains(e.target)) {
       navLinks.classList.remove('open');
@@ -133,7 +77,7 @@ if (hamburger && navLinks) {
   });
 }
 
-// ── SEARCH with debounce ──
+// ── SEARCH ──
 function handleSearch() {
   const query = document.getElementById('heroSearch')?.value?.trim();
   if (query) {
@@ -220,7 +164,7 @@ function renderPlaceCard(place) {
   `;
 }
 
-// ── LOAD STATS with retry ──
+// ── LOAD STATS ──
 async function loadStats(retries = 2) {
   try {
     const data = await db.getPlaces();
@@ -237,14 +181,12 @@ async function loadStats(retries = 2) {
       }
     });
   } catch (err) {
-    if (retries > 0) {
-      setTimeout(() => loadStats(retries - 1), 2000);
-    }
+    if (retries > 0) setTimeout(() => loadStats(retries - 1), 2000);
     console.error("Stats error:", err);
   }
 }
 
-// ── RENDER FEATURED with retry ──
+// ── RENDER FEATURED ──
 async function renderFeatured(retries = 2) {
   const grid = document.getElementById("featuredGrid");
   if (!grid) return;
@@ -277,20 +219,6 @@ function goToDetail(id) {
   window.location.href = `pages/detail.html?id=${id}`;
 }
 
-// ── INIT ──
-document.addEventListener('DOMContentLoaded', () => {
-  renderFeatured();
-  loadStats();
-
-  // Back-to-top button
-  const btt = document.createElement('button');
-  btt.id = 'backToTop';
-  btt.className = 'back-to-top';
-  btt.innerHTML = '↑';
-  btt.setAttribute('aria-label', 'ກັບຂຶ້ນເທິງ');
-  btt.onclick = () => window.scrollTo({ top: 0, behavior: 'smooth' });
-  document.body.appendChild(btt);
-});
 // ==========================================
 // ລະບົບ Event Slider (ດຶງຂໍ້ມູນຈາກ Supabase)
 // ==========================================
@@ -299,11 +227,9 @@ let slideInterval;
 
 async function loadEventSliders() {
   const container = document.getElementById('sliderContainer');
-  // ຖ້າບໍ່ມີກ່ອງນີ້ໃນໜ້າເວັບ (ເຊັ່ນຢູ່ໜ້າອື່ນ) ໃຫ້ຂ້າມການເຮັດວຽກໄປເລີຍ ເພື່ອບໍ່ໃຫ້ເກີດ Error
   if (!container) return; 
   
   try {
-    // ດຶງຂໍ້ມູນຈາກ Supabase (ສະເພາະ Event ທີ່ເປີດໃຊ້ງານ: is_active = true)
     const { data: events, error } = await supabase
       .from('event_sliders')
       .select('*')
@@ -317,7 +243,6 @@ async function loadEventSliders() {
       return;
     }
 
-    // ສ້າງ HTML ຈາກຂໍ້ມູນທີ່ດຶງມາ
     let htmlContent = '';
     events.forEach(event => {
       htmlContent += `
@@ -331,7 +256,6 @@ async function loadEventSliders() {
       `;
     });
 
-    // ໃສ່ປຸ່ມກົດ ຊ້າຍ-ຂວາ ຖ້າມີຫຼາຍກວ່າ 1 ຮູບ
     if (events.length > 1) {
       htmlContent += `
         <a class="prev-btn" onclick="changeSlide(-1)">&#10094;</a>
@@ -339,23 +263,19 @@ async function loadEventSliders() {
       `;
     }
 
-    // ເອົາ HTML ໄປຍັດໃສ່ໃນໜ້າເວັບ
     container.innerHTML = htmlContent;
 
-    // ເອີ້ນໃຊ້ຟັງຊັນໃຫ້ Slider ເລີ່ມເຮັດວຽກ
     slideIndex = 1;
     showSlides(slideIndex);
     if (events.length > 1) {
       startAutoSlide();
     }
-
   } catch (err) {
     console.error("Error loading sliders:", err);
     container.innerHTML = '<p style="text-align:center;">ເກີດຂໍ້ຜິດພາດໃນການດຶງຂໍ້ມູນ</p>';
   }
 }
 
-// ຟັງຊັນສຳລັບປຸ່ມກົດ ຊ້າຍ-ຂວາ (ໃຊ້ window. ເພື່ອໃຫ້ HTML ເອີ້ນໃຊ້ໄດ້ງ່າຍ)
 window.changeSlide = function(n) {
   showSlides(slideIndex += n);
   resetAutoSlide(); 
@@ -378,7 +298,7 @@ function showSlides(n) {
 function startAutoSlide() {
   slideInterval = setInterval(function() {
     changeSlide(1);
-  }, 5000); // ປ່ຽນຮູບທຸກໆ 5 ວິນາທີ
+  }, 5000);
 }
 
 function resetAutoSlide() {
@@ -386,8 +306,18 @@ function resetAutoSlide() {
   startAutoSlide();
 }
 
-// ໃຫ້ລະບົບເລີ່ມດຶງຂໍ້ມູນທັນທີ ເມື່ອໜ້າເວັບໂຫຼດສຳເລັດ
+// ── INIT (ລວມການໂຫຼດທຸກຢ່າງໄວ້ບ່ອນດຽວ) ──
 document.addEventListener('DOMContentLoaded', () => {
-  loadEventSliders();
+  renderFeatured();
+  loadStats();
+  loadEventSliders(); // ເອີ້ນໃຊ້ສະໄລ້ຮູບພາບ
+
+  // Back-to-top button
+  const btt = document.createElement('button');
+  btt.id = 'backToTop';
+  btt.className = 'back-to-top';
+  btt.innerHTML = '↑';
+  btt.setAttribute('aria-label', 'ກັບຂຶ້ນເທິງ');
+  btt.onclick = () => window.scrollTo({ top: 0, behavior: 'smooth' });
+  document.body.appendChild(btt);
 });
-// ==========================================
