@@ -320,6 +320,11 @@ async function sendMessage() {
       updateRateBadge();
     }
 
+    // Also refresh the navbar badge (top-right corner)
+    if (typeof Auth !== "undefined" && Auth.refreshBadge) {
+      Auth.refreshBadge();
+    }
+
     await typewriterMessage(result.reply);
     chatHistory.push({ role: "assistant", content: result.reply });
   } catch (err) {
@@ -333,6 +338,7 @@ async function sendMessage() {
         true
       );
       updateRateBadgeFromServer({ used: err.limit, remaining: 0, limit: err.limit });
+      if (typeof Auth !== "undefined" && Auth.refreshBadge) Auth.refreshBadge();
     } else {
       const errMsg = err?.message || String(err);
       appendMessage("bot",
