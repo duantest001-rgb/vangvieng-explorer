@@ -1,51 +1,49 @@
 /**
  * 🌿 VangVieng Explorer - Supabase API Client
- * Optimized for performance and error handling.
  */
 const supabaseUrl = 'https://axqgotrbnglssxhwkfjc.supabase.co';
-const supabaseKey = 'YOUR_SUPABASE_ANON_KEY'; // ກະລຸນາວາງ Key ຂອງເຈົ້າໃສ່ນີ້
-const supabase = supabase.createClient(supabaseUrl, supabaseKey);
+const supabaseKey = 'YOUR_SUPABASE_ANON_KEY'; // ເອົາ Key ແທ້ຂອງເຈົ້າວາງໃສ່ນີ້
+
+let supabase;
+try {
+    if (window.supabase) {
+        supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+    } else {
+        console.warn("ຍັງບໍ່ໄດ້ໂຫຼດ Supabase Script ຈາກ CDN");
+    }
+} catch (e) {
+    console.error("Supabase Init Error:", e.message);
+}
 
 const vveApi = {
-    // ດຶງຂໍ້ມູນສະຖານທີ່ທັງໝົດ ພ້ອມລະບົບ Filter
+    // ຟັງຊັນດຶງຂໍ້ມູນສະຖານທີ່ທັງໝົດ
     async getPlaces(options = {}) {
+        if (!supabase) return []; // ປ້ອງກັນໜ້າຈໍຂາວຖ້າເຊື່ອມຕໍ່ບໍ່ໄດ້
+        
         try {
             let query = supabase.from('places').select('*');
+            if (options.category && options.category !== 'all') query = query.eq('category', options.category);
+            if (options.is_eco) query = query.eq('is_eco', true);
 
-            if (options.category && options.category !== 'all') {
-                query = query.eq('category', options.category);
-            }
-            if (options.is_eco) {
-                query = query.eq('is_eco', true);
-            }
-
-            // ລຽງລໍາດັບຕາມ Rating ຫຼື ວັນທີ
-            const orderBy = options.orderBy || 'rating';
-            query = query.order(orderBy, { ascending: false });
-
-            const { data, error } = await query;
+            const { data, error } = await query.order('rating', { ascending: false });
             if (error) throw error;
             return data;
         } catch (err) {
-            console.error("API Error [getPlaces]:", err.message);
-            vveApp.showToast("ບໍ່ສາມາດດຶງຂໍ້ມູນສະຖານທີ່ໄດ້", "error");
+            console.error("Fetch Error:", err.message);
             return [];
         }
     },
 
-    // ດຶງຂໍ້ມູນສະຖານທີ່ດຽວຕາມ ID
+    // ຟັງຊັນດຶງຂໍ້ມູນສະຖານທີ່ດຽວ (ສຳລັບໜ້າ Detail)
     async getPlaceById(id) {
+        if (!supabase) return null;
+        
         try {
-            const { data, error } = await supabase
-                .from('places')
-                .select('*')
-                .eq('id', id)
-                .single();
-            
+            const { data, error } = await supabase.from('places').select('*').eq('id', id).single();
             if (error) throw error;
             return data;
         } catch (err) {
-            console.error("API Error [getPlaceById]:", err.message);
+            console.error("Fetch Error [getPlaceById]:", err.message);
             return null;
         }
     }
