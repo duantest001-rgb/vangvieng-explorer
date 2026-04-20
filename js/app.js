@@ -291,3 +291,103 @@ document.addEventListener('DOMContentLoaded', () => {
   btt.onclick = () => window.scrollTo({ top: 0, behavior: 'smooth' });
   document.body.appendChild(btt);
 });
+// ==========================================
+// ລະບົບ Event Slider (ດຶງຂໍ້ມູນຈາກ Supabase)
+// ==========================================
+let slideIndex = 1;
+let slideInterval;
+
+async function loadEventSliders() {
+  const container = document.getElementById('sliderContainer');
+  // ຖ້າບໍ່ມີກ່ອງນີ້ໃນໜ້າເວັບ (ເຊັ່ນຢູ່ໜ້າອື່ນ) ໃຫ້ຂ້າມການເຮັດວຽກໄປເລີຍ ເພື່ອບໍ່ໃຫ້ເກີດ Error
+  if (!container) return; 
+  
+  try {
+    // ດຶງຂໍ້ມູນຈາກ Supabase (ສະເພາະ Event ທີ່ເປີດໃຊ້ງານ: is_active = true)
+    const { data: events, error } = await supabase
+      .from('event_sliders')
+      .select('*')
+      .eq('is_active', true)
+      .order('created_at', { ascending: false });
+
+    if (error) throw error;
+
+    if (events.length === 0) {
+      container.innerHTML = '<p style="text-align:center;">ຍັງບໍ່ມີກິດຈະກຳໃນຕອນນີ້</p>';
+      return;
+    }
+
+    // ສ້າງ HTML ຈາກຂໍ້ມູນທີ່ດຶງມາ
+    let htmlContent = '';
+    events.forEach(event => {
+      htmlContent += `
+        <div class="event-slide fade">
+          <img src="${event.image_url}" alt="${event.title}" style="width:100%; border-radius: 12px; height: 400px; object-fit: cover;">
+          <div class="event-text">
+            <h3>${event.title}</h3>
+            <p>${event.description}</p>
+          </div>
+        </div>
+      `;
+    });
+
+    // ໃສ່ປຸ່ມກົດ ຊ້າຍ-ຂວາ ຖ້າມີຫຼາຍກວ່າ 1 ຮູບ
+    if (events.length > 1) {
+      htmlContent += `
+        <a class="prev-btn" onclick="changeSlide(-1)">&#10094;</a>
+        <a class="next-btn" onclick="changeSlide(1)">&#10095;</a>
+      `;
+    }
+
+    // ເອົາ HTML ໄປຍັດໃສ່ໃນໜ້າເວັບ
+    container.innerHTML = htmlContent;
+
+    // ເອີ້ນໃຊ້ຟັງຊັນໃຫ້ Slider ເລີ່ມເຮັດວຽກ
+    slideIndex = 1;
+    showSlides(slideIndex);
+    if (events.length > 1) {
+      startAutoSlide();
+    }
+
+  } catch (err) {
+    console.error("Error loading sliders:", err);
+    container.innerHTML = '<p style="text-align:center;">ເກີດຂໍ້ຜິດພາດໃນການດຶງຂໍ້ມູນ</p>';
+  }
+}
+
+// ຟັງຊັນສຳລັບປຸ່ມກົດ ຊ້າຍ-ຂວາ (ໃຊ້ window. ເພື່ອໃຫ້ HTML ເອີ້ນໃຊ້ໄດ້ງ່າຍ)
+window.changeSlide = function(n) {
+  showSlides(slideIndex += n);
+  resetAutoSlide(); 
+}
+
+function showSlides(n) {
+  let i;
+  let slides = document.getElementsByClassName("event-slide");
+  if (slides.length === 0) return; 
+  
+  if (n > slides.length) {slideIndex = 1}    
+  if (n < 1) {slideIndex = slides.length}
+  
+  for (i = 0; i < slides.length; i++) {
+    slides[i].style.display = "none";  
+  }
+  slides[slideIndex-1].style.display = "block";  
+}
+
+function startAutoSlide() {
+  slideInterval = setInterval(function() {
+    changeSlide(1);
+  }, 5000); // ປ່ຽນຮູບທຸກໆ 5 ວິນາທີ
+}
+
+function resetAutoSlide() {
+  clearInterval(slideInterval);
+  startAutoSlide();
+}
+
+// ໃຫ້ລະບົບເລີ່ມດຶງຂໍ້ມູນທັນທີ ເມື່ອໜ້າເວັບໂຫຼດສຳເລັດ
+document.addEventListener('DOMContentLoaded', () => {
+  loadEventSliders();
+});
+// ==========================================
