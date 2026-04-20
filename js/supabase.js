@@ -2,7 +2,7 @@
  * 🌿 VangVieng Explorer - Supabase API Client
  */
 const supabaseUrl = 'https://axqgotrbnglssxhwkfjc.supabase.co';
-const supabaseKey = 'YOUR_SUPABASE_ANON_KEY'; // ເອົາ Key ແທ້ຂອງເຈົ້າວາງໃສ່ນີ້
+const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImF4cWdvdHJibmdsc3N4aHdrZmpjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI0MDQ4NzgsImV4cCI6MjA4Nzk4MDg3OH0.yUGLC-dSAJ3YhfFtws-p_P4mBwyma85GvA1uHoeGtJg'; // ເອົາ Key ແທ້ຂອງເຈົ້າວາງໃສ່ນີ້
 
 let supabase;
 try {
