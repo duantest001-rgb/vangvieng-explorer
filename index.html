@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>VangVieng Explorer 🌿 — ສຳຫຼວດວັງວຽງ ລາວ</title>
 
-  <!-- SEO -->
   <meta name="description" content="ສຳຫຼວດວັງວຽງ ລາວ — ສະຖານທີ່ທ່ອງທ່ຽວ, ທີ່ພັກ, ຮ້ານອາຫານ, ກິດຈະກຳ. Discover Vang Vieng attractions, hotels, restaurants and activities powered by AI.">
   <meta name="keywords" content="Vang Vieng, ວັງວຽງ, Laos, ລາວ, tourism, travel, eco tourism, Blue Lagoon, Tham Chang, kayak, zipline">
   <meta name="author" content="VangVieng Explorer">
@@ -13,7 +12,6 @@
   <meta name="google-site-verification" content="aIEkSNs_3NFdKV3iaKgwpjX4M2gqIAVR-UfDAykAiaM">
   <link rel="canonical" href="https://duantest001-rgb.github.io/vangvieng-explorer/">
 
-  <!-- Open Graph (Facebook, Line, WhatsApp) -->
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://duantest001-rgb.github.io/vangvieng-explorer/">
   <meta property="og:title" content="VangVieng Explorer — ສຳຫຼວດວັງວຽງ ລາວ">
@@ -23,13 +21,11 @@
   <meta property="og:locale:alternate" content="en_US">
   <meta property="og:site_name" content="VangVieng Explorer">
 
-  <!-- Twitter Card -->
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="VangVieng Explorer — ສຳຫຼວດວັງວຽງ">
   <meta name="twitter:description" content="ສະຖານທີ່ທ່ອງທ່ຽວ, ທີ່ພັກ, ຮ້ານອາຫານ ວັງວຽງ ໂດຍ AI">
   <meta name="twitter:image" content="https://duantest001-rgb.github.io/vangvieng-explorer/assets/logo.png">
 
-  <!-- PWA -->
   <meta name="theme-color" content="#1050a0">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -77,7 +73,6 @@
     </div>
   </nav>
 
-  <!-- HERO -->
   <section class="hero">
     <div class="hero-bg">
       <div class="hero-shape s1"></div><div class="hero-shape s2"></div><div class="hero-shape s3"></div>
@@ -102,7 +97,6 @@
         <button class="tag" onclick="searchTag('adventure')" data-i18n="tag.adventure">🛶 Adventure</button>
         <button class="tag" onclick="searchTag('cafe')" data-i18n="tag.cafe">☕ Cafe</button>
       </div>
-      <!-- WEATHER + STATS WIDGETS -->
       <div class="hero-widgets">
         <div class="weather-widget" id="weatherWidget" style="display:none;">
           <span class="weather-icon" id="wIcon">🌤️</span>
@@ -125,10 +119,20 @@
       <div class="scroll-arrow">↓</div>
     </div>
   </section>
-<div class="event-slider-container" id="sliderContainer">
-  <p style="text-align: center; padding: 20px;">ກຳລັງໂຫຼດກິດຈະກຳ...</p>
-</div>
-  <!-- CATEGORIES -->
+
+  <section class="section event-section">
+    <div class="container">
+      <div class="section-header">
+        <p class="section-label">ອັບເດດລ່າສຸດ</p>
+        <h2 class="section-title">ກິດຈະກຳ & ອີເວັ້ນ</h2>
+      </div>
+      
+      <div class="event-slider-container" id="sliderContainer">
+        <p style="text-align: center; padding: 20px;">ກຳລັງໂຫຼດກິດຈະກຳ...</p>
+      </div>
+    </div>
+  </section>
+
   <section class="section categories-section">
     <div class="container">
       <div class="section-header">
@@ -172,7 +176,6 @@
     </div>
   </section>
 
-  <!-- BOOKING SECTION -->
   <section style="padding:3rem 0;background:linear-gradient(135deg,#071830,#0d2d54);">
     <div class="container">
       <div style="text-align:center;margin-bottom:2rem;">
@@ -210,7 +213,6 @@
     </div>
   </section>
 
-  <!-- FEATURED -->
   <section class="section featured-section">
     <div class="container">
       <div class="section-header">
@@ -222,7 +224,6 @@
     </div>
   </section>
 
-  <!-- ECO BANNER -->
   <section class="eco-banner">
     <div class="eco-bg-shapes"><div class="eco-shape e1"></div><div class="eco-shape e2"></div></div>
     <div class="container eco-content">
@@ -241,7 +242,6 @@
     </div>
   </section>
 
-  <!-- AI PROMO -->
   <section class="section ai-promo-section">
     <div class="container">
       <div class="ai-promo-card">
@@ -281,7 +281,6 @@
     if (promoSection) observer.observe(promoSection);
   </script>
 
-  <!-- FOOTER -->
   <footer class="footer">
     <div class="container footer-grid">
       <div class="footer-brand">
@@ -320,7 +319,6 @@
   <script>
     // ── WEATHER — Vang Vieng ──
     async function loadWeather() {
-      // ລອງ direct ກ່ອນ — ຖ້າ fail ໃຊ້ Worker proxy
       const WEATHER_URL = 'https://api.openweathermap.org/data/2.5/weather?lat=18.9167&lon=102.4500&appid=25e354c80aa4d1d062271734755205c4&units=metric';
       const PROXY_URL   = 'https://gemini-proxy.duan-test001.workers.dev/weather';
 
@@ -335,7 +333,6 @@
         try {
           data = await tryFetch(WEATHER_URL);
         } catch {
-          // fallback ຜ່ານ Worker
           data = await tryFetch(PROXY_URL);
         }
         const temp = Math.round(data.main.temp);
@@ -378,49 +375,5 @@
     }
   </script>
   <script src="js/active-trip.js"></script>
-  <script src="js/active-trip.js"></script>
-  
-  <script>
-    let slideIndex = 1;
-    let slideInterval;
-
-    // ລໍຖ້າໃຫ້ໜ້າເວັບໂຫຼດສຳເລັດແລ້ວຈຶ່ງເອີ້ນໃຊ້
-    document.addEventListener("DOMContentLoaded", function() {
-      showSlides(slideIndex);
-      startAutoSlide();
-    });
-
-    function changeSlide(n) {
-      showSlides(slideIndex += n);
-      resetAutoSlide(); 
-    }
-
-    function showSlides(n) {
-      let i;
-      let slides = document.getElementsByClassName("event-slide");
-      if (slides.length === 0) return; // ປ້ອງກັນ Error ຖ້າບໍ່ມີສະໄລ້
-      
-      if (n > slides.length) {slideIndex = 1}    
-      if (n < 1) {slideIndex = slides.length}
-      
-      for (i = 0; i < slides.length; i++) {
-        slides[i].style.display = "none";  
-      }
-      slides[slideIndex-1].style.display = "block";  
-    }
-
-    function startAutoSlide() {
-      slideInterval = setInterval(function() {
-        changeSlide(1);
-      }, 5000); 
-    }
-
-    function resetAutoSlide() {
-      clearInterval(slideInterval);
-      startAutoSlide();
-    }
-  </script>
-</body>
-</html>
 </body>
 </html>
