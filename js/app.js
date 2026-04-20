@@ -1,9 +1,8 @@
 /**
  * 🌿 VangVieng Explorer - Main App Logic
- * Handle UI rendering and Global interactions.
  */
 const vveApp = {
-    // ສ້າງ HTML Card ສໍາລັບສະຖານທີ່
+    // ຟັງຊັນສ້າງໂຄງສ້າງ Card
     renderPlaceCard(place) {
         return `
             <div class="place-card" data-aos="fade-up">
@@ -29,7 +28,7 @@ const vveApp = {
         `;
     },
 
-    // ລະບົບແຈ້ງເຕືອນ (Toast)
+    // ຟັງຊັນແຈ້ງເຕືອນ
     showToast(message, type = 'info') {
         const toast = document.createElement('div');
         toast.className = `toast toast-${type}`;
@@ -40,29 +39,45 @@ const vveApp = {
             </div>
         `;
         document.body.appendChild(toast);
-        
         setTimeout(() => {
             toast.style.opacity = '0';
             setTimeout(() => toast.remove(), 500);
         }, 3000);
     },
 
-    // ການຈັດການ Navigation
+    // ຟັງຊັນຈັດການເມນູ
     initNav() {
         const nav = document.querySelector('nav');
-        window.addEventListener('scroll', () => {
-            if (window.scrollY > 50) {
-                nav.style.padding = '0.7rem 5%';
-                nav.style.boxShadow = '0 5px 20px rgba(0,0,0,0.1)';
-            } else {
-                nav.style.padding = '1rem 5%';
-                nav.style.boxShadow = 'none';
-            }
-        });
+        if(nav) {
+            window.addEventListener('scroll', () => {
+                if (window.scrollY > 50) {
+                    nav.style.padding = '0.7rem 5%';
+                    nav.style.boxShadow = '0 5px 20px rgba(0,0,0,0.1)';
+                } else {
+                    nav.style.padding = '1rem 5%';
+                    nav.style.boxShadow = 'none';
+                }
+            });
+        }
     }
 };
 
-// Start App when DOM ready
-document.addEventListener('DOMContentLoaded', () => {
+// ສັ່ງໃຫ້ແອັບເລີ່ມເຮັດວຽກເມື່ອເປີດໜ້າເວັບ
+document.addEventListener('DOMContentLoaded', async () => {
     vveApp.initNav();
+    
+    // ດຶງຂໍ້ມູນມາສະແດງໃນໜ້າຫຼັກ (ຖ້າມີ ID 'places-grid')
+    const container = document.getElementById('places-grid');
+    if (container) {
+        container.innerHTML = "<p style='text-align:center; width:100%;'>ກຳລັງໂຫຼດຂໍ້ມູນ...</p>";
+        
+        // ເອີ້ນໃຊ້ຟັງຊັນດຶງຂໍ້ມູນຈາກ supabase.js
+        const places = await vveApi.getPlaces();
+        
+        if (places && places.length > 0) {
+            container.innerHTML = places.map(p => vveApp.renderPlaceCard(p)).join('');
+        } else {
+            container.innerHTML = "<p style='text-align:center; width:100%; color:#d32f2f; background:#ffebee; padding:15px; border-radius:10px;'>ຍັງບໍ່ມີຂໍ້ມູນ ຫຼື ບໍ່ສາມາດເຊື່ອມຕໍ່ຖານຂໍ້ມູນໄດ້ (ກະລຸນາໃສ່ API Key)</p>";
+        }
+    }
 });
