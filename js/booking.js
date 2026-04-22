@@ -45,6 +45,12 @@ function openBooking(type, placeId = null, placeName = '') {
             style="width:100%;padding:10px 14px;border:1.5px solid #d0d8ec;border-radius:10px;font-size:0.9rem;font-family:inherit;outline:none;">
         </div>
         <div>
+          <label style="font-size:0.78rem;font-weight:600;color:#3a4a6b;display:block;margin-bottom:5px;">📧 Email <span style="font-size:0.72rem;color:#9aa5be;font-weight:400;">(ສຳລັບຮັບໃບຢືນຢັນ)</span></label>
+          <input id="bk_email" type="email" placeholder="example@email.com"
+            value="${session.email || ''}"
+            style="width:100%;padding:10px 14px;border:1.5px solid #d0d8ec;border-radius:10px;font-size:0.9rem;font-family:inherit;outline:none;">
+        </div>
+        <div>
           <label style="font-size:0.78rem;font-weight:600;color:#3a4a6b;display:block;margin-bottom:5px;">📅 ${t('bk.date')} *</label>
           <input id="bk_date" type="date" min="${new Date().toISOString().slice(0,10)}"
             style="width:100%;padding:10px 14px;border:1.5px solid #d0d8ec;border-radius:10px;font-size:0.9rem;font-family:inherit;outline:none;">
@@ -154,6 +160,7 @@ function getTypeFields(type) {
 async function submitBooking(type, placeId, placeName, userId) {
   const name    = document.getElementById('bk_name')?.value.trim();
   const phone   = document.getElementById('bk_phone')?.value.trim();
+  const email   = document.getElementById('bk_email')?.value.trim() || null;
   const date    = document.getElementById('bk_date')?.value;
   const persons = parseInt(document.getElementById('bk_persons')?.value) || 1;
   const notes   = document.getElementById('bk_notes')?.value.trim();
@@ -167,7 +174,7 @@ async function submitBooking(type, placeId, placeName, userId) {
   const data = {
     user_id:      session?.userId || null,
     booking_type: type,
-    name, phone, date, persons, notes,
+    name, phone, email, date, persons, notes,
     place_id:     placeId || null,
     place_name:   placeName || null,
     pickup:       document.getElementById('bk_pickup')?.value.trim() || null,
