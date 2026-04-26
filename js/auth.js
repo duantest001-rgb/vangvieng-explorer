@@ -193,7 +193,10 @@ const Auth = {
 // ── Rate Limit (ຍັງໃຊ້ສຳລັບ guest + fallback) ──
 const RateLimit = {
   _key(userId) {
-    return RATE_KEY_PFX + (userId||"guest") + "_" + new Date().toISOString().slice(0,10);
+    // ໃຊ້ local date (UTC+7) ບໍ່ແມ່ນ UTC — ເພື່ອ reset ຖືກຕ້ອງຕາມເວລາລາວ
+    const now = new Date();
+    const localDate = new Date(now.getTime() + (7 * 60 * 60 * 1000));
+    return RATE_KEY_PFX + (userId||"guest") + "_" + localDate.toISOString().slice(0,10);
   },
   usedToday(userId) {
     try { return parseInt(localStorage.getItem(this._key(userId))||"0",10); } catch { return 0; }
