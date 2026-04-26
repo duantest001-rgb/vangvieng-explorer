@@ -117,15 +117,34 @@ format:
 
 ກົດ: ${pace === '🌿 ສະບາຍໆ' ? 'ສູງສຸດ 2 stops/ວັນ' : pace === '🔥 ເຕັມທີ່' ? '4-5 stops/ວັນ' : '3 stops/ວັນ'}`;
 
-    // 4. Call Claude via Worker
+    // 4. Call Claude via Worker (ສົ່ງ auth token ເພື່ອໃຫ້ Worker ຮັບຮູ້ user + quota)
+    const session = (typeof Auth !== 'undefined') ? Auth.getSession() : null;
+    const planHeaders = { 'Content-Type': 'application/json' };
+    if (session?.accessToken) {
+      planHeaders['Authorization'] = `Bearer ${session.accessToken}`;
+    }
+
     const res = await fetch(AI_PROXY_URL, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: planHeaders,
       body: JSON.stringify({
         system: 'ເຈົ້າຕອບໄດ້ສະເພາະ JSON array ເທົ່ານັ້ນ ບໍ່ມີ text ອື່ນ',
         messages: [{ role: 'user', content: prompt }]
       })
     });
+
+    // ກວດໂຄຕາໝົດ
+    if (res.status === 429) {
+      const errData = await res.json().catch(() => ({}));
+      if (errData.error?.type === 'quota_exceeded') {
+        throw new Error(`⛔ ໝົດໂຄຕ້າ AI ວັນນີ້ (${errData.error.limit} ຄັ້ງ/ວັນ) — ມາໃໝ່ໄດ້ພຣຸ່ງນີ້`);
+      }
+      throw new Error('ໂຄຕ້າໝົດ ຫຼື request ຖືກ block — ລອງໃໝ່ຈາກ AI Chat');
+    }
+
+    if (!res.ok) {
+      throw new Error(`Worker error ${res.status} — ລອງໃໝ່ອີກຄັ້ງ`);
+    }
 
     const data = await res.json();
     const text = data.content?.[0]?.text || '[]';
