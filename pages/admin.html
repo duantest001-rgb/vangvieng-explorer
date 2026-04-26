@@ -465,6 +465,58 @@
     </div>
   </div><!-- end sectionDashboard -->
 
+  <!-- TAB: BOOKINGS -->
+  <div id="sectionBookings" style="display:none;">
+    <div style="padding:24px; max-width:1400px; margin:0 auto;">
+
+      <!-- Stats row -->
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px;">
+        <div class="stat-card blue"><div class="num" id="bkTotal">-</div><div class="lbl">ທັງໝົດ</div></div>
+        <div class="stat-card yellow"><div class="num" id="bkPending">-</div><div class="lbl">⏳ ລໍຖ້າ</div></div>
+        <div class="stat-card green"><div class="num" id="bkConfirmed">-</div><div class="lbl">✅ ຢືນຢັນ</div></div>
+        <div class="stat-card red"><div class="num" id="bkCancelled">-</div><div class="lbl">❌ ຍົກເລີກ</div></div>
+      </div>
+
+      <!-- Filters -->
+      <div style="display:flex;gap:12px;margin-bottom:16px;flex-wrap:wrap;">
+        <select class="filter-select" id="bkStatusFilter" onchange="filterBookings()">
+          <option value="">ທຸກສະຖານະ</option>
+          <option value="pending">⏳ ລໍຖ້າ</option>
+          <option value="confirmed">✅ ຢືນຢັນ</option>
+          <option value="cancelled">❌ ຍົກເລີກ</option>
+        </select>
+        <select class="filter-select" id="bkTypeFilter" onchange="filterBookings()">
+          <option value="">ທຸກປະເພດ</option>
+          <option value="activity">🏔️ ກິດຈະກຳ</option>
+          <option value="hotel">🏨 ທີ່ພັກ</option>
+          <option value="taxi">🚕 ລົດຮັບສົ່ງ</option>
+          <option value="bike">🛵 ລົດຈັກ</option>
+        </select>
+      </div>
+
+      <!-- Table -->
+      <div style="overflow-x:auto;">
+        <table style="width:100%;border-collapse:collapse;">
+          <thead>
+            <tr style="border-bottom:1px solid var(--border);">
+              <th style="padding:12px;text-align:left;font-size:0.78rem;color:var(--muted);text-transform:uppercase;">#ID</th>
+              <th style="padding:12px;text-align:left;font-size:0.78rem;color:var(--muted);text-transform:uppercase;">ປະເພດ</th>
+              <th style="padding:12px;text-align:left;font-size:0.78rem;color:var(--muted);text-transform:uppercase;">ຊື່ / Email</th>
+              <th style="padding:12px;text-align:left;font-size:0.78rem;color:var(--muted);text-transform:uppercase;">ເບີໂທ</th>
+              <th style="padding:12px;text-align:left;font-size:0.78rem;color:var(--muted);text-transform:uppercase;">ວັນທີ</th>
+              <th style="padding:12px;text-align:left;font-size:0.78rem;color:var(--muted);text-transform:uppercase;">ລາຍລະອຽດ</th>
+              <th style="padding:12px;text-align:left;font-size:0.78rem;color:var(--muted);text-transform:uppercase;">ສະຖານະ</th>
+              <th style="padding:12px;text-align:left;font-size:0.78rem;color:var(--muted);text-transform:uppercase;">ຈັດການ</th>
+            </tr>
+          </thead>
+          <tbody id="bookingsBody">
+            <tr><td colspan="8" style="text-align:center;padding:2rem;color:var(--muted);">⏳ ກຳລັງໂຫລດ...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div><!-- end sectionBookings -->
+
 <!-- ── ADD/EDIT MODAL ── -->
 <div class="modal-overlay" id="placeModal">
   <div class="modal">
@@ -1046,6 +1098,9 @@ function showToast(msg, type='success') {
 // ── BOOKINGS ──
 let allBookings = [];
 
+// ── N8N WEBHOOK URL ສຳລັບ trigger email ──
+const N8N_BOOKING_WEBHOOK = 'https://n8n.lao-trips.com/webhook/booking-action';
+
 async function loadBookings() {
   const body = document.getElementById('bookingsBody');
   body.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:2rem;color:var(--muted);">⏳ ກຳລັງໂຫລດ...</td></tr>';
@@ -1056,11 +1111,21 @@ async function loadBookings() {
     allBookings = await res.json();
     if (!Array.isArray(allBookings)) throw new Error('load failed');
     renderBookings(allBookings);
-    // Update badge
-    const pending = allBookings.filter(b => b.status === 'pending').length;
+
+    // Stats
+    const pending   = allBookings.filter(b => b.status === 'pending').length;
+    const confirmed = allBookings.filter(b => b.status === 'confirmed').length;
+    const cancelled = allBookings.filter(b => b.status === 'cancelled' || b.status === 'rejected').length;
+    document.getElementById('bkTotal').textContent     = allBookings.length;
+    document.getElementById('bkPending').textContent   = pending;
+    document.getElementById('bkConfirmed').textContent = confirmed;
+    document.getElementById('bkCancelled').textContent = cancelled;
+
+    // Badge
     const badge = document.getElementById('bookingBadge');
     if (pending > 0) { badge.textContent = pending; badge.style.display = 'inline'; }
     else badge.style.display = 'none';
+
   } catch(e) {
     body.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:2rem;color:var(--danger);">❌ ໂຫລດ bookings ຜິດພາດ</td></tr>';
   }
@@ -1069,48 +1134,65 @@ async function loadBookings() {
 function renderBookings(bookings) {
   const body = document.getElementById('bookingsBody');
   if (!bookings.length) {
-    body.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:2rem;color:var(--muted);">ຍັງບໍ່ມີ booking</td></tr>';
+    body.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:3rem;color:var(--muted);">📭 ຍັງບໍ່ມີ booking</td></tr>';
     return;
   }
-  const typeEmoji = { activity:'🏔️', hotel:'🏨', taxi:'🚕', bike:'🛵' };
-  const statusStyle = {
+  const typeLabel = { activity:'🏔️ ກິດຈະກຳ', hotel:'🏨 ທີ່ພັກ', taxi:'🚕 ລົດ', bike:'🛵 ລົດຈັກ' };
+  const statusBadge = {
     pending:   'background:#fff8e1;color:#b8860b;',
     confirmed: 'background:#d4edda;color:#155724;',
-    cancelled: 'background:#ffdede;color:#c0392b;'
+    rejected:  'background:#ffdede;color:#c0392b;',
+    cancelled: 'background:#ffdede;color:#c0392b;',
   };
+  const statusLabel = {
+    pending:'⏳ ລໍຖ້າ', confirmed:'✅ ຢືນຢັນ', rejected:'❌ ປະຕິເສດ', cancelled:'❌ ຍົກເລີກ'
+  };
+
   body.innerHTML = bookings.map(b => `
-    <tr style="border-bottom:1px solid var(--border);">
-      <td style="padding:10px 12px;color:var(--muted);font-size:0.78rem;">#${b.id}</td>
-      <td style="padding:10px 12px;">${typeEmoji[b.booking_type]||'📋'} ${b.booking_type}</td>
-      <td style="padding:10px 12px;font-weight:600;">${b.name}<br><span style="font-size:0.75rem;color:var(--muted);">${b.place_name||''}</span></td>
-      <td style="padding:10px 12px;">
-        <a href="tel:${b.phone}" style="color:var(--accent);">${b.phone}</a>
+    <tr style="border-bottom:1px solid rgba(255,255,255,0.05);">
+      <td style="padding:12px;color:var(--muted);font-size:0.75rem;white-space:nowrap;">
+        #${String(b.id).slice(0,8).toUpperCase()}
       </td>
-      <td style="padding:10px 12px;">${b.date}</td>
-      <td style="padding:10px 12px;font-size:0.8rem;color:var(--muted);">
-        ${b.booking_type==='taxi' ? `📍 ${b.pickup||''} → ${b.dropoff||''}` : ''}
-        ${b.booking_type==='bike' ? `🛵 ${b.bike_type||''} x${b.bike_qty||1}` : ''}
+      <td style="padding:12px;font-size:0.85rem;">
+        ${typeLabel[b.booking_type]||b.booking_type}
+      </td>
+      <td style="padding:12px;">
+        <div style="font-weight:600;font-size:0.9rem;">${b.name||'-'}</div>
+        <div style="font-size:0.75rem;color:var(--muted);">${b.email||'<span style="color:#ff6b6b">ບໍ່ມີ email</span>'}</div>
+        ${b.place_name ? `<div style="font-size:0.75rem;color:var(--accent);">📍 ${b.place_name}</div>` : ''}
+      </td>
+      <td style="padding:12px;">
+        <a href="tel:${b.phone}" style="color:var(--accent);font-size:0.88rem;">${b.phone||'-'}</a>
+        ${b.whatsapp ? `<br><a href="https://wa.me/${b.whatsapp?.replace(/\D/g,'')}" target="_blank" style="color:#25d366;font-size:0.75rem;">💬 WA</a>` : ''}
+      </td>
+      <td style="padding:12px;font-size:0.85rem;white-space:nowrap;">${b.date||'-'}</td>
+      <td style="padding:12px;font-size:0.78rem;color:var(--muted);max-width:200px;">
+        ${b.booking_type==='taxi' ? `📍 ${b.pickup||''} → ${b.dropoff||''}${b.car_type?'<br>🚗 '+b.car_type:''}` : ''}
+        ${b.booking_type==='bike' ? `🛵 ${b.bike_type||''} x${b.bike_qty||1}${b.return_date?'<br>📅 ຄືນ: '+b.return_date:''}` : ''}
         ${b.booking_type==='hotel' ? `🛏️ ${b.room_type||''}` : ''}
-        ${b.persons ? `👥 ${b.persons} ຄົນ` : ''}
+        ${b.persons ? `<br>👥 ${b.persons} ຄົນ` : ''}
         ${b.notes ? `<br>📝 ${b.notes}` : ''}
       </td>
-      <td style="padding:10px 12px;">
-        <span style="padding:3px 10px;border-radius:99px;font-size:0.75rem;font-weight:700;${statusStyle[b.status]||''}">
-          ${b.status}
+      <td style="padding:12px;">
+        <span style="padding:4px 10px;border-radius:99px;font-size:0.75rem;font-weight:700;${statusBadge[b.status]||''}">
+          ${statusLabel[b.status]||b.status}
         </span>
-      </td>
-      <td style="padding:10px 12px;">
-        <div style="display:flex;gap:6px;">
-          ${b.status==='pending' ? `
-          <button onclick="updateBookingStatus(${b.id},'confirmed')"
-            style="padding:4px 10px;background:#d4edda;color:#155724;border:none;border-radius:6px;font-size:0.75rem;cursor:pointer;font-family:inherit;font-weight:700;">
-            ✅
-          </button>
-          <button onclick="updateBookingStatus(${b.id},'cancelled')"
-            style="padding:4px 10px;background:#ffdede;color:#c0392b;border:none;border-radius:6px;font-size:0.75rem;cursor:pointer;font-family:inherit;font-weight:700;">
-            ❌
-          </button>` : ''}
+        <div style="font-size:0.7rem;color:var(--muted);margin-top:4px;">
+          ${new Date(b.created_at).toLocaleDateString('lo-LA')}
         </div>
+      </td>
+      <td style="padding:12px;">
+        ${b.status==='pending' ? `
+        <div style="display:flex;gap:6px;">
+          <button onclick="updateBookingStatus('${b.id}','confirmed')"
+            style="padding:6px 14px;background:#d4edda;color:#155724;border:none;border-radius:8px;font-size:0.8rem;cursor:pointer;font-family:inherit;font-weight:700;white-space:nowrap;">
+            ✅ ຢືນຢັນ
+          </button>
+          <button onclick="updateBookingStatus('${b.id}','rejected')"
+            style="padding:6px 14px;background:#ffdede;color:#c0392b;border:none;border-radius:8px;font-size:0.8rem;cursor:pointer;font-family:inherit;font-weight:700;white-space:nowrap;">
+            ❌ ປະຕິເສດ
+          </button>
+        </div>` : '<span style="color:var(--muted);font-size:0.8rem;">-</span>'}
       </td>
     </tr>
   `).join('');
@@ -1126,12 +1208,29 @@ function filterBookings() {
 }
 
 async function updateBookingStatus(id, status) {
+  // 1. Update Supabase
   const res = await fetch(`${SUPABASE_URL}/rest/v1/bookings?id=eq.${id}`, {
     method: 'PATCH',
     headers: authHeaders({ 'Content-Type': 'application/json', 'Prefer': 'return=minimal' }),
     body: JSON.stringify({ status })
   });
-  if (res.ok) { showToast(status === 'confirmed' ? '✅ Confirmed!' : '❌ Cancelled', 'success'); loadBookings(); }
+  if (!res.ok) { showToast('❌ ອັບເດດຜິດພາດ', 'error'); return; }
+
+  showToast(status === 'confirmed' ? '✅ ຢືນຢັນແລ້ວ — ກຳລັງສົ່ງ Email...' : '❌ ປະຕິເສດແລ້ວ — ກຳລັງສົ່ງ Email...', 'success');
+
+  // 2. Trigger n8n webhook ສົ່ງ Email ຫາລູກຄ້າ
+  try {
+    await fetch(N8N_BOOKING_WEBHOOK, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ bookingId: id, action: status })
+    });
+  } catch(e) {
+    console.warn('n8n webhook error:', e);
+    // ບໍ່ block — Supabase update ສຳເລັດແລ້ວ
+  }
+
+  loadBookings();
 }
 
 function switchTab(tab) {
