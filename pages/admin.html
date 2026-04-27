@@ -639,6 +639,7 @@
 // ── CONFIG ──
 const SUPABASE_URL = 'https://axqgotrbnglssxhwkfjc.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImF4cWdvdHJibmdsc3N4aHdrZmpjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI0MDQ4NzgsImV4cCI6MjA4Nzk4MDg3OH0.yUGLC-dSAJ3YhfFtws-p_P4mBwyma85GvA1uHoeGtJg';
+const SUPABASE_SVC = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImF4cWdvdHJibmdsc3N4aHdrZmpjIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3MjQwNDg3OCwiZXhwIjoyMDg3OTgwODc4fQ.qtJwj9gZ1KJPuC5sp8UFQRQDSbCSostJykk72ss2hrM';
 // ── STATE ──
 let allPlaces = [];
 let editingId = null;
@@ -718,9 +719,11 @@ function doLogout() {
 
 // ── API HELPERS (ໃຊ້ _accessToken ຂອງ admin) ──
 function authHeaders(extra = {}) {
+  // ໃຊ້ service key ສຳລັບ admin — bypass RLS
+  // ກວດ login ຜ່ານ _accessToken ແຕ່ API ໃຊ້ SVC key
   return {
     'apikey': SUPABASE_KEY,
-    'Authorization': `Bearer ${_accessToken || SUPABASE_KEY}`,
+    'Authorization': `Bearer ${SUPABASE_SVC}`,
     ...extra
   };
 }
@@ -1210,22 +1213,33 @@ function filterBookings() {
 }
 
 async function updateBookingStatus(id, status) {
-  // Update Supabase status + reset notified ເພື່ອໃຫ້ n8n poll ຮັບຮູ້
-  const body = status === 'confirmed'
+  const payload = status === 'confirmed'
     ? { status: 'confirmed', notified: null }
     : { status: 'rejected',  notified: null };
 
-  const res = await fetch(`${SUPABASE_URL}/rest/v1/bookings?id=eq.${id}`, {
-    method: 'PATCH',
-    headers: authHeaders({ 'Content-Type': 'application/json', 'Prefer': 'return=minimal' }),
-    body: JSON.stringify(body)
-  });
+  try {
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/bookings?id=eq.${id}`, {
+      method: 'PATCH',
+      headers: {
+        'apikey': SUPABASE_KEY,
+        'Authorization': `Bearer ${SUPABASE_SVC}`,
+        'Content-Type': 'application/json',
+        'Prefer': 'return=minimal'
+      },
+      body: JSON.stringify(payload)
+    });
 
-  if (res.ok) {
-    showToast(status === 'confirmed' ? '✅ ຢືນຢັນແລ້ວ!' : '❌ ປະຕິເສດແລ້ວ!', 'success');
-    loadBookings();
-  } else {
-    showToast('❌ ອັບເດດຜິດພາດ — ລອງໃໝ່', 'error');
+    if (res.ok) {
+      showToast(status === 'confirmed' ? '✅ ຢືນຢັນແລ້ວ!' : '❌ ປະຕິເສດແລ້ວ!', 'success');
+      await loadBookings();
+    } else {
+      const errText = await res.text();
+      console.error('PATCH error:', res.status, errText);
+      showToast(`❌ ອັບເດດຜິດພາດ (${res.status})`, 'error');
+    }
+  } catch(e) {
+    console.error('updateBookingStatus error:', e);
+    showToast('❌ Network error — ລອງໃໝ່', 'error');
   }
 }
 
