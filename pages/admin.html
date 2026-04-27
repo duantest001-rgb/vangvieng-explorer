@@ -807,7 +807,9 @@ function renderStats() {
 
   // Category breakdown
   const cats = { attraction:'🏔️ ສະຖານທີ່', hotel:'🏨 ທີ່ພັກ', restaurant:'🍜 ອາຫານ', activity:'🛶 ກິດຈະກຳ' };
-  document.getElementById('catBreakdown').innerHTML = Object.entries(cats).map(([key, label]) => {
+  const catBreakdownEl = document.getElementById('catBreakdown');
+  if (!catBreakdownEl) return;
+  catBreakdownEl.innerHTML = Object.entries(cats).map(([key, label]) => {
     const count = allPlaces.filter(p => p.category === key).length;
     const pct   = allPlaces.length ? Math.round((count / allPlaces.length) * 100) : 0;
     return `
@@ -1208,29 +1210,23 @@ function filterBookings() {
 }
 
 async function updateBookingStatus(id, status) {
-  // 1. Update Supabase
+  // Update Supabase status + reset notified ເພື່ອໃຫ້ n8n poll ຮັບຮູ້
+  const body = status === 'confirmed'
+    ? { status: 'confirmed', notified: null }
+    : { status: 'rejected',  notified: null };
+
   const res = await fetch(`${SUPABASE_URL}/rest/v1/bookings?id=eq.${id}`, {
     method: 'PATCH',
     headers: authHeaders({ 'Content-Type': 'application/json', 'Prefer': 'return=minimal' }),
-    body: JSON.stringify({ status })
+    body: JSON.stringify(body)
   });
-  if (!res.ok) { showToast('❌ ອັບເດດຜິດພາດ', 'error'); return; }
 
-  showToast(status === 'confirmed' ? '✅ ຢືນຢັນແລ້ວ — ກຳລັງສົ່ງ Email...' : '❌ ປະຕິເສດແລ້ວ — ກຳລັງສົ່ງ Email...', 'success');
-
-  // 2. Trigger n8n webhook ສົ່ງ Email ຫາລູກຄ້າ
-  try {
-    await fetch(N8N_BOOKING_WEBHOOK, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ bookingId: id, action: status })
-    });
-  } catch(e) {
-    console.warn('n8n webhook error:', e);
-    // ບໍ່ block — Supabase update ສຳເລັດແລ້ວ
+  if (res.ok) {
+    showToast(status === 'confirmed' ? '✅ ຢືນຢັນແລ້ວ!' : '❌ ປະຕິເສດແລ້ວ!', 'success');
+    loadBookings();
+  } else {
+    showToast('❌ ອັບເດດຜິດພາດ — ລອງໃໝ່', 'error');
   }
-
-  loadBookings();
 }
 
 function switchTab(tab) {
